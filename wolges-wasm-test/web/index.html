@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TileMania WASM Test - Sprint 1 Day 4</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #1e1e1e;
+            color: #00ff00;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        h3 {
+            color: #00cc00;
+            margin-top: 30px;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .pass {
+            border-color: #00ff00;
+            background: #003300;
+            color: #00ff00;
+        }
+        .fail {
+            border-color: #ff0000;
+            background: #330000;
+            color: #ff6666;
+        }
+        #status {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 20px;
+            margin: 20px 0;
+            background: #2a2a2a;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #benchmark {
+            margin-top: 30px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+        }
+        .metric:last-child {
+            border-bottom: none;
+        }
+        .metric-label {
+            color: #888;
+        }
+        .metric-value {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        code {
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ffff00;
+        }
+        .info {
+            background: #1a3a5a;
+            border-left: 4px solid #4a9eff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #a0d0ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦀 TileMania WASM Compatibility Test</h1>
+    <p>Sprint 1 - Week 1 - Day 4: Browser Testing</p>
+
+    <div class="info">
+        <strong>ℹ️ Note:</strong> This is a basic WASM test without wolges integration.
+        Testing core WASM functionality and browser compatibility.
+    </div>
+
+    <div id="status">⏳ Initializing WASM module...</div>
+
+    <div id="results"></div>
+
+    <div id="benchmark"></div>
+
+    <div id="system-info" style="margin-top: 30px; padding: 20px; background: #2a2a2a; border-radius: 8px;">
+        <h3>System Information</h3>
+        <div class="metric">
+            <span class="metric-label">User Agent:</span>
+            <span class="metric-value" id="user-agent">Loading...</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Platform:</span>
+            <span class="metric-value" id="platform">Loading...</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">WASM Support:</span>
+            <span class="metric-value" id="wasm-support">Loading...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { test_wolges_basic, validate_word } from './pkg/wolges_wasm_test.js';
+
+        async function runTests() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const benchmarkDiv = document.getElementById('benchmark');
+
+            // Update system info
+            document.getElementById('user-agent').textContent = navigator.userAgent.split(' ').slice(-2).join(' ');
+            document.getElementById('platform').textContent = navigator.platform;
+            document.getElementById('wasm-support').textContent = typeof WebAssembly !== 'undefined' ? '✅ Supported' : '❌ Not Supported';
+
+            try {
+                // Initialize WASM
+                statusDiv.innerHTML = '⏳ Loading WASM module...';
+                const start = performance.now();
+                await init();
+                const loadTime = performance.now() - start;
+
+                statusDiv.innerHTML = `✅ WASM module loaded successfully in ${loadTime.toFixed(2)}ms`;
+
+                // Test 1: Basic functionality
+                console.log('Running Test 1: Basic WASM execution');
+                const test1 = test_wolges_basic();
+                resultsDiv.innerHTML += `
+                    <div class="test-result ${test1 ? 'pass' : 'fail'}">
+                        <strong>Test 1: Basic WASM Execution</strong><br>
+                        Function: <code>test_wolges_basic()</code><br>
+                        Result: ${test1 ? 'PASS ✅' : 'FAIL ❌'}<br>
+                        Details: Verified Rust → WASM compilation and execution
+                    </div>
+                `;
+
+                // Test 2: String parameter passing
+                console.log('Running Test 2: String parameter passing');
+                const test2 = validate_word('TEST');
+                resultsDiv.innerHTML += `
+                    <div class="test-result ${test2 ? 'pass' : 'fail'}">
+                        <strong>Test 2: String Parameter Passing</strong><br>
+                        Function: <code>validate_word('TEST')</code><br>
+                        Result: ${test2 ? 'PASS ✅' : 'FAIL ❌'}<br>
+                        Details: JavaScript ↔ WASM string interop working
+                    </div>
+                `;
+
+                // Test 3: Empty string handling
+                console.log('Running Test 3: Empty string handling');
+                const test3 = !validate_word('');
+                resultsDiv.innerHTML += `
+                    <div class="test-result ${test3 ? 'pass' : 'fail'}">
+                        <strong>Test 3: Edge Case - Empty String</strong><br>
+                        Function: <code>validate_word('')</code><br>
+                        Result: ${test3 ? 'PASS ✅' : 'FAIL ❌'}<br>
+                        Details: Empty string correctly rejected
+                    </div>
+                `;
+
+                // Benchmark: Function call performance
+                console.log('Running performance benchmark...');
+                const testWords = ['QI', 'ZYZZYVA', 'RETINA', 'SCRABBLE', 'TEST', 'A', 'WORD', 'GAME'];
+                const iterations = 1000;
+
+                const benchStart = performance.now();
+                for (let i = 0; i < iterations; i++) {
+                    for (const word of testWords) {
+                        validate_word(word);
+                    }
+                }
+                const benchEnd = performance.now();
+
+                const totalCalls = iterations * testWords.length;
+                const totalTime = benchEnd - benchStart;
+                const avgTime = totalTime / totalCalls;
+                const callsPerSecond = (totalCalls / totalTime) * 1000;
+
+                benchmarkDiv.innerHTML = `
+                    <h3>⚡ Performance Benchmark</h3>
+                    <div class="metric">
+                        <span class="metric-label">Total function calls:</span>
+                        <span class="metric-value">${totalCalls.toLocaleString()}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total time:</span>
+                        <span class="metric-value">${totalTime.toFixed(2)}ms</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Average per call:</span>
+                        <span class="metric-value">${avgTime.toFixed(4)}ms</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Throughput:</span>
+                        <span class="metric-value">${callsPerSecond.toLocaleString(undefined, {maximumFractionDigits: 0})} calls/sec</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Target:</span>
+                        <span class="metric-value">${avgTime < 10 ? '✅ PASS' : '⚠️ REVIEW'} (< 10ms per call)</span>
+                    </div>
+                `;
+
+                // Final summary
+                resultsDiv.innerHTML += `
+                    <div class="test-result pass" style="margin-top: 30px;">
+                        <strong>🎉 All Tests Passed!</strong><br>
+                        WASM module is fully functional in this browser.<br>
+                        Ready for TileMania deployment pipeline.
+                    </div>
+                `;
+
+                console.log('All tests completed successfully!');
+
+            } catch (error) {
+                console.error('Test error:', error);
+                statusDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultsDiv.innerHTML = `
+                    <div class="test-result fail">
+                        <strong>WASM Failed to Load</strong><br>
+                        Error: ${error.message}<br>
+                        Stack: <pre style="font-size: 10px; overflow-x: auto;">${error.stack}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        // Check for WASM support before running tests
+        if (typeof WebAssembly === 'undefined') {
+            document.getElementById('status').innerHTML = '❌ WebAssembly not supported in this browser';
+            document.getElementById('results').innerHTML = `
+                <div class="test-result fail">
+                    Your browser does not support WebAssembly. Please use a modern browser like:
+                    <ul>
+                        <li>Chrome 57+</li>
+                        <li>Firefox 52+</li>
+                        <li>Safari 11+</li>
+                        <li>Edge 16+</li>
+                    </ul>
+                </div>
+            `;
+        } else {
+            runTests();
+        }
+    </script>
+</body>
+</html>

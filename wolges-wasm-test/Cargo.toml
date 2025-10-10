@@ -1,0 +1,14 @@
+[package]
+name = "wolges-wasm-test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# wolges = { git = "https://github.com/andy-k/wolges.git" }  # Temporarily disabled for basic WASM test
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

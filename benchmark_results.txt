@@ -1,0 +1,10 @@
+TileMania KWG Benchmark Results
+Date: Khamis 09 Okt 2025 11:45:46  +08
+File: assets/lexicons/CSW24.kwg (4.82 MB)
+
+Cold read:  51.112 ms
+Warm read:  15.494 ms (avg of 10)
+Throughput: 120.50 MB/s
+
+System: Linux messier45-station 6.8.0-85-generic #85~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep 19 16:18:59 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+Disk: /dev/mmcblk0p2   29G   22G  4.8G  82% /
