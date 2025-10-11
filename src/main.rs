@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 
 mod plugins;
+mod ui;
+
 use plugins::{CorePlugin, StatePlugin, AssetPlugin, InputPlugin};
+use ui::UiPlugin;
 
 fn main() {
     App::new()
@@ -18,6 +21,7 @@ fn main() {
             StatePlugin,
             AssetPlugin,
             InputPlugin,
+            UiPlugin,
         ))
         .run();
 }
