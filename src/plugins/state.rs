@@ -24,11 +24,10 @@ impl Plugin for StatePlugin {
     }
 }
 
-fn enter_splash(mut next_state: ResMut<NextState<GameState>>) {
+fn enter_splash() {
     info!("📺 Entering Splash screen");
-    // Auto-transition to main menu
-    // In future sprints, will add 2-second timer with logo animation
-    next_state.set(GameState::MainMenu);
+    // Asset loading will trigger transition to MainMenu
+    // (handled in splash.rs update_splash function)
 }
 
 fn enter_main_menu() {
