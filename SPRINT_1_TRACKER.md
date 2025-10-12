@@ -366,7 +366,35 @@ All Week 1 validation objectives achieved:
 
 ---
 
-**Last Updated:** 2025-10-10 (Days 6-8 complete - Week 2 Days 1-3 COMPLETE)
-**Next Update:** Day 9 (Input Enhancement)
+### Thursday (Day 9) - 2025-10-10
+
+**Status:** ✅ COMPLETE
+
+**Tasks:**
+- [x] Define InputAction enum (14 actions total)
+- [x] Create action-based input mapping system
+- [x] Map 18 keyboard keys to actions
+- [x] Map mouse buttons to actions (Select, Cancel, PlaceTile)
+- [x] Add helper methods (action_just_pressed, get_actions)
+- [x] Implement frame-based action clearing
+- [x] Support multi-action per key (context-dependent)
+- [x] Document Day 9 completion
+
+**Blockers:** None
+
+**Notes:**
+- Input abstraction layer complete with 14 game actions
+- Actions: Navigation (4), Selection (2), UI (2), Game (5), System (3)
+- Multi-action support: ESC → Cancel + Pause, S → Settings + SwapTiles + MoveDown
+- Frame-based clearing prevents stale input
+- Helper methods ready for Sprint 2+ gameplay systems
+- Clean compilation: 2.76s (0 errors, 0 warnings)
+- Created DAY9_COMPLETION_SUMMARY.md
+- Ready for Day 10: Final Integration & Testing
+
+---
+
+**Last Updated:** 2025-10-10 (Days 6-9 complete - Week 2 Days 1-4 COMPLETE)
+**Next Update:** Day 10 (Integration & Testing - Sprint 1 Finale)
 **Owner:** Tech Lead
-**Status:** 🟢 WEEK 1 COMPLETE, WEEK 2 60% COMPLETE (Days 6-8)
+**Status:** 🟢 WEEK 1 COMPLETE, WEEK 2 80% COMPLETE (Days 6-9)
