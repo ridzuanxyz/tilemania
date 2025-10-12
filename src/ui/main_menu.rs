@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
+use super::components::{ButtonComponent, ButtonSize, ButtonVariant};
 
 #[derive(Component)]
 pub struct MainMenuScreen;
@@ -55,107 +56,78 @@ pub fn update_main_menu(
 }
 
 fn spawn_main_menu_ui(commands: &mut Commands) {
-    commands
-        .spawn((
-            Node {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                flex_direction: FlexDirection::Column,
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                row_gap: Val::Px(20.0),
-                ..default()
-            },
-            BackgroundColor(Color::srgb(0.15, 0.15, 0.2)),
-            MainMenuScreen,
-        ))
-        .with_children(|parent| {
-            // Title
-            parent.spawn((
-                Text::new("📚 TileMania"),
-                TextFont {
-                    font_size: 80.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.9, 0.9, 1.0)),
-            ));
+    let screen_id = commands.spawn((
+        Node {
+            width: Val::Percent(100.0),
+            height: Val::Percent(100.0),
+            flex_direction: FlexDirection::Column,
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            row_gap: Val::Px(20.0),
+            ..default()
+        },
+        BackgroundColor(Color::srgb(0.15, 0.15, 0.2)),
+        MainMenuScreen,
+    )).id();
 
-            // Subtitle
-            parent.spawn((
-                Text::new("Scrabble Learning Game"),
-                TextFont {
-                    font_size: 30.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.7, 0.7, 0.8)),
-                Node {
-                    margin: UiRect::bottom(Val::Px(40.0)),
-                    ..default()
-                },
-            ));
+    // Title
+    let title = commands.spawn((
+        Text::new("📚 TileMania"),
+        TextFont {
+            font_size: 80.0,
+            ..default()
+        },
+        TextColor(Color::srgb(0.9, 0.9, 1.0)),
+    )).id();
+    commands.entity(screen_id).add_child(title);
 
-            // Play button
-            parent
-                .spawn((
-                    Button,
-                    Node {
-                        width: Val::Px(300.0),
-                        height: Val::Px(80.0),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BackgroundColor(Color::srgb(0.2, 0.6, 0.3)),
-                    PlayButton,
-                ))
-                .with_children(|button| {
-                    button.spawn((
-                        Text::new("▶ Play (SPACE)"),
-                        TextFont {
-                            font_size: 40.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
-                });
+    // Subtitle
+    let subtitle = commands.spawn((
+        Text::new("Scrabble Learning Game"),
+        TextFont {
+            font_size: 30.0,
+            ..default()
+        },
+        TextColor(Color::srgb(0.7, 0.7, 0.8)),
+        Node {
+            margin: UiRect::bottom(Val::Px(40.0)),
+            ..default()
+        },
+    )).id();
+    commands.entity(screen_id).add_child(subtitle);
 
-            // Settings button
-            parent
-                .spawn((
-                    Button,
-                    Node {
-                        width: Val::Px(300.0),
-                        height: Val::Px(80.0),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BackgroundColor(Color::srgb(0.4, 0.4, 0.5)),
-                    SettingsButton,
-                ))
-                .with_children(|button| {
-                    button.spawn((
-                        Text::new("⚙ Settings (S)"),
-                        TextFont {
-                            font_size: 40.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
-                });
+    // Play button (using new ButtonComponent)
+    let play_button = ButtonComponent::spawn(
+        commands,
+        "▶ Play (SPACE)",
+        ButtonSize::Large,
+        ButtonVariant::Primary,
+        PlayButton,
+    );
+    commands.entity(screen_id).add_child(play_button);
 
-            // Instructions
-            parent.spawn((
-                Text::new("Press SPACE to start | S for Settings | ESC to quit"),
-                TextFont {
-                    font_size: 20.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.5, 0.5, 0.6)),
-                Node {
-                    margin: UiRect::top(Val::Px(40.0)),
-                    ..default()
-                },
-            ));
-        });
+    // Settings button (using new ButtonComponent)
+    let settings_button = ButtonComponent::spawn(
+        commands,
+        "⚙ Settings (S)",
+        ButtonSize::Large,
+        ButtonVariant::Secondary,
+        SettingsButton,
+    );
+    commands.entity(screen_id).add_child(settings_button);
+
+    // Instructions
+    let instructions = commands.spawn((
+        Text::new("Press SPACE to start | S for Settings | ESC to quit"),
+        TextFont {
+            font_size: 20.0,
+            ..default()
+        },
+        TextColor(Color::srgb(0.5, 0.5, 0.6)),
+        Node {
+            margin: UiRect::top(Val::Px(40.0)),
+            ..default()
+        },
+    )).id();
+    commands.entity(screen_id).add_child(instructions);
 }
