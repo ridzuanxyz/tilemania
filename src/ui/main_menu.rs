@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
-use super::components::{ButtonComponent, ButtonSize, ButtonVariant};
+use super::components::{ButtonComponent, ButtonSize, ButtonVariant, TextComponent, TextStyle, TextColorVariant};
 
 #[derive(Component)]
 pub struct MainMenuScreen;
@@ -70,30 +70,26 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         MainMenuScreen,
     )).id();
 
-    // Title
-    let title = commands.spawn((
-        Text::new("📚 TileMania"),
-        TextFont {
-            font_size: 80.0,
-            ..default()
-        },
-        TextColor(Color::srgb(0.9, 0.9, 1.0)),
-    )).id();
+    // Title (using TextComponent)
+    let title = TextComponent::spawn(
+        commands,
+        "📚 TileMania",
+        TextStyle::Title,
+        TextColorVariant::Accent,
+    );
     commands.entity(screen_id).add_child(title);
 
-    // Subtitle
-    let subtitle = commands.spawn((
-        Text::new("Scrabble Learning Game"),
-        TextFont {
-            font_size: 30.0,
-            ..default()
-        },
-        TextColor(Color::srgb(0.7, 0.7, 0.8)),
+    // Subtitle (using TextComponent with custom node)
+    let subtitle = TextComponent::spawn_with_node(
+        commands,
+        "Scrabble Learning Game",
+        TextStyle::Subheading,
+        TextColorVariant::Secondary,
         Node {
             margin: UiRect::bottom(Val::Px(40.0)),
             ..default()
         },
-    )).id();
+    );
     commands.entity(screen_id).add_child(subtitle);
 
     // Play button (using new ButtonComponent)
@@ -116,18 +112,16 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
     );
     commands.entity(screen_id).add_child(settings_button);
 
-    // Instructions
-    let instructions = commands.spawn((
-        Text::new("Press SPACE to start | S for Settings | ESC to quit"),
-        TextFont {
-            font_size: 20.0,
-            ..default()
-        },
-        TextColor(Color::srgb(0.5, 0.5, 0.6)),
+    // Instructions (using TextComponent)
+    let instructions = TextComponent::spawn_with_node(
+        commands,
+        "Press SPACE to start | S for Settings | ESC to quit",
+        TextStyle::Caption,
+        TextColorVariant::Muted,
         Node {
             margin: UiRect::top(Val::Px(40.0)),
             ..default()
         },
-    )).id();
+    );
     commands.entity(screen_id).add_child(instructions);
 }

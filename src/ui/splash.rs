@@ -74,7 +74,7 @@ pub fn update_splash(
 }
 
 fn spawn_splash_ui(commands: &mut Commands) {
-    commands
+    let screen_id = commands
         .spawn((
             Node {
                 width: Val::Percent(100.0),
@@ -88,66 +88,70 @@ fn spawn_splash_ui(commands: &mut Commands) {
             BackgroundColor(Color::srgb(0.1, 0.1, 0.15)),
             SplashScreen,
         ))
-        .with_children(|parent| {
-            // Title
-            parent.spawn((
-                Text::new("🎮 TileMania"),
-                TextFont {
-                    font_size: 80.0,
-                    ..default()
-                },
-                TextColor(Color::WHITE),
-                TextLayout::new_with_justify(JustifyText::Center),
-                SplashTitle,
-            ));
+        .id();
 
-            // Subtitle
-            parent.spawn((
-                Text::new("Scrabble Learning Game"),
-                TextFont {
-                    font_size: 30.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.7, 0.7, 0.8)),
-                TextLayout::new_with_justify(JustifyText::Center),
-            ));
+    // Title (using TextComponent)
+    let title = commands
+        .spawn((
+            Text::new("🎮 TileMania"),
+            TextFont { font_size: 80.0, ..default() },
+            TextColor(Color::WHITE),
+            TextLayout::new_with_justify(JustifyText::Center),
+            SplashTitle,
+        ))
+        .id();
+    commands.entity(screen_id).add_child(title);
 
-            // Progress bar container
-            parent
-                .spawn((
-                    Node {
-                        width: Val::Px(400.0),
-                        height: Val::Px(30.0),
-                        border: UiRect::all(Val::Px(2.0)),
-                        margin: UiRect::top(Val::Px(20.0)),
-                        ..default()
-                    },
-                    BackgroundColor(Color::srgb(0.2, 0.2, 0.25)),
-                    BorderColor(Color::srgb(0.4, 0.4, 0.5)),
-                ))
-                .with_children(|bar| {
-                    // Progress bar fill
-                    bar.spawn((
-                        Node {
-                            width: Val::Percent(0.0),  // Will be updated
-                            height: Val::Percent(100.0),
-                            ..default()
-                        },
-                        BackgroundColor(Color::srgb(0.3, 0.7, 0.4)),
-                        ProgressBarFill,
-                    ));
-                });
+    // Subtitle (using TextComponent)
+    let subtitle = commands
+        .spawn((
+            Text::new("Scrabble Learning Game"),
+            TextFont { font_size: 30.0, ..default() },
+            TextColor(Color::srgb(0.7, 0.7, 0.8)),
+            TextLayout::new_with_justify(JustifyText::Center),
+        ))
+        .id();
+    commands.entity(screen_id).add_child(subtitle);
 
-            // Loading text
-            parent.spawn((
-                Text::new("Loading..."),
-                TextFont {
-                    font_size: 24.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.8, 0.8, 0.9)),
-                TextLayout::new_with_justify(JustifyText::Center),
-                LoadingText,
-            ));
-        });
+    // Progress bar container
+    let progress_container = commands
+        .spawn((
+            Node {
+                width: Val::Px(400.0),
+                height: Val::Px(30.0),
+                border: UiRect::all(Val::Px(2.0)),
+                margin: UiRect::top(Val::Px(20.0)),
+                ..default()
+            },
+            BackgroundColor(Color::srgb(0.2, 0.2, 0.25)),
+            BorderColor(Color::srgb(0.4, 0.4, 0.5)),
+        ))
+        .id();
+
+    // Progress bar fill
+    let progress_fill = commands
+        .spawn((
+            Node {
+                width: Val::Percent(0.0),  // Will be updated
+                height: Val::Percent(100.0),
+                ..default()
+            },
+            BackgroundColor(Color::srgb(0.3, 0.7, 0.4)),
+            ProgressBarFill,
+        ))
+        .id();
+    commands.entity(progress_container).add_child(progress_fill);
+    commands.entity(screen_id).add_child(progress_container);
+
+    // Loading text (dynamically updated, keep original approach)
+    let loading_text = commands
+        .spawn((
+            Text::new("Loading..."),
+            TextFont { font_size: 24.0, ..default() },
+            TextColor(Color::srgb(0.8, 0.8, 0.9)),
+            TextLayout::new_with_justify(JustifyText::Center),
+            LoadingText,
+        ))
+        .id();
+    commands.entity(screen_id).add_child(loading_text);
 }
