@@ -6,6 +6,8 @@ pub enum GameState {
     Splash,
     MainMenu,
     GameBoard,
+    Stage1Playing,
+    Stage1Paused,
     Results,
     Settings,
 }

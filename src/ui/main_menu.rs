@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
-use super::components::{ButtonComponent, ButtonSize, ButtonVariant, TextComponent, TextStyle, TextColorVariant};
+use super::components::{
+    ButtonComponent, ButtonSize, ButtonVariant,
+    TextComponent, TextStyle, TextColorVariant,
+    Stack, StackDirection, Spacing, Alignment,
+};
 
 #[derive(Component)]
 pub struct MainMenuScreen;
@@ -56,19 +60,24 @@ pub fn update_main_menu(
 }
 
 fn spawn_main_menu_ui(commands: &mut Commands) {
+    // Create main screen container with centered vertical stack
     let screen_id = commands.spawn((
         Node {
             width: Val::Percent(100.0),
             height: Val::Percent(100.0),
-            flex_direction: FlexDirection::Column,
-            justify_content: JustifyContent::Center,
-            align_items: AlignItems::Center,
-            row_gap: Val::Px(20.0),
             ..default()
         },
         BackgroundColor(Color::srgb(0.15, 0.15, 0.2)),
         MainMenuScreen,
     )).id();
+
+    // Create centered vertical stack for content
+    let stack_id = Stack::spawn_centered(
+        commands,
+        StackDirection::Vertical,
+        Spacing::MD,
+    );
+    commands.entity(screen_id).add_child(stack_id);
 
     // Title (using TextComponent)
     let title = TextComponent::spawn(
@@ -77,22 +86,22 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         TextStyle::Title,
         TextColorVariant::Accent,
     );
-    commands.entity(screen_id).add_child(title);
+    commands.entity(stack_id).add_child(title);
 
-    // Subtitle (using TextComponent with custom node)
-    let subtitle = TextComponent::spawn_with_node(
+    // Subtitle (using TextComponent)
+    let subtitle = TextComponent::spawn(
         commands,
         "Scrabble Learning Game",
         TextStyle::Subheading,
         TextColorVariant::Secondary,
-        Node {
-            margin: UiRect::bottom(Val::Px(40.0)),
-            ..default()
-        },
     );
-    commands.entity(screen_id).add_child(subtitle);
+    commands.entity(stack_id).add_child(subtitle);
 
-    // Play button (using new ButtonComponent)
+    // Spacer between subtitle and buttons
+    let spacer1 = Spacer::spawn_vertical(commands, Spacing::LG);
+    commands.entity(stack_id).add_child(spacer1);
+
+    // Play button (using ButtonComponent)
     let play_button = ButtonComponent::spawn(
         commands,
         "▶ Play (SPACE)",
@@ -100,9 +109,9 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         ButtonVariant::Primary,
         PlayButton,
     );
-    commands.entity(screen_id).add_child(play_button);
+    commands.entity(stack_id).add_child(play_button);
 
-    // Settings button (using new ButtonComponent)
+    // Settings button (using ButtonComponent)
     let settings_button = ButtonComponent::spawn(
         commands,
         "⚙ Settings (S)",
@@ -110,18 +119,18 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         ButtonVariant::Secondary,
         SettingsButton,
     );
-    commands.entity(screen_id).add_child(settings_button);
+    commands.entity(stack_id).add_child(settings_button);
+
+    // Spacer between buttons and instructions
+    let spacer2 = Spacer::spawn_vertical(commands, Spacing::LG);
+    commands.entity(stack_id).add_child(spacer2);
 
     // Instructions (using TextComponent)
-    let instructions = TextComponent::spawn_with_node(
+    let instructions = TextComponent::spawn(
         commands,
         "Press SPACE to start | S for Settings | ESC to quit",
         TextStyle::Caption,
         TextColorVariant::Muted,
-        Node {
-            margin: UiRect::top(Val::Px(40.0)),
-            ..default()
-        },
     );
-    commands.entity(screen_id).add_child(instructions);
+    commands.entity(stack_id).add_child(instructions);
 }

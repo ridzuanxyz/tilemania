@@ -2,9 +2,13 @@ use bevy::prelude::*;
 
 mod plugins;
 mod ui;
+mod lexicon;
+mod scoring;
+mod stage1;
 
 use plugins::{CorePlugin, StatePlugin, AssetPlugin, InputPlugin};
 use ui::UiPlugin;
+use stage1::Stage1Plugin;
 
 fn main() {
     App::new()
@@ -22,6 +26,7 @@ fn main() {
             AssetPlugin,
             InputPlugin,
             UiPlugin,
+            Stage1Plugin,
         ))
         .run();
 }
