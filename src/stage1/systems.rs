@@ -4,6 +4,8 @@ use bevy::prelude::*;
 use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};
+use super::visuals::{spawn_score_popup, spawn_particle_burst, TileColors, ValidationFlash};
+use super::powerups::{ActivePowerUps, get_fall_speed_multiplier};
 use crate::plugins::state::GameState;
 use crate::lexicon::Lexicon;
 use crate::scoring::ScoreCalculator;
@@ -88,16 +90,20 @@ pub fn spawn_falling_tiles(
 
 /// Updates falling tile positions
 pub fn update_falling_tiles(
-    mut query: Query<(&mut Transform, &FallingTile)>,
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Transform, &FallingTile)>,
     time: Res<Time>,
+    active_powerups: Res<ActivePowerUps>,
 ) {
-    for (mut transform, tile) in query.iter_mut() {
-        // Move tile downward
-        transform.translation.y -= tile.speed * time.delta_seconds();
+    let speed_multiplier = get_fall_speed_multiplier(&active_powerups);
+
+    for (entity, mut transform, tile) in query.iter_mut() {
+        // Move tile downward (with power-up speed modifier)
+        transform.translation.y -= tile.speed * speed_multiplier * time.delta_seconds();
 
         // Despawn if off-screen
         if transform.translation.y < -400.0 {
-            // TODO: Despawn entity (need Commands in this system)
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
@@ -148,7 +154,8 @@ pub fn validate_word(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut state: ResMut<Stage1State>,
     config: Res<Stage1Config>,
-    tile_query: Query<&FallingTile>,
+    tile_query: Query<(&FallingTile, &Transform)>,
+    asset_server: Res<AssetServer>,
 ) {
     if !keyboard.just_pressed(KeyCode::Space) && !keyboard.just_pressed(KeyCode::Enter) {
         return;
@@ -160,12 +167,21 @@ pub fn validate_word(
         return;
     }
 
-    // Build word from selected tiles
+    // Build word from selected tiles and get average position for effects
     let mut word = String::new();
+    let mut avg_position = Vec3::ZERO;
+    let mut tile_count = 0;
+
     for entity in &state.selected_tiles {
-        if let Ok(tile) = tile_query.get(*entity) {
+        if let Ok((tile, transform)) = tile_query.get(*entity) {
             word.push(tile.letter);
+            avg_position += transform.translation;
+            tile_count += 1;
         }
+    }
+
+    if tile_count > 0 {
+        avg_position /= tile_count as f32;
     }
 
     // Validate word
@@ -187,7 +203,20 @@ pub fn validate_word(
         state.combo_count += 1;
         state.words_found.push(word.to_uppercase());
 
-        // Despawn selected tiles
+        // Visual feedback for valid word
+        spawn_score_popup(&mut commands, &asset_server, avg_position, points, true);
+        spawn_particle_burst(&mut commands, avg_position, TileColors::VALID, 12);
+
+        // Add validation flash to tiles before despawning
+        for entity in &state.selected_tiles {
+            commands.entity(*entity).insert(ValidationFlash {
+                is_valid: true,
+                duration: 0.3,
+                elapsed: 0.0,
+            });
+        }
+
+        // Despawn selected tiles (after brief delay for flash)
         for entity in &state.selected_tiles {
             commands.entity(*entity).despawn_recursive();
         }
@@ -196,6 +225,18 @@ pub fn validate_word(
     } else {
         warn!("✗ Invalid word: {}", word);
         state.combo_count = 0; // Break combo on invalid word
+
+        // Visual feedback for invalid word
+        spawn_score_popup(&mut commands, &asset_server, avg_position, 0, false);
+
+        // Add validation flash to tiles (they stay on screen)
+        for entity in &state.selected_tiles {
+            commands.entity(*entity).insert(ValidationFlash {
+                is_valid: false,
+                duration: 0.5,
+                elapsed: 0.0,
+            });
+        }
     }
 
     clear_selection(&mut commands, &mut state);
