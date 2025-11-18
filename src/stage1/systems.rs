@@ -5,6 +5,7 @@ use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};
 use super::visuals::{spawn_score_popup, spawn_particle_burst, TileColors, ValidationFlash};
+use super::powerups::{ActivePowerUps, get_fall_speed_multiplier};
 use crate::plugins::state::GameState;
 use crate::lexicon::Lexicon;
 use crate::scoring::ScoreCalculator;
@@ -89,16 +90,20 @@ pub fn spawn_falling_tiles(
 
 /// Updates falling tile positions
 pub fn update_falling_tiles(
-    mut query: Query<(&mut Transform, &FallingTile)>,
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Transform, &FallingTile)>,
     time: Res<Time>,
+    active_powerups: Res<ActivePowerUps>,
 ) {
-    for (mut transform, tile) in query.iter_mut() {
-        // Move tile downward
-        transform.translation.y -= tile.speed * time.delta_seconds();
+    let speed_multiplier = get_fall_speed_multiplier(&active_powerups);
+
+    for (entity, mut transform, tile) in query.iter_mut() {
+        // Move tile downward (with power-up speed modifier)
+        transform.translation.y -= tile.speed * speed_multiplier * time.delta_seconds();
 
         // Despawn if off-screen
         if transform.translation.y < -400.0 {
-            // TODO: Despawn entity (need Commands in this system)
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
