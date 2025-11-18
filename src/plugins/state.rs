@@ -8,6 +8,8 @@ pub enum GameState {
     GameBoard,
     Stage1Playing,
     Stage1Paused,
+    Stage2Playing,
+    Stage2Paused,
     Results,
     Settings,
 }

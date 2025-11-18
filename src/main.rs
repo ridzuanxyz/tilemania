@@ -5,10 +5,12 @@ mod ui;
 mod lexicon;
 mod scoring;
 mod stage1;
+mod stage2;
 
 use plugins::{CorePlugin, StatePlugin, AssetPlugin, InputPlugin};
 use ui::UiPlugin;
 use stage1::Stage1Plugin;
+use stage2::Stage2Plugin;
 
 fn main() {
     App::new()
@@ -27,6 +29,7 @@ fn main() {
             InputPlugin,
             UiPlugin,
             Stage1Plugin,
+            Stage2Plugin,
         ))
         .run();
 }
