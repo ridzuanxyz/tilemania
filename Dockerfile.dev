@@ -1,0 +1,41 @@
+# TileMania - Development Docker Image
+# For development with hot-reload and debugging
+
+FROM rust:1.70
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libasound2-dev \
+    libudev-dev \
+    pkg-config \
+    libx11-dev \
+    libxcursor-dev \
+    libxrandr-dev \
+    libxi-dev \
+    mesa-vulkan-drivers \
+    libgl1-mesa-dri \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install development tools
+RUN cargo install cargo-watch cargo-edit cargo-audit
+
+# Create app directory
+WORKDIR /app
+
+# Copy only Cargo files first for better layer caching
+COPY Cargo.toml Cargo.lock ./
+
+# Download dependencies (cached layer)
+RUN mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build && \
+    rm -rf src
+
+# Set up volume mount point
+VOLUME ["/app"]
+
+# Expose port for future web features
+EXPOSE 8080
+
+# Default command: watch and rebuild on changes
+CMD ["cargo", "watch", "-x", "run"]

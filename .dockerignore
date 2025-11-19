@@ -1,0 +1,57 @@
+# Git
+.git/
+.gitignore
+.github/
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation (not needed in container)
+docs/
+*.md
+!README.md
+
+# CI/CD
+.github/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+tmp/
+temp/
+
+# Test files
+tests/
+benches/
+
+# Examples
+examples/
+
+# Archives
+*.tar.gz
+*.zip
+*.7z
+
+# Large word lists that shouldn't be in image
+# (User must mount their own licensed lexicons)
+assets/lexicons/CSW24.txt
+assets/lexicons/TWL*.txt
+assets/lexicons/SOWPODS.txt

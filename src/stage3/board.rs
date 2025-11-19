@@ -1,11 +1,11 @@
-/// Board management for Stage 3 (15×15 Classic Scrabble board)
+/// Board management for Stage 3 (15×15 Classic Word Tile Board)
 
 use bevy::prelude::*;
 use super::components::PremiumSquare;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
-/// 15×15 Scrabble board
+/// 15×15 word tile game board
 #[derive(Resource)]
 pub struct Board {
     pub grid: [[Option<char>; 15]; 15],
@@ -22,7 +22,7 @@ impl Default for Board {
 }
 
 impl Board {
-    /// Create the classic Scrabble premium square layout
+    /// Create the classic premium square layout
     fn create_premium_layout() -> [[PremiumSquare; 15]; 15] {
         use PremiumSquare::*;
 
@@ -150,11 +150,11 @@ impl Default for TileBag {
 }
 
 impl TileBag {
-    /// Create standard Scrabble tile distribution (100 tiles total)
+    /// Create standard tile distribution (100 tiles total)
     fn create_tile_distribution() -> Vec<char> {
         let mut tiles = Vec::new();
 
-        // Letter frequencies (standard English Scrabble)
+        // Letter frequencies (standard English word games)
         let distribution = [
             ('A', 9), ('B', 2), ('C', 2), ('D', 4), ('E', 12),
             ('F', 2), ('G', 3), ('H', 2), ('I', 9), ('J', 1),

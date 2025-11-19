@@ -1,6 +1,6 @@
 /// Stage 3: Classic Board
 ///
-/// Traditional Scrabble gameplay on a 15×15 board with AI opponent.
+/// Traditional word tile gameplay on a 15×15 board with AI opponent.
 /// Features premium squares (DW, TW, DL, TL), 7-tile rack, and turn-based play.
 
 use bevy::prelude::*;

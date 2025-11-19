@@ -1,16 +1,16 @@
-/// Scoring module for Scrabble-based game mechanics
+/// Scoring module for word tile game mechanics
 ///
-/// Implements standard Scrabble tile values and scoring rules
+/// Implements standard tile point values and scoring rules
 
 use std::collections::HashMap;
 
-/// Scrabble tile point values (standard distribution)
+/// Tile point values (standard letter distribution)
 pub struct TileValues {
     values: HashMap<char, u32>,
 }
 
 impl TileValues {
-    /// Creates a new TileValues with standard Scrabble point values
+    /// Creates a new TileValues with standard tile point values
     pub fn new() -> Self {
         let mut values = HashMap::new();
 
