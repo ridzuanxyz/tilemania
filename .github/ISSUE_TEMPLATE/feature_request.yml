@@ -1,0 +1,140 @@
+name: Feature Request
+description: Suggest an idea for TileMania
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! We appreciate your input.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: I would like the game to...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - Gameplay Mechanic
+        - UI/UX Improvement
+        - New Game Mode/Stage
+        - Performance Optimization
+        - Accessibility
+        - Audio/Visual
+        - Settings/Configuration
+        - Multiplayer/Social
+        - Tutorial/Help System
+        - Platform Support
+        - Developer Tools
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Which stage/area would this affect?
+      description: Select all that apply
+      options:
+        - Stage 1 - Falling Letters
+        - Stage 2 - Tile Matching
+        - Stage 3 - Classic Board
+        - Stage 4 - Speed Challenge
+        - Stage 5 - AI Tournaments
+        - All Stages
+        - Main Menu/UI
+        - Settings
+        - New Stage (Stage 6+)
+        - Core Systems
+      multiple: true
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Critical (can't use without it)
+        - High (would significantly improve experience)
+        - Medium (nice to have)
+        - Low (minor convenience)
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe alternatives you've considered
+      placeholder: Alternatively, we could...
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples/References
+      description: Provide examples of similar features in other games or applications
+      placeholder: Similar to how [Game X] does...
+    validations:
+      required: false
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups/Sketches
+      description: If applicable, add mockups, sketches, or visual examples
+      placeholder: Drag images here or paste links
+    validations:
+      required: false
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: How would this feature benefit players?
+      placeholder: |
+        - Makes gameplay more engaging
+        - Improves learning outcomes
+        - Reduces frustration
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context or screenshots about the feature request
+      placeholder: Any additional information...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

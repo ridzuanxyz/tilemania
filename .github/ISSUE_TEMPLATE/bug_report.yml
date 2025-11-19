@@ -1,0 +1,144 @@
+name: Bug Report
+description: File a bug report to help us improve TileMania
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Which stage does this affect?
+      description: Select the game stage where the bug occurs
+      options:
+        - Stage 1 - Falling Letters
+        - Stage 2 - Tile Matching
+        - Stage 3 - Classic Board
+        - Stage 4 - Speed Challenge
+        - Stage 5 - AI Tournaments
+        - Main Menu / UI
+        - Settings
+        - All Stages
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: The game should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: Instead, the game...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (game crashes/unplayable)
+        - High (major feature broken)
+        - Medium (feature partially works)
+        - Low (minor visual/text issue)
+        - Cosmetic (typo, alignment, etc.)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: What platform are you running on?
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Web (WASM)
+        - Other
+      multiple: true
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: OS Version
+      description: What OS version are you running?
+      placeholder: e.g., Ubuntu 22.04, macOS 14.0, Windows 11
+    validations:
+      required: false
+
+  - type: input
+    id: game-version
+    attributes:
+      label: TileMania Version
+      description: What version of TileMania are you running?
+      placeholder: e.g., v0.1.0, main branch commit abc123
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs/Screenshots
+      description: Please copy and paste any relevant log output or attach screenshots
+      placeholder: Paste logs here or drag images
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: Any additional information that might help...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
