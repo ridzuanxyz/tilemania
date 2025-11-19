@@ -191,6 +191,16 @@ pub fn spawn_pause_menu(
         });
 }
 
+/// Despawn pause menu
+pub fn despawn_pause_menu(
+    mut commands: Commands,
+    query: Query<Entity, With<PauseMenu>>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 /// Handle pause menu button clicks
 pub fn handle_pause_menu_buttons(
     mut commands: Commands,
