@@ -1,6 +1,8 @@
 /// UI for Stage 4 (Speed Challenge)
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
+use bevy::ui::Style;
 use super::{Stage4State, Stage4Config};
 
 /// Marker for Stage 4 HUD

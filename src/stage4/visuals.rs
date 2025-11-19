@@ -1,6 +1,7 @@
 /// Visual effects for Stage 4 (Speed Challenge)
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
 use super::components::*;
 
 pub fn update_tile_visuals(

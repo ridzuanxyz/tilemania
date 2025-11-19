@@ -1,6 +1,7 @@
 /// Visual effects for Stage 3 (Classic Board)
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
 use super::components::*;
 
 /// Update tile visual states

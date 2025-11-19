@@ -1,6 +1,8 @@
 /// Pause menu for Stage 2 (Match-3 gameplay)
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
+use bevy::ui::Style;
 use crate::plugins::state::GameState;
 
 /// Marker for pause menu UI
