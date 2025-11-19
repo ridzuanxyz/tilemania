@@ -1,6 +1,7 @@
 /// Visual effects and feedback systems for Stage 1
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
 use super::components::*;
 
 /// Colors for tile states
