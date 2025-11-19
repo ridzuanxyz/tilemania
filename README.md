@@ -67,6 +67,11 @@ cargo build --release --target wasm32-unknown-unknown
 | Document | Purpose |
 |----------|---------|
 | [EXECUTIVE_SUMMARY.md](EXECUTIVE_SUMMARY.md) | Project overview and vision |
+| [FINAL_IMPLEMENTATION_SUMMARY.md](FINAL_IMPLEMENTATION_SUMMARY.md) | Detailed implementation breakdown |
+| [CHANGELOG.md](CHANGELOG.md) | Version history and changes |
+| [BUILD_GUIDE.md](BUILD_GUIDE.md) | Platform-specific build instructions |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+| [ASSET_SPECIFICATIONS.md](ASSET_SPECIFICATIONS.md) | Asset requirements (audio, visual) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
 | [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) | Gameplay mechanics & UX |
 | [STAGES_2_5_ARCHITECTURE.md](STAGES_2_5_ARCHITECTURE.md) | Stage implementation details |
@@ -98,35 +103,35 @@ cargo build --release --target wasm32-unknown-unknown
 
 ### Stage Details
 
-#### Stage 1: Falling Letters
+#### Stage 1: Falling Letters ([Full Details](STAGE1_COMPLETE_100_PERCENT.md))
 - Catch falling letters to form 2-letter words
 - 5 difficulty levels (90s → 45s time limits)
 - Combo system (1x → 3x multiplier)
 - 4 power-ups (Slow Motion, Bomb, Shuffle, Extra Time)
 - Real-time validation against CSW24 lexicon
 
-#### Stage 2: Tile Matching
+#### Stage 2: Tile Matching ([Full Details](STAGE2_COMPLETE.md))
 - Match-3 gameplay on 8×8 grid
 - Form 3-4 letter words horizontally or vertically
 - Cascade system with tile gravity
 - Target score objectives
 - Moves limit on higher difficulties
 
-#### Stage 3: Classic Board
+#### Stage 3: Classic Board ([Full Details](STAGE3_COMPLETE.md))
 - Full 15×15 Scrabble board with premium squares
 - AI opponent with 5 difficulty levels
 - Turn-based gameplay with 7-tile rack
 - Standard 100-tile bag distribution
 - AI personalities (Aggressive, Defensive, Balanced)
 
-#### Stage 4: Speed Challenge
+#### Stage 4: Speed Challenge ([Full Details](STAGE4_COMPLETE.md))
 - 7-tile rack with instant refresh
 - 45-120 second time limits
 - Streak multiplier system (1.05x → 1.25x)
 - Panic mode at low time
 - Fast-paced scoring
 
-#### Stage 5: AI Tournaments
+#### Stage 5: AI Tournaments ([Full Details](STAGE5_COMPLETE.md))
 - 8-player single-elimination bracket
 - 7 unique AI opponents with personalities
 - Best-of-3 match format
