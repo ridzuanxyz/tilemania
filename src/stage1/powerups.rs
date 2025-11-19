@@ -1,6 +1,8 @@
 /// Power-ups system for Stage 1
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
+use bevy::ui::Style;
 use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};

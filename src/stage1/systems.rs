@@ -1,6 +1,7 @@
 /// Systems for Stage 1 gameplay logic
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
 use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};

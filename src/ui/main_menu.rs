@@ -3,7 +3,7 @@ use crate::plugins::state::GameState;
 use super::components::{
     ButtonComponent, ButtonSize, ButtonVariant,
     TextComponent, TextStyle, TextColorVariant,
-    Stack, StackDirection, Spacing, Alignment,
+    Stack, StackDirection, Spacing, Alignment, Spacer,
 };
 
 #[derive(Component)]
