@@ -398,32 +398,13 @@ pub fn spawn_results_screen(
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
 ) {
-    let title_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 56.0,
-        color: if state.score >= config.target_score {
-            Color::srgb(0.3, 0.9, 0.3) // Success green
-        } else {
-            Color::srgb(0.9, 0.9, 1.0) // Normal white
-        },
-    };
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
 
-    let stat_label_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Medium.ttf"),
-        font_size: 22.0,
-        color: Color::srgb(0.7, 0.7, 0.8),
-    };
-
-    let stat_value_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 32.0,
-        color: Color::srgb(1.0, 1.0, 1.0),
-    };
-
-    let button_text_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 28.0,
-        color: Color::srgb(0.1, 0.1, 0.15),
+    let title_color = if state.score >= config.target_score {
+        Color::srgb(0.3, 0.9, 0.3) // Success green
+    } else {
+        Color::srgb(0.9, 0.9, 1.0) // Normal white
     };
 
     // Root container
@@ -445,21 +426,23 @@ pub fn spawn_results_screen(
         ))
         .with_children(|parent| {
             // Title
-            parent.spawn(TextBundle {
-                text: Text::from_section(
-                    if state.score >= config.target_score {
-                        "LEVEL COMPLETE!"
-                    } else {
-                        "TIME'S UP!"
-                    },
-                    title_style,
-                ),
-                style: Node {
+            parent.spawn((
+                Text::new(if state.score >= config.target_score {
+                    "LEVEL COMPLETE!"
+                } else {
+                    "TIME'S UP!"
+                }),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 56.0,
+                    ..default()
+                },
+                TextColor(title_color),
+                Node {
                     margin: UiRect::bottom(Val::Px(40.0)),
                     ..default()
                 },
-                ..default()
-            });
+            ));
 
             // Stats container
             parent
@@ -474,23 +457,55 @@ pub fn spawn_results_screen(
                 })
                 .with_children(|stats| {
                     stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Final Score: ", stat_label_style.clone()),
-                        TextSection::new(&state.score.to_string(), stat_value_style.clone()),
+                        TextSection::new("Final Score: ", TextStyle {
+                            font: font_medium.clone(),
+                            font_size: 22.0,
+                            color: Color::srgb(0.7, 0.7, 0.8),
+                        }),
+                        TextSection::new(&state.score.to_string(), TextStyle {
+                            font: font_bold.clone(),
+                            font_size: 32.0,
+                            color: Color::srgb(1.0, 1.0, 1.0),
+                        }),
                     ]));
 
                     stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Words Found: ", stat_label_style.clone()),
-                        TextSection::new(&state.words_found.len().to_string(), stat_value_style.clone()),
+                        TextSection::new("Words Found: ", TextStyle {
+                            font: font_medium.clone(),
+                            font_size: 22.0,
+                            color: Color::srgb(0.7, 0.7, 0.8),
+                        }),
+                        TextSection::new(&state.words_found.len().to_string(), TextStyle {
+                            font: font_bold.clone(),
+                            font_size: 32.0,
+                            color: Color::srgb(1.0, 1.0, 1.0),
+                        }),
                     ]));
 
                     stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Moves Made: ", stat_label_style.clone()),
-                        TextSection::new(&state.moves_made.to_string(), stat_value_style.clone()),
+                        TextSection::new("Moves Made: ", TextStyle {
+                            font: font_medium.clone(),
+                            font_size: 22.0,
+                            color: Color::srgb(0.7, 0.7, 0.8),
+                        }),
+                        TextSection::new(&state.moves_made.to_string(), TextStyle {
+                            font: font_bold.clone(),
+                            font_size: 32.0,
+                            color: Color::srgb(1.0, 1.0, 1.0),
+                        }),
                     ]));
 
                     stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Max Combo: ", stat_label_style.clone()),
-                        TextSection::new(&state.combo_count.to_string(), stat_value_style.clone()),
+                        TextSection::new("Max Combo: ", TextStyle {
+                            font: font_medium.clone(),
+                            font_size: 22.0,
+                            color: Color::srgb(0.7, 0.7, 0.8),
+                        }),
+                        TextSection::new(&state.combo_count.to_string(), TextStyle {
+                            font: font_bold.clone(),
+                            font_size: 32.0,
+                            color: Color::srgb(1.0, 1.0, 1.0),
+                        }),
                     ]));
                 });
 
@@ -524,7 +539,11 @@ pub fn spawn_results_screen(
                         .with_children(|button| {
                             button.spawn(TextBundle::from_section(
                                 "Play Again",
-                                button_text_style.clone(),
+                                TextStyle {
+                                    font: font_bold.clone(),
+                                    font_size: 28.0,
+                                    color: Color::srgb(0.1, 0.1, 0.15),
+                                },
                             ));
                         });
 
@@ -547,7 +566,11 @@ pub fn spawn_results_screen(
                         .with_children(|button| {
                             button.spawn(TextBundle::from_section(
                                 "Main Menu",
-                                button_text_style.clone(),
+                                TextStyle {
+                                    font: font_bold.clone(),
+                                    font_size: 28.0,
+                                    color: Color::srgb(0.1, 0.1, 0.15),
+                                },
                             ));
                         });
                 });

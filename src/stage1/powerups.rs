@@ -295,14 +295,13 @@ pub fn spawn_powerup_ui(
         })
         .with_children(|parent| {
             parent.spawn((
-                TextBundle::from_section(
-                    "Power-ups (1-4):",
-                    TextStyle {
-                        font: font.clone(),
-                        font_size: 20.0,
-                        color: Color::srgb(0.8, 0.8, 0.8),
-                    },
-                ),
+                Text::new("Power-ups (1-4):"),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 20.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.8, 0.8, 0.8)),
                 PowerUpDisplayMarker,
             ));
         });
@@ -335,26 +334,28 @@ pub fn update_powerup_display(
                     let icon = powerup_icon(powerup);
                     let color = powerup_color(powerup);
 
-                    parent.spawn(TextBundle::from_section(
-                        format!("{}. {} {:?}", i + 1, icon, powerup),
-                        TextStyle {
+                    parent.spawn((
+                        Text::new(format!("{}. {} {:?}", i + 1, icon, powerup)),
+                        TextFont {
                             font: font.clone(),
                             font_size: 18.0,
-                            color,
+                            ..default()
                         },
+                        TextColor(color),
                     ));
                 }
 
                 // Show slow motion timer if active
                 if active.slow_motion_remaining_ms > 0 {
                     let seconds = active.slow_motion_remaining_ms / 1000;
-                    parent.spawn(TextBundle::from_section(
-                        format!("🐌 Slow Motion: {}s", seconds),
-                        TextStyle {
+                    parent.spawn((
+                        Text::new(format!("🐌 Slow Motion: {}s", seconds)),
+                        TextFont {
                             font: font.clone(),
                             font_size: 18.0,
-                            color: Color::srgb(0.5, 0.7, 1.0),
+                            ..default()
                         },
+                        TextColor(Color::srgb(0.5, 0.7, 1.0)),
                     ));
                 }
             });
