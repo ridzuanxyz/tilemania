@@ -1,7 +1,7 @@
 /// UI for Stage 2 (Match-3 gameplay)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
+use bevy::text::{TextStyle, TextSection};
 use bevy::ui::Style;
 use super::{Stage2Config, Stage2State};
 use super::difficulty::*;

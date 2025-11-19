@@ -1,6 +1,7 @@
 /// Board management for Stage 3 (15×15 Classic Word Tile Board)
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
 use super::components::PremiumSquare;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
