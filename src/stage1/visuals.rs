@@ -96,10 +96,10 @@ pub fn update_score_popups(
     time: Res<Time>,
 ) {
     for (entity, mut popup, mut transform, mut text) in query.iter_mut() {
-        popup.elapsed += time.delta_seconds();
+        popup.elapsed += time.delta_secs();
 
         // Float upward
-        transform.translation.y += 100.0 * time.delta_seconds();
+        transform.translation.y += 100.0 * time.delta_secs();
 
         // Fade out
         let alpha = 1.0 - (popup.elapsed / popup.lifetime);
@@ -130,7 +130,7 @@ pub fn update_validation_flash(
     time: Res<Time>,
 ) {
     for (entity, mut flash, mut sprite) in query.iter_mut() {
-        flash.elapsed += time.delta_seconds();
+        flash.elapsed += time.delta_secs();
 
         // Flash effect (fade from colored to normal)
         let progress = flash.elapsed / flash.duration;
@@ -224,10 +224,10 @@ pub fn update_particles(
     time: Res<Time>,
 ) {
     for (entity, mut particle, mut transform, mut sprite, velocity) in query.iter_mut() {
-        particle.elapsed += time.delta_seconds();
+        particle.elapsed += time.delta_secs();
 
         // Move particle
-        transform.translation += velocity.0 * time.delta_seconds();
+        transform.translation += velocity.0 * time.delta_secs();
 
         // Fade out
         let alpha = 1.0 - (particle.elapsed / particle.lifetime);

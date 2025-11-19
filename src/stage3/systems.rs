@@ -236,7 +236,7 @@ pub fn update_timer(
         return;
     }
 
-    let delta_ms = (time.delta_seconds() * 1000.0) as u32;
+    let delta_ms = (time.delta_secs() * 1000.0) as u32;
 
     if state.time_remaining_ms > delta_ms {
         state.time_remaining_ms -= delta_ms;

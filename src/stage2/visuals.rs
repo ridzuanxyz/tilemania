@@ -128,7 +128,7 @@ pub fn update_cascade_animations(
         // Move towards target position
         let target_pos = Vec3::new(target_x, target_y, 0.0);
         let direction = (target_pos - transform.translation).normalize_or_zero();
-        let move_distance = cascade.speed * time.delta_seconds();
+        let move_distance = cascade.speed * time.delta_secs();
 
         transform.translation += direction * move_distance;
 
@@ -176,7 +176,7 @@ pub fn update_score_popups(
         popup.lifetime.tick(time.delta());
 
         // Rise upward
-        transform.translation.y += popup.rise_speed * time.delta_seconds();
+        transform.translation.y += popup.rise_speed * time.delta_secs();
 
         // Fade out
         let alpha = 1.0 - popup.lifetime.fraction();
@@ -241,7 +241,7 @@ pub fn update_particles(
 
         // Move based on velocity
         let velocity_3d = Vec3::new(particle.velocity.x, particle.velocity.y, 0.0);
-        transform.translation += velocity_3d * time.delta_seconds();
+        transform.translation += velocity_3d * time.delta_secs();
 
         // Apply friction
         particle.velocity *= 0.95;

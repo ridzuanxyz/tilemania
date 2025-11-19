@@ -455,7 +455,7 @@ pub fn update_timer(
         return;
     }
 
-    let delta_ms = (time.delta_seconds() * 1000.0) as u32;
+    let delta_ms = (time.delta_secs() * 1000.0) as u32;
     state.time_remaining_ms = state.time_remaining_ms.saturating_sub(delta_ms);
 
     for mut text in query.iter_mut() {

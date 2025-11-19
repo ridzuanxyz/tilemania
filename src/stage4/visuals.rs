@@ -30,7 +30,7 @@ pub fn update_score_popups(
     for (entity, mut transform, mut text, mut popup) in popup_query.iter_mut() {
         popup.lifetime.tick(time.delta());
 
-        transform.translation.y += popup.rise_speed * time.delta_seconds();
+        transform.translation.y += popup.rise_speed * time.delta_secs();
 
         let alpha = 1.0 - popup.lifetime.fraction();
         for section in &mut text.sections {
@@ -58,7 +58,7 @@ pub fn update_particles(
         particle.lifetime.tick(time.delta());
 
         let velocity_3d = Vec3::new(particle.velocity.x, particle.velocity.y, 0.0);
-        transform.translation += velocity_3d * time.delta_seconds();
+        transform.translation += velocity_3d * time.delta_secs();
 
         particle.velocity *= 0.95;
 
