@@ -1,7 +1,6 @@
 /// Core gameplay systems for Stage 5 (AI Tournaments)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::{TournamentState, CurrentMatch, MatchResult};
 use super::components::*;
 

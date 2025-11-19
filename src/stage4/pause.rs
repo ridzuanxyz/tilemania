@@ -1,8 +1,6 @@
 /// Pause menu for Stage 4 (Speed Challenge)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
-use bevy::ui::Style;
 use crate::plugins::state::GameState;
 
 #[derive(Component)]

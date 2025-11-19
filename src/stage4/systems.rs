@@ -1,7 +1,6 @@
 /// Core gameplay systems for Stage 4 (Speed Challenge)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::{Stage4State, Stage4Config, TilePool, WordEvent};
 use crate::lexicon::Lexicon;
 use crate::scoring::ScoreCalculator;

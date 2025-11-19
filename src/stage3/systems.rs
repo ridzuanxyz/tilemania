@@ -1,7 +1,6 @@
 /// Core gameplay systems for Stage 3
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::{Stage3State, Stage3Config, Turn, Direction, MoveEvent, GameOverReason};
 use super::board::{Board, TileBag};
 use super::components::*;

@@ -2,7 +2,6 @@
 
 use bevy::prelude::*;
 use bevy::text::TextStyle;
-use bevy::ui::Style;
 use super::{TournamentState, CurrentMatch};
 use super::components::*;
 

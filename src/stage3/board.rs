@@ -1,7 +1,6 @@
 /// Board management for Stage 3 (15×15 Classic Word Tile Board)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::components::PremiumSquare;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -260,18 +259,16 @@ pub fn spawn_board(
             // Add premium square label
             if premium != PremiumSquare::Normal {
                 let label = get_premium_label(premium);
-                commands.spawn(Text2dBundle {
-                    text: Text::from_section(
-                        label,
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 12.0,
-                            color: Color::srgba(1.0, 1.0, 1.0, 0.6),
-                        },
-                    ),
-                    transform: Transform::from_translation(Vec3::new(x, y, 1.0)),
-                    ..default()
-                });
+                commands.spawn((
+                    Text2d::new(label),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 12.0,
+                        ..default()
+                    },
+                    TextColor(Color::srgba(1.0, 1.0, 1.0, 0.6)),
+                    Transform::from_translation(Vec3::new(x, y, 1.0)),
+                ));
             }
         }
     }

@@ -1,8 +1,6 @@
 /// Pause menu for Stage 2 (Match-3 gameplay)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
-use bevy::ui::Style;
 use crate::plugins::state::GameState;
 
 /// Marker for pause menu UI
@@ -41,17 +39,7 @@ pub fn spawn_pause_menu(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let title_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 64.0,
-        color: Color::srgb(0.9, 0.9, 1.0),
-    };
-
-    let button_text_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 32.0,
-        color: Color::srgb(0.1, 0.1, 0.15),
-    };
+    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     // Root container - semi-transparent overlay
     commands
@@ -76,14 +64,19 @@ pub fn spawn_pause_menu(
         ))
         .with_children(|parent| {
             // Pause title
-            parent.spawn(TextBundle {
-                text: Text::from_section("PAUSED", title_style),
-                style: Style {
+            parent.spawn((
+                Text::new("PAUSED"),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 64.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.9, 0.9, 1.0)),
+                Node {
                     margin: UiRect::bottom(Val::Px(50.0)),
                     ..default()
                 },
-                ..default()
-            });
+            ));
 
             // Buttons container
             parent
@@ -113,9 +106,14 @@ pub fn spawn_pause_menu(
                             PauseButton::Resume,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section(
-                                "Resume",
-                                button_text_style.clone(),
+                            button.spawn((
+                                Text::new("Resume"),
+                                TextFont {
+                                    font: font.clone(),
+                                    font_size: 32.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
                             ));
                         });
 
@@ -136,9 +134,14 @@ pub fn spawn_pause_menu(
                             PauseButton::Restart,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section(
-                                "Restart",
-                                button_text_style.clone(),
+                            button.spawn((
+                                Text::new("Restart"),
+                                TextFont {
+                                    font: font.clone(),
+                                    font_size: 32.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
                             ));
                         });
 
@@ -159,28 +162,32 @@ pub fn spawn_pause_menu(
                             PauseButton::Quit,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section(
-                                "Quit to Menu",
-                                button_text_style.clone(),
+                            button.spawn((
+                                Text::new("Quit to Menu"),
+                                TextFont {
+                                    font: font.clone(),
+                                    font_size: 32.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
                             ));
                         });
                 });
 
             // Hint text
-            parent.spawn(
-                TextBundle::from_section(
-                    "Press ESC to resume",
-                    TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Medium.ttf"),
-                        font_size: 20.0,
-                        color: Color::srgb(0.6, 0.6, 0.7),
-                    },
-                )
-                .with_style(Style {
+            parent.spawn((
+                Text::new("Press ESC to resume"),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Medium.ttf"),
+                    font_size: 20.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.6, 0.6, 0.7)),
+                Node {
                     margin: UiRect::top(Val::Px(30.0)),
                     ..default()
-                }),
-            );
+                },
+            ));
         });
 }
 
