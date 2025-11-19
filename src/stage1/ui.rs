@@ -39,40 +39,37 @@ pub fn spawn_stage1_hud(
                 .with_children(|top_bar| {
                     // Score display (top-left)
                     top_bar.spawn((
-                        TextBundle::from_section(
-                            "Score: 0",
-                            TextStyle {
-                                font: font.clone(),
-                                font_size: 32.0,
-                                color: Color::WHITE,
-                            },
-                        ),
+                        Text::new("Score: 0"),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 32.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         ScoreDisplay,
                     ));
 
                     // Timer display (top-center)
                     top_bar.spawn((
-                        TextBundle::from_section(
-                            "Time: 90s",
-                            TextStyle {
-                                font: font.clone(),
-                                font_size: 32.0,
-                                color: Color::WHITE,
-                            },
-                        ),
+                        Text::new("Time: 90s"),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 32.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         TimerDisplay,
                     ));
 
                     // Combo display (top-right)
                     top_bar.spawn((
-                        TextBundle::from_section(
-                            "Combo: 0x",
-                            TextStyle {
-                                font: font.clone(),
-                                font_size: 32.0,
-                                color: Color::srgb(1.0, 0.9, 0.4),
-                            },
-                        ),
+                        Text::new("Combo: 0x"),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 32.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(1.0, 0.9, 0.4)),
                         ComboDisplay,
                     ));
                 });
@@ -90,19 +87,18 @@ pub fn spawn_stage1_hud(
                 })
                 .with_children(|bottom| {
                     bottom.spawn((
-                        TextBundle::from_section(
-                            "",
-                            TextStyle {
-                                font: font.clone(),
-                                font_size: 48.0,
-                                color: Color::srgb(1.0, 1.0, 0.5),
-                            },
-                        )
-                        .with_style(Node {
+                        Text::new(""),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 48.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(1.0, 1.0, 0.5)),
+                        Node {
                             position_type: PositionType::Relative,
                             left: Val::Px(-100.0), // Center adjustment
                             ..default()
-                        }),
+                        },
                         WordDisplay,
                     ));
                 });
@@ -203,33 +199,36 @@ pub fn spawn_start_screen(
         ))
         .with_children(|parent| {
             // Title
-            parent.spawn(TextBundle::from_section(
-                "Stage 1: Falling Letters",
-                TextStyle {
+            parent.spawn((
+                Text::new("Stage 1: Falling Letters"),
+                TextFont {
                     font: font.clone(),
                     font_size: 64.0,
-                    color: Color::WHITE,
+                    ..default()
                 },
+                TextColor(Color::WHITE),
             ));
 
             // Subtitle
-            parent.spawn(TextBundle::from_section(
-                "Form 2-letter words!",
-                TextStyle {
+            parent.spawn((
+                Text::new("Form 2-letter words!"),
+                TextFont {
                     font: font.clone(),
                     font_size: 32.0,
-                    color: Color::srgb(0.8, 0.8, 0.8),
+                    ..default()
                 },
+                TextColor(Color::srgb(0.8, 0.8, 0.8)),
             ));
 
             // Difficulty buttons
-            parent.spawn(TextBundle::from_section(
-                "Select Difficulty:",
-                TextStyle {
+            parent.spawn((
+                Text::new("Select Difficulty:"),
+                TextFont {
                     font: font.clone(),
                     font_size: 28.0,
-                    color: Color::WHITE,
+                    ..default()
                 },
+                TextColor(Color::WHITE),
             ));
 
             for diff in &DIFFICULTY_LEVELS {
@@ -249,28 +248,30 @@ pub fn spawn_start_screen(
                         DifficultyButton(diff.level),
                     ))
                     .with_children(|button| {
-                        button.spawn(TextBundle::from_section(
-                            format!(
+                        button.spawn((
+                            Text::new(format!(
                                 "D{}: {} ({}s)",
                                 diff.level, diff.name, diff.total_time_seconds
-                            ),
-                            TextStyle {
+                            )),
+                            TextFont {
                                 font: font.clone(),
                                 font_size: 24.0,
-                                color: Color::WHITE,
+                                ..default()
                             },
+                            TextColor(Color::WHITE),
                         ));
                     });
             }
 
             // Instructions
-            parent.spawn(TextBundle::from_section(
-                "Click tiles to select • Press SPACE to submit",
-                TextStyle {
+            parent.spawn((
+                Text::new("Click tiles to select • Press SPACE to submit"),
+                TextFont {
                     font: font.clone(),
                     font_size: 20.0,
-                    color: Color::srgb(0.6, 0.6, 0.6),
+                    ..default()
                 },
+                TextColor(Color::srgb(0.6, 0.6, 0.6)),
             ));
         });
 }
@@ -355,33 +356,36 @@ pub fn spawn_results_screen(
         ))
         .with_children(|parent| {
             // Title
-            parent.spawn(TextBundle::from_section(
-                "Time's Up!",
-                TextStyle {
+            parent.spawn((
+                Text::new("Time's Up!"),
+                TextFont {
                     font: font.clone(),
                     font_size: 64.0,
-                    color: Color::WHITE,
+                    ..default()
                 },
+                TextColor(Color::WHITE),
             ));
 
             // Final score
-            parent.spawn(TextBundle::from_section(
-                format!("Final Score: {}", state.score),
-                TextStyle {
+            parent.spawn((
+                Text::new(format!("Final Score: {}", state.score)),
+                TextFont {
                     font: font.clone(),
                     font_size: 48.0,
-                    color: Color::srgb(1.0, 0.9, 0.3),
+                    ..default()
                 },
+                TextColor(Color::srgb(1.0, 0.9, 0.3)),
             ));
 
             // Words found
-            parent.spawn(TextBundle::from_section(
-                format!("Words Found: {}", state.words_found.len()),
-                TextStyle {
+            parent.spawn((
+                Text::new(format!("Words Found: {}", state.words_found.len())),
+                TextFont {
                     font: font.clone(),
                     font_size: 32.0,
-                    color: Color::WHITE,
+                    ..default()
                 },
+                TextColor(Color::WHITE),
             ));
 
             // Word list (first 10)
@@ -394,13 +398,14 @@ pub fn spawn_results_screen(
                 .join(", ");
 
             if !word_list.is_empty() {
-                parent.spawn(TextBundle::from_section(
-                    word_list,
-                    TextStyle {
+                parent.spawn((
+                    Text::new(word_list),
+                    TextFont {
                         font: font.clone(),
                         font_size: 24.0,
-                        color: Color::srgb(0.8, 0.8, 0.8),
+                        ..default()
                     },
+                    TextColor(Color::srgb(0.8, 0.8, 0.8)),
                 ));
             }
 
@@ -419,13 +424,14 @@ pub fn spawn_results_screen(
                     ..default()
                 })
                 .with_children(|button| {
-                    button.spawn(TextBundle::from_section(
-                        "Play Again",
-                        TextStyle {
+                    button.spawn((
+                        Text::new("Play Again"),
+                        TextFont {
                             font: font.clone(),
                             font_size: 24.0,
-                            color: Color::WHITE,
+                            ..default()
                         },
+                        TextColor(Color::WHITE),
                     ));
                 });
 
@@ -443,13 +449,14 @@ pub fn spawn_results_screen(
                     ..default()
                 })
                 .with_children(|button| {
-                    button.spawn(TextBundle::from_section(
-                        "Main Menu",
-                        TextStyle {
+                    button.spawn((
+                        Text::new("Main Menu"),
+                        TextFont {
                             font: font.clone(),
                             font_size: 24.0,
-                            color: Color::WHITE,
+                            ..default()
                         },
+                        TextColor(Color::WHITE),
                     ));
                 });
         });
