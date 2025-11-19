@@ -14,6 +14,8 @@ pub struct Lexicon {
     words: HashSet<String>,
     /// Total word count
     word_count: usize,
+    /// Name of the loaded lexicon (e.g., "CSW24", "ENABLE", "Custom")
+    pub lexicon_name: String,
 }
 
 impl Lexicon {
@@ -22,6 +24,7 @@ impl Lexicon {
         Self {
             words: HashSet::new(),
             word_count: 0,
+            lexicon_name: "Empty".to_string(),
         }
     }
 
@@ -33,7 +36,8 @@ impl Lexicon {
     /// # Returns
     /// * `Result<Lexicon, String>` - Loaded lexicon or error message
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self, String> {
-        let content = fs::read_to_string(path)
+        let path_ref = path.as_ref();
+        let content = fs::read_to_string(path_ref)
             .map_err(|e| format!("Failed to read lexicon file: {}", e))?;
 
         let mut words = HashSet::new();
@@ -47,7 +51,61 @@ impl Lexicon {
 
         let word_count = words.len();
 
-        Ok(Self { words, word_count })
+        // Extract lexicon name from filename (e.g., "CSW24.txt" -> "CSW24")
+        let lexicon_name = path_ref
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("Unknown")
+            .to_string();
+
+        Ok(Self { words, word_count, lexicon_name })
+    }
+
+    /// Attempts to load a lexicon from multiple sources (in priority order)
+    ///
+    /// Tries to load lexicons in the following order:
+    /// 1. CSW24.txt (if user has licensed copy)
+    /// 2. ENABLE.txt (public domain)
+    /// 3. TWL.txt (if available)
+    /// 4. custom.txt (user-provided)
+    ///
+    /// # Returns
+    /// * `Result<Lexicon, String>` - First successfully loaded lexicon or error if none found
+    pub fn load_default() -> Result<Self, String> {
+        let paths = vec![
+            "assets/lexicons/CSW24.txt",
+            "assets/lexicons/ENABLE.txt",
+            "assets/lexicons/TWL.txt",
+            "assets/lexicons/custom.txt",
+            "CSW24.txt",  // Try root directory as fallback
+            "ENABLE.txt",
+        ];
+
+        let mut last_error = String::new();
+
+        for path in paths {
+            match Self::load_from_file(path) {
+                Ok(lexicon) => {
+                    println!("✓ Loaded {} lexicon with {} words from {}",
+                             lexicon.lexicon_name, lexicon.word_count, path);
+                    return Ok(lexicon);
+                }
+                Err(e) => {
+                    last_error = e;
+                }
+            }
+        }
+
+        Err(format!(
+            "No word list found! Tried multiple locations.\n\
+             Last error: {}\n\n\
+             To use TileMania, you must provide a word list:\n\
+             1. Download ENABLE (public domain): http://www.puzzlers.org/pub/wordlists/enable1.txt\n\
+             2. Save as: assets/lexicons/ENABLE.txt\n\
+             3. Or provide your own word list (one word per line, uppercase)\n\n\
+             See LEGAL_CONSIDERATIONS.md for licensing information.",
+            last_error
+        ))
     }
 
     /// Validates if a word exists in the lexicon (case-insensitive)
