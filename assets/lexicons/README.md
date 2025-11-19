@@ -10,11 +10,11 @@ TileMania requires a word list to function. Due to licensing restrictions, some 
 
 ## 📥 Getting a Word List
 
-### Option 1: RE-ENABLE-CSW (Included) ✅ **RECOMMENDED**
+### Option 1: TML - TileMania Lexicon (Included) ✅ **RECOMMENDED**
 
 **Status:** ✅ **Included** (167,737 words)
 
-**RE-ENABLE-CSW** is a filtered version of RE-Enable containing only words that also exist in CSW24. This avoids US/UK spelling confusion (color vs colour) while remaining public domain.
+**TML (TileMania Lexicon)** is a filtered version of RE-Enable containing only words that also exist in CSW24. This avoids US/UK spelling confusion (color vs colour) while remaining public domain.
 
 **Specifications:**
 - **Words:** 167,737 (97.3% of RE-Enable)
@@ -22,7 +22,7 @@ TileMania requires a word list to function. Due to licensing restrictions, some 
 - **Source:** RE-Enable filtered to CSW24 vocabulary
 - **Purpose:** International English words, avoids regional variants
 - **Format:** One word per line, lowercase
-- **Location:** `assets/lexicons/RE-ENABLE-CSW.txt` ✅ **Already included!**
+- **Location:** `assets/lexicons/TML.txt` ✅ **Already included!**
 
 **Why use this:**
 - Avoids confusing kids with US/UK spelling differences
@@ -101,19 +101,7 @@ CSW24 (Collins Scrabble Words 2024) is the official competitive word list.
 
 ---
 
-### Option 5: TWL (Licensed) 🔒
-
-**Status:** Not included (requires license)
-
-TWL (Tournament Word List) is the North American official list.
-
-**To Use TWL:**
-1. License from Hasbro/NASPA
-2. Save as: `assets/lexicons/TWL.txt`
-
----
-
-### Option 6: Custom Word List 📝
+### Option 5: Custom Word List 📝
 
 **Status:** User-provided
 
@@ -142,9 +130,10 @@ EXAMPLE
 TileMania automatically tries to load lexicons in this priority order:
 
 1. `CSW24.txt` (if you have license)
-2. `ENABLE.txt` (public domain)
-3. `TWL.txt` (if available)
-4. `custom.txt` (your own list)
+2. `TML.txt` (TileMania Lexicon - recommended)
+3. `RE-ENABLE.txt` (public domain)
+4. `ENABLE.txt` (public domain)
+5. `custom.txt` (your own list)
 
 The first found lexicon will be loaded.
 
@@ -154,9 +143,10 @@ The first found lexicon will be loaded.
 
 | Lexicon | Words | License | Cost | Best For |
 |---------|-------|---------|------|----------|
-| **ENABLE** | ~173K | Public domain | **FREE** | ✅ General use, educational |
+| **TML** | 167K | Public domain | **FREE** | ✅ **Recommended** - International words, no US/UK confusion |
+| **RE-ENABLE** | 172K | Public domain | **FREE** | General use with US variants |
+| **ENABLE** | ~173K | Public domain | **FREE** | General use, educational |
 | **CSW24** | ~280K | Licensed | $$$ | Tournament, competitive |
-| **TWL** | ~187K | Licensed | $$$ | North American tournaments |
 | **Custom** | Varies | Your choice | FREE | Specialized/educational |
 
 ---

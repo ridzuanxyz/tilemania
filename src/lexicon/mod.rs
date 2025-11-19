@@ -1,7 +1,7 @@
 /// Lexicon module for word validation
 ///
 /// This module provides fast word validation using a HashSet-based approach
-/// optimized for various word list formats (CSW24, TWL, ENABLE, etc.).
+/// optimized for various word list formats (CSW24, ENABLE, etc.).
 
 use std::collections::HashSet;
 use std::fs;
@@ -65,24 +65,22 @@ impl Lexicon {
     ///
     /// Tries to load lexicons in the following order:
     /// 1. CSW24.txt (if user has licensed copy)
-    /// 2. RE-ENABLE-CSW.txt (RE-Enable filtered to CSW24 words, avoids US/UK confusion)
+    /// 2. TML.txt (TileMania Lexicon - RE-Enable filtered to CSW24 words, avoids US/UK confusion)
     /// 3. RE-ENABLE.txt (full public domain RE-Enable, 172K words)
     /// 4. ENABLE.txt (original public domain, 173K words)
-    /// 5. TWL.txt (if available)
-    /// 6. custom.txt (user-provided)
+    /// 5. custom.txt (user-provided)
     ///
     /// # Returns
     /// * `Result<Lexicon, String>` - First successfully loaded lexicon or error if none found
     pub fn load_default() -> Result<Self, String> {
         let paths = vec![
             "assets/lexicons/CSW24.txt",
-            "assets/lexicons/RE-ENABLE-CSW.txt",
+            "assets/lexicons/TML.txt",
             "assets/lexicons/RE-ENABLE.txt",
             "assets/lexicons/ENABLE.txt",
-            "assets/lexicons/TWL.txt",
             "assets/lexicons/custom.txt",
             "CSW24.txt",  // Try root directory as fallback
-            "RE-ENABLE-CSW.txt",
+            "TML.txt",
             "RE-ENABLE.txt",
             "ENABLE.txt",
         ];
