@@ -10,11 +10,59 @@ TileMania requires a word list to function. Due to licensing restrictions, some 
 
 ## 📥 Getting a Word List
 
-### Option 1: ENABLE (Public Domain) ✅ **RECOMMENDED**
+### Option 1: RE-ENABLE-CSW (Included) ✅ **RECOMMENDED**
+
+**Status:** ✅ **Included** (167,737 words)
+
+**RE-ENABLE-CSW** is a filtered version of RE-Enable containing only words that also exist in CSW24. This avoids US/UK spelling confusion (color vs colour) while remaining public domain.
+
+**Specifications:**
+- **Words:** 167,737 (97.3% of RE-Enable)
+- **License:** Public domain (free for commercial use)
+- **Source:** RE-Enable filtered to CSW24 vocabulary
+- **Purpose:** International English words, avoids regional variants
+- **Format:** One word per line, lowercase
+- **Location:** `assets/lexicons/RE-ENABLE-CSW.txt` ✅ **Already included!**
+
+**Why use this:**
+- Avoids confusing kids with US/UK spelling differences
+- International English vocabulary (same as competitive play)
+- Still 100% legal (public domain source)
+- No licensing fees
+
+---
+
+### Option 2: RE-ENABLE (Included) ✅
+
+**Status:** ✅ **Included** (172,400 words)
+
+**RE-ENABLE** is a modern, public domain recreation of the ENABLE word list.
+
+**Download from source:**
+```bash
+curl -L -o assets/lexicons/RE-ENABLE.txt https://raw.githubusercontent.com/JakesMD/Re-Enable/main/re-enable.txt
+```
+
+**Or visit:** https://github.com/JakesMD/Re-Enable
+
+**Specifications:**
+- **Words:** 172,400
+- **License:** Public domain (free for commercial use)
+- **Source:** Modern recreation of ENABLE
+- **Format:** One word per line, lowercase
+- **Location:** `assets/lexicons/RE-ENABLE.txt` ✅ **Already included!**
+
+**Includes:**
+- US English spelling variants (color, honor, etc.)
+- Some words NOT in CSW24 (regional variations)
+
+---
+
+### Option 3: ENABLE (Public Domain)
 
 **Status:** Included (sample subset - full list needed)
 
-The ENABLE (Enhanced North American Benchmark LExicon) is **public domain** and free to use.
+The original ENABLE (Enhanced North American Benchmark LExicon) is **public domain** and free to use.
 
 **Download Full ENABLE:**
 ```bash
@@ -31,7 +79,7 @@ curl -o assets/lexicons/ENABLE.txt http://www.puzzlers.org/pub/wordlists/enable1
 
 ---
 
-### Option 2: CSW24 (Licensed) 🔒
+### Option 4: CSW24 (Licensed) 🔒
 
 **Status:** Not included (requires license)
 
@@ -53,7 +101,7 @@ CSW24 (Collins Scrabble Words 2024) is the official competitive word list.
 
 ---
 
-### Option 3: TWL (Licensed) 🔒
+### Option 5: TWL (Licensed) 🔒
 
 **Status:** Not included (requires license)
 
@@ -65,7 +113,7 @@ TWL (Tournament Word List) is the North American official list.
 
 ---
 
-### Option 4: Custom Word List 📝
+### Option 6: Custom Word List 📝
 
 **Status:** User-provided
 
