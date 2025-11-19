@@ -1,7 +1,6 @@
 /// Visual effects and feedback systems for Stage 1
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::components::*;
 
 /// Colors for tile states
@@ -74,18 +73,14 @@ pub fn spawn_score_popup(
             lifetime: 1.5,
             elapsed: 0.0,
         },
-        Text2dBundle {
-            text: Text::from_section(
-                format!("+{}", points),
-                TextStyle {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 36.0,
-                    color,
-                },
-            ),
-            transform: Transform::from_translation(position),
+        Text2d::new(format!("+{}", points)),
+        TextFont {
+            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+            font_size: 36.0,
             ..default()
         },
+        TextColor(color),
+        Transform::from_translation(position),
     ));
 }
 

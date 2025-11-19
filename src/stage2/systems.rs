@@ -1,7 +1,6 @@
 /// Systems for Stage 2 gameplay logic
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use rand::Rng;
 use super::components::*;
 use super::{Stage2Config, Stage2State};
@@ -52,18 +51,18 @@ pub fn spawn_grid(
                     transform: Transform::from_xyz(x, y, 0.0),
                     ..default()
                 },
-                Text2dBundle {
-                    text: Text::from_section(
-                        letter.to_string(),
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 42.0,
-                            color: Color::srgb(0.1, 0.1, 0.1),
-                        },
-                    ),
-                    transform: Transform::from_xyz(x, y, 1.0),
+            ));
+
+            // Spawn letter text at higher z-level
+            commands.spawn((
+                Text2d::new(letter.to_string()),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 42.0,
                     ..default()
                 },
+                TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                Transform::from_xyz(x, y, 1.0),
             ));
         }
     }

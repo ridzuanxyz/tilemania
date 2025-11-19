@@ -1,7 +1,6 @@
 /// Systems for Stage 1 gameplay logic
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};
@@ -55,35 +54,32 @@ pub fn spawn_falling_tiles(
             let x_pos = -400.0 + (column as f32 * 120.0); // Spread across screen
             let y_pos = 400.0; // Top of screen
 
-            // Spawn the tile
-            commands.spawn((
+            // Spawn the tile (sprite + text as child for layering)
+            let tile_entity = commands.spawn((
                 FallingTile {
                     letter,
                     column,
                     speed: config.fall_speed,
                     is_selected: false,
                 },
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: Color::srgb(0.8, 0.8, 0.9),
-                        custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
-                        ..default()
-                    },
-                    transform: Transform::from_xyz(x_pos, y_pos, 0.0),
+                Sprite {
+                    color: Color::srgb(0.8, 0.8, 0.9),
+                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
                     ..default()
                 },
-                Text2dBundle {
-                    text: Text::from_section(
-                        letter.to_string(),
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 48.0,
-                            color: Color::srgb(0.1, 0.1, 0.1),
-                        },
-                    ),
-                    transform: Transform::from_xyz(x_pos, y_pos, 1.0),
+                Transform::from_xyz(x_pos, y_pos, 0.0),
+            )).id();
+
+            // Spawn letter text as child (z=1 for layering above sprite)
+            commands.spawn((
+                Text2d::new(letter.to_string()),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 48.0,
                     ..default()
                 },
+                TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                Transform::from_xyz(x_pos, y_pos, 1.0),
             ));
         }
     }

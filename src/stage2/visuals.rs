@@ -1,7 +1,6 @@
 /// Visual effects for Stage 2 (Match-3 gameplay)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::components::*;
 
 /// Color scheme for Stage 2 tiles
@@ -147,18 +146,15 @@ pub fn spawn_score_popup(
     position: Vec3,
     score: u32,
 ) {
-    let text_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 32.0,
-        color: Color::srgb(1.0, 0.95, 0.3),
-    };
-
     commands.spawn((
-        Text2dBundle {
-            text: Text::from_section(format!("+{}", score), text_style),
-            transform: Transform::from_translation(position + Vec3::new(0.0, 30.0, 10.0)),
+        Text2d::new(format!("+{}", score)),
+        TextFont {
+            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+            font_size: 32.0,
             ..default()
         },
+        TextColor(Color::srgb(1.0, 0.95, 0.3)),
+        Transform::from_translation(position + Vec3::new(0.0, 30.0, 10.0)),
         ScorePopup {
             initial_y: position.y,
             ..default()

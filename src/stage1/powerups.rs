@@ -2,7 +2,6 @@
 
 use bevy::prelude::*;
 use bevy::text::TextStyle;
-use bevy::ui::Style;
 use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};
@@ -69,18 +68,18 @@ pub fn spawn_powerup_pickups(
                     transform: Transform::from_xyz(x_pos, y_pos, 2.0),
                     ..default()
                 },
-                Text2dBundle {
-                    text: Text::from_section(
-                        powerup_icon(&powerup_type),
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 32.0,
-                            color: Color::WHITE,
-                        },
-                    ),
-                    transform: Transform::from_xyz(x_pos, y_pos, 3.0),
+            ));
+
+            // Spawn power-up icon text at higher z-level
+            commands.spawn((
+                Text2d::new(powerup_icon(&powerup_type)),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 32.0,
                     ..default()
                 },
+                TextColor(Color::WHITE),
+                Transform::from_xyz(x_pos, y_pos, 3.0),
             ));
 
             info!("💎 Spawned power-up: {:?}", powerup_type);

@@ -1,8 +1,6 @@
 /// Pause menu for Stage 3 (Classic Board)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
-use bevy::ui::Style;
 use crate::plugins::state::GameState;
 
 /// Marker for pause menu
