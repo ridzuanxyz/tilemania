@@ -105,7 +105,7 @@ fn spawn_splash_ui(commands: &mut Commands) {
     // Subtitle (using TextComponent)
     let subtitle = commands
         .spawn((
-            Text::new("Scrabble Learning Game"),
+            Text::new("Word Tile Strategy Game"),
             TextFont { font_size: 30.0, ..default() },
             TextColor(Color::srgb(0.7, 0.7, 0.8)),
             TextLayout::new_with_justify(JustifyText::Center),

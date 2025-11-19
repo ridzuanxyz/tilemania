@@ -44,7 +44,7 @@ pub fn spawn_falling_tiles(
         timer.tick(time.delta());
 
         if timer.just_finished() {
-            // Randomly select a letter weighted by Scrabble distribution
+            // Randomly select a letter weighted by standard tile distribution
             let letter = get_weighted_random_letter();
 
             // Randomly select a column
@@ -293,12 +293,12 @@ pub fn check_game_over(
     }
 }
 
-/// Returns a random letter weighted by Scrabble tile distribution
+/// Returns a random letter weighted by standard tile distribution
 fn get_weighted_random_letter() -> char {
     let mut rng = rand::thread_rng();
     let roll: u32 = rng.gen_range(0..100);
 
-    // Approximate Scrabble distribution (simplified)
+    // Standard English letter frequency distribution (simplified)
     match roll {
         0..=11 => 'E',   // 12%
         12..=20 => 'A',  // 9%

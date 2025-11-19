@@ -479,7 +479,7 @@ pub fn update_moves_display(
     }
 }
 
-/// Returns a weighted random letter (Scrabble distribution)
+/// Returns a weighted random letter (standard tile distribution)
 fn get_weighted_random_letter() -> char {
     let mut rng = rand::thread_rng();
     let roll: u32 = rng.gen_range(0..100);

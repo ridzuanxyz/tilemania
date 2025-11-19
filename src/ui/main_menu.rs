@@ -91,7 +91,7 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
     // Subtitle (using TextComponent)
     let subtitle = TextComponent::spawn(
         commands,
-        "Scrabble Learning Game",
+        "Word Tile Strategy Game",
         TextStyle::Subheading,
         TextColorVariant::Secondary,
     );
