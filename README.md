@@ -77,10 +77,10 @@ cargo build --release --target wasm32-unknown-unknown
 | Stage | Document | Lines of Code |
 |-------|----------|---------------|
 | Stage 1 | [STAGE1_COMPLETE_100_PERCENT.md](STAGE1_COMPLETE_100_PERCENT.md) | 2,136 |
-| Stage 2 | Git commit `e25f92f` | 2,238 |
-| Stage 3 | Git commit `45d515e` | 2,136 |
-| Stage 4 | Git commit `92f4a32` | 950 |
-| Stage 5 | Git commit `e6fee05` | 790 |
+| Stage 2 | [STAGE2_COMPLETE.md](STAGE2_COMPLETE.md) | 2,238 |
+| Stage 3 | [STAGE3_COMPLETE.md](STAGE3_COMPLETE.md) | 2,136 |
+| Stage 4 | [STAGE4_COMPLETE.md](STAGE4_COMPLETE.md) | 950 |
+| Stage 5 | [STAGE5_COMPLETE.md](STAGE5_COMPLETE.md) | 790 |
 
 ---
 
@@ -192,7 +192,15 @@ tilemania/
 ├── Cargo.toml                     # Rust dependencies
 ├── EXECUTIVE_SUMMARY.md           # Project overview
 ├── STAGES_2_5_ARCHITECTURE.md     # Implementation architecture
-└── STAGE1_COMPLETE_100_PERCENT.md # Stage 1 details
+├── STAGE1_COMPLETE_100_PERCENT.md # Stage 1 completion summary
+├── STAGE2_COMPLETE.md             # Stage 2 completion summary
+├── STAGE3_COMPLETE.md             # Stage 3 completion summary
+├── STAGE4_COMPLETE.md             # Stage 4 completion summary
+├── STAGE5_COMPLETE.md             # Stage 5 completion summary
+├── CHANGELOG.md                   # Version history
+├── ASSET_SPECIFICATIONS.md        # Asset requirements
+├── BUILD_GUIDE.md                 # Build instructions
+└── CONTRIBUTING.md                # Contribution guidelines
 ```
 
 ---
