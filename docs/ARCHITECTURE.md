@@ -1,10 +1,10 @@
 # 🏗️ Technical Architecture Document
-**Scrabble Learning Game (TileMania)**
+**Word Tile Strategy Game (TileMania)**
 
 ---
 
 ## 📋 Document Overview
-This document provides the technical architecture for the Scrabble Learning Game, designed for competitive Scrabble training for ages 7-12. The system is built using Rust and Bevy, with offline-first design and cross-platform deployment.
+This document provides the technical architecture for the Word Tile Strategy Game, designed for competitive Scrabble training for ages 7-12. The system is built using Rust and Bevy, with offline-first design and cross-platform deployment.
 
 **Last Updated:** 2025-10-08
 **Architecture Version:** 1.0
@@ -22,7 +22,7 @@ This document provides the technical architecture for the Scrabble Learning Game
 5. **Data Integrity**: Local persistence with data validation
 
 ### Technical Constraints
-- CSW24 lexicon (~280k words) must load in <2 seconds
+- TML lexicon (~280k words) must load in <2 seconds
 - Word validation must complete in <5ms
 - Game state transitions must feel instantaneous (<100ms)
 - WASM build size target: <10MB compressed
@@ -318,7 +318,7 @@ impl Plugin for Stage1Plugin {
 
 #### Stage 4: Rack Training
 - **Mechanic:** Given 7 tiles, find highest-scoring word
-- **Scoring:** Scrabble tile values (A=1, Z=10, etc.)
+- **Scoring:** tile values (A=1, Z=10, etc.)
 - **Difficulty Progression:** Harder racks, bingo opportunities
 - **Mastery Metric:** Average score >30 points per rack
 
@@ -331,7 +331,7 @@ impl Plugin for Stage1Plugin {
 #### Stage 6: Tournament Mode
 - **Mechanic:** Full 15x15 board, timed games, blank tiles
 - **Rules:** Standard Scrabble rules, 25-minute game clock
-- **AI Difficulty:** Advanced tournament-level play
+- **AI Difficulty:** Advanced competitive-level play
 - **Mastery Metric:** Win 40% against advanced AI
 
 ---

@@ -22,8 +22,8 @@ From **zero to production-ready** in three implementation phases:
 ## 📦 Complete Feature List
 
 ### **Core Gameplay** ✅
-- [x] CSW24 word validation (280,886 words, <1ms lookup)
-- [x] Scrabble scoring (tile values + time bonus + combos)
+- [x] TML word validation (167,737 words, <1ms lookup)
+- [x] tile scoring (tile values + time bonus + combos)
 - [x] 5 difficulty levels (Beginner → Expert)
 - [x] Falling tile physics (gravity + columns)
 - [x] Weighted letter distribution (matches Scrabble frequencies)
@@ -518,7 +518,7 @@ Build all 5 stages to complete MVP
 - Stage 2: Tile Matching
 - Stage 3: Classic Board
 - Stage 4: Speed Challenge
-- Stage 5: AI Tournaments
+- Stage 5: AI Competitions
 
 ---
 

@@ -91,14 +91,14 @@ tilemania/
 ├── src/
 │   ├── main.rs              # Entry point
 │   ├── lexicon/             # Word validation (CSW24)
-│   ├── scoring/             # Scrabble scoring engine
+│   ├── scoring/             # tile scoring engine
 │   ├── plugins/             # Core plugins
 │   ├── ui/                  # UI plugin
 │   ├── stage1/              # Falling Letters stage
 │   ├── stage2/              # Tile Matching stage
 │   ├── stage3/              # Classic Board stage
 │   ├── stage4/              # Speed Challenge stage
-│   └── stage5/              # AI Tournaments stage
+│   └── stage5/              # AI Competitions stage
 │
 ├── assets/                  # Game assets (fonts, audio, sprites)
 ├── docs/                    # Documentation
@@ -191,7 +191,7 @@ fn CalculateScore() { ... }
 /// * `word` - The word to validate
 ///
 /// # Returns
-/// * `true` if word is in CSW24 lexicon
+/// * `true` if word is in TML lexicon
 pub fn is_valid_word(word: &str) -> bool {
     // Implementation comments use //
     self.lexicon.contains(word)

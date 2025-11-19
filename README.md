@@ -1,6 +1,6 @@
-# 🧠 TileMania - Scrabble Learning Game
+# 🧠 TileMania - Word Tile Strategy Game
 
-**A modern, gamified platform to train future Scrabble champions (Ages 7-12)**
+**A modern, gamified platform to master word-building strategy and vocabulary (Ages 7-12)**
 
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 [![Bevy](https://img.shields.io/badge/bevy-0.15-blue.svg)](https://bevyengine.org/)
@@ -12,15 +12,15 @@
 
 ## 🎯 Project Overview
 
-TileMania transforms Scrabble learning from rote memorization into a **rewarding, playful, and strategic journey**. Through 5 progressive stages, kids master everything from 2-letter words to tournament-level strategy.
+TileMania transforms vocabulary learning from rote memorization into a **rewarding, playful, and strategic journey**. Through 5 progressive stages, kids master everything from 2-letter words to advanced word-building strategy.
 
 **✅ Implementation Complete:**
-- 🎮 **5 fully implemented gameplay stages** (Falling Letters → AI Tournaments)
+- 🎮 **5 fully implemented gameplay stages** (Falling Letters → AI Competitions)
 - 🌐 Offline-first design (no internet required)
 - 🦀 Built with Rust + Bevy 0.15 (fast, cross-platform)
-- 📚 CSW24 lexicon integration (280,886 words)
+- 📚 TML (TileMania Lexicon) integration (167,737 words, public domain)
 - 🤖 AI opponents with 5 difficulty levels per stage
-- 🏆 Tournament-ready training with bracket system
+- 🏆 Competitive play with bracket system
 - **10,270 lines** of production Rust code
 
 ---
@@ -95,9 +95,9 @@ cargo build --release --target wasm32-unknown-unknown
 |-------|-------|----------|--------|-------|
 | **1** | 2-letter words | Falling letters arcade game | ✅ Complete | 2,136 |
 | **2** | 3-4 letter words | Match-3 tile grid (8×8) | ✅ Complete | 2,238 |
-| **3** | Classic board | 15×15 Scrabble vs AI | ✅ Complete | 2,136 |
+| **3** | Classic board | 15×15 word tile board vs AI | ✅ Complete | 2,136 |
 | **4** | Speed challenge | Rapid word formation | ✅ Complete | 950 |
-| **5** | AI tournaments | 8-player bracket elimination | ✅ Complete | 790 |
+| **5** | AI competitions | 8-player bracket elimination | ✅ Complete | 790 |
 
 **Total Implementation:** 8,250 lines across 5 stages + 400 lines core systems = **~10,270 lines**
 
@@ -108,7 +108,7 @@ cargo build --release --target wasm32-unknown-unknown
 - 5 difficulty levels (90s → 45s time limits)
 - Combo system (1x → 3x multiplier)
 - 4 power-ups (Slow Motion, Bomb, Shuffle, Extra Time)
-- Real-time validation against CSW24 lexicon
+- Real-time word validation using TML lexicon
 
 #### Stage 2: Tile Matching ([Full Details](STAGE2_COMPLETE.md))
 - Match-3 gameplay on 8×8 grid
@@ -118,7 +118,7 @@ cargo build --release --target wasm32-unknown-unknown
 - Moves limit on higher difficulties
 
 #### Stage 3: Classic Board ([Full Details](STAGE3_COMPLETE.md))
-- Full 15×15 Scrabble board with premium squares
+- Full 15×15 word tile board with premium squares
 - AI opponent with 5 difficulty levels
 - Turn-based gameplay with 7-tile rack
 - Standard 100-tile bag distribution
@@ -131,7 +131,7 @@ cargo build --release --target wasm32-unknown-unknown
 - Panic mode at low time
 - Fast-paced scoring
 
-#### Stage 5: AI Tournaments ([Full Details](STAGE5_COMPLETE.md))
+#### Stage 5: AI Competitions ([Full Details](STAGE5_COMPLETE.md))
 - 8-player single-elimination bracket
 - 7 unique AI opponents with personalities
 - Best-of-3 match format
@@ -144,8 +144,8 @@ cargo build --release --target wasm32-unknown-unknown
 
 - **Language:** Rust 1.70+ 🦀
 - **Engine:** Bevy 0.15 (ECS, 2D rendering, UI)
-- **Lexicon:** CSW24 (Collins Scrabble Words 2024, 280,886 words)
-- **Scrabble Engine:** wolges (GADDAG-based move generation)
+- **Lexicon:** TML - TileMania Lexicon (167,737 words, public domain)
+- **Word Engine:** wolges (GADDAG-based word generation)
 - **Dependencies:** rand, bevy_text
 - **Platforms:** Desktop (Windows/Mac/Linux) + Web (WASM)
 
@@ -159,8 +159,8 @@ tilemania/
 │   ├── main.rs                    # App entry point (42 lines)
 │   ├── plugins/                   # Core plugins (state, assets, input)
 │   ├── ui/                        # UI plugin
-│   ├── lexicon/                   # CSW24 word validation (155 lines)
-│   ├── scoring/                   # Scrabble scoring engine (180 lines)
+│   ├── lexicon/                   # Word validation (155 lines)
+│   ├── scoring/                   # Tile scoring engine (180 lines)
 │   ├── stage1/                    # Falling Letters (2,136 lines)
 │   │   ├── mod.rs, components.rs, systems.rs
 │   │   ├── difficulty.rs, visuals.rs, ui.rs
@@ -184,7 +184,8 @@ tilemania/
 │
 ├── assets/
 │   ├── lexicons/
-│   │   └── CSW24.txt              # 280,886 words
+│   │   ├── TML.txt                # 167,737 words (included)
+│   │   └── RE-ENABLE.txt          # 172,400 words (included)
 │   ├── fonts/                     # Typography (placeholders)
 │   ├── audio/                     # SFX & music (placeholders)
 │   └── sprites/                   # Visual assets (placeholders)
@@ -222,8 +223,8 @@ tilemania/
 - ✅ Stage 5: AI Tournaments (790 lines)
 
 **Core Systems:**
-- ✅ Lexicon integration (CSW24, 280,886 words)
-- ✅ Scrabble scoring engine
+- ✅ Lexicon integration (TML, 167,737 words)
+- ✅ Tile scoring engine
 - ✅ State management (12 game states)
 - ✅ Plugin architecture
 - ✅ ECS component systems
@@ -253,13 +254,13 @@ tilemania/
 ## 🏆 Key Features Implemented
 
 ### Lexicon System
-- ✅ CSW24 word validation (280,886 words)
+- ✅ TML word validation (167,737 words, public domain)
 - ✅ O(1) lookup performance (HashSet-based)
 - ✅ Length-based filtering (2-15 letters)
 - ✅ Case-insensitive validation
 
 ### Scoring System
-- ✅ Standard Scrabble tile values
+- ✅ Standard tile point values
 - ✅ Premium square bonuses (DL, TL, DW, TW)
 - ✅ Time bonuses
 - ✅ Combo multipliers
@@ -270,7 +271,7 @@ tilemania/
 - ✅ AI personalities (Aggressive, Defensive, Balanced)
 - ✅ Move generation algorithms
 - ✅ Strategic play (blocking, high-scoring moves)
-- ✅ Tournament bracket management
+- ✅ Competition bracket management
 
 ### Visual Systems
 - ✅ Particle effects
@@ -286,7 +287,7 @@ tilemania/
 - ✅ Results screens
 - ✅ Pause menus (ESC key)
 - ✅ Difficulty selection
-- ✅ Tournament bracket visualization
+- ✅ Competition bracket visualization
 
 ### Audio Hooks
 - ✅ Event-based audio system (ready for assets)
@@ -321,7 +322,7 @@ cargo run --release
 - Scoring calculations
 - Difficulty level configurations
 - AI move generation
-- Tournament bracket logic
+- Competition bracket logic
 
 ---
 
@@ -344,7 +345,7 @@ cargo run --release
 - **Stages Implemented:** 5/5 (100%)
 - **AI Difficulty Levels:** 25 (5 per stage)
 - **Game States:** 12
-- **Word Count:** 280,886 (CSW24)
+- **Word Count:** 167,737 (TML - public domain)
 - **Supported Platforms:** Desktop + Web (WASM)
 - **Target Age:** 7-12 years
 - **Development Status:** Core Complete, Assets Pending
@@ -368,7 +369,7 @@ cargo run --release
 
 ### ✅ Phase 1: Core Implementation (COMPLETE)
 - ✅ All 5 gameplay stages
-- ✅ Lexicon integration (CSW24)
+- ✅ Lexicon integration (TML - public domain)
 - ✅ AI opponent system
 - ✅ Scoring engine
 - ✅ State management
@@ -426,10 +427,10 @@ Each stage follows the same 8-module pattern:
 
 ## 🎓 Learning Resources
 
-### Scrabble Strategy
-- [NASPA](https://www.scrabbleplayers.org/) - North American Scrabble Players Association
-- [WESPA](https://www.wespa.org/) - World English Scrabble Players Association
-- [CSW24](https://scrabble.org.au/words/csw24) - Official word list
+### Word Game Resources
+- [RE-Enable Lexicon](https://github.com/JakesMD/Re-Enable) - Public domain word list
+- [ENABLE Word List](http://www.puzzlers.org/pub/wordlists/) - Public domain lexicons
+- [Word Game Strategy](https://en.wikipedia.org/wiki/Word_game) - General strategy guides
 
 ### Technical Resources
 - [Bevy Book](https://bevyengine.org/learn/book/introduction/)
@@ -460,22 +461,22 @@ Each stage follows the same 8-module pattern:
 
 ## 📜 License
 
-Educational use only (MVP phase). See [docs/ARCHITECTURE_DECISIONS.md](docs/ARCHITECTURE_DECISIONS.md) for CSW24 licensing details.
+Proprietary software. All rights reserved. See [LICENSE](LICENSE) for details.
 
-For commercial use, will require:
-- HarperCollins license for CSW24
-- OR switch to TWL/OSPD
-- OR educational-only distribution
+**Lexicon:**
+- TML (TileMania Lexicon) - Public domain (derived from RE-Enable)
+- RE-ENABLE - Public domain
+- Users may optionally provide their own licensed word lists (CSW24, etc.)
 
 ---
 
 ## 🎉 Acknowledgments
 
-- Collins Scrabble Words (CSW24) - HarperCollins Publishers
-- wolges crate - Andy Kurnia
+- RE-Enable Lexicon - JakesMD (public domain word list)
+- ENABLE Word List - Original public domain contributors
+- wolges crate - Andy Kurnia (word generation algorithms)
 - Bevy Engine - Bevy Foundation
 - Rust community for excellent tooling
-- Scrabble grandmasters worldwide for pedagogical insights
 
 ---
 
@@ -494,6 +495,6 @@ For questions about:
 
 ---
 
-*"Training the next generation of Scrabble champions, one word at a time."* 🏆
+*"Building vocabulary and strategy skills, one word at a time."* 🏆
 
 **Built with ❤️ using Rust 🦀 and Bevy 🕊️**

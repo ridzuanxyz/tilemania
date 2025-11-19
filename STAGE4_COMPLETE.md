@@ -21,7 +21,7 @@
 - [x] 7-tile rack (refreshes after each word)
 - [x] Weighted tile distribution (Scrabble frequencies)
 - [x] Real-time word validation (instant feedback)
-- [x] Scrabble scoring system
+- [x] tile scoring system
 - [x] Time limits (120s-45s based on difficulty)
 - [x] Target score goals
 - [x] Streak multiplier system
@@ -471,4 +471,4 @@ victory_theme.ogg:
 **Project:** TileMania - Stage 4 (Speed Challenge)
 **Status:** ✅ **100% COMPLETE**
 **Date:** 2025-11-18
-**Next:** Stage 5 - AI Tournaments! 🏆
+**Next:** Stage 5 - AI Competitions! 🏆
