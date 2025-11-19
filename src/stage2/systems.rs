@@ -87,7 +87,14 @@ pub fn handle_tile_selection(
     let (camera, camera_transform) = camera_query.single();
 
     if let Some(cursor_pos) = window.cursor_position() {
-        if let Some(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
+        if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
+            // Get selected tile's grid position before iterating (to avoid borrow conflicts)
+            let selected_grid_pos = if let Some(selected_entity) = state.selected_tile {
+                tile_query.get(selected_entity).ok().map(|(_, tile, _)| tile.grid_pos)
+            } else {
+                None
+            };
+
             // Check if click hit a tile
             for (entity, mut tile, transform) in tile_query.iter_mut() {
                 let tile_pos = transform.translation.truncate();
@@ -97,8 +104,7 @@ pub fn handle_tile_selection(
                     if let Some(selected) = state.selected_tile {
                         // Second tile selected - check if adjacent
                         if selected != entity {
-                            if let Ok((_, selected_tile, _)) = tile_query.get(selected) {
-                                let (r1, c1) = selected_tile.grid_pos;
+                            if let Some((r1, c1)) = selected_grid_pos {
                                 let (r2, c2) = tile.grid_pos;
 
                                 // Check if adjacent (not diagonal)
@@ -440,7 +446,7 @@ pub fn update_score_display(
     config: Res<Stage2Config>,
 ) {
     for mut text in query.iter_mut() {
-        text.sections[0].value = format!("Score: {} / {}", state.score, config.target_score);
+        **text = format!("Score: {} / {}", state.score, config.target_score);
     }
 }
 
@@ -459,7 +465,7 @@ pub fn update_timer(
 
     for mut text in query.iter_mut() {
         let seconds = state.time_remaining_ms / 1000;
-        text.sections[0].value = format!("Time: {}s", seconds);
+        **text = format!("Time: {}s", seconds);
     }
 }
 
@@ -471,10 +477,10 @@ pub fn update_moves_display(
 ) {
     for mut text in query.iter_mut() {
         if config.moves_limit > 0 {
-            text.sections[0].value = format!("Moves: {} / {}",
+            **text = format!("Moves: {} / {}",
                 state.moves_made, config.moves_limit);
         } else {
-            text.sections[0].value = format!("Moves: {}", state.moves_made);
+            **text = format!("Moves: {}", state.moves_made);
         }
     }
 }

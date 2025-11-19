@@ -6,7 +6,7 @@
 use bevy::prelude::*;
 
 /// Audio events that can be triggered
-#[derive(Event)]
+#[derive(Event, Debug)]
 pub enum AudioEvent {
     // UI Sounds
     ButtonClick,

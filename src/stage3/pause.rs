@@ -39,22 +39,12 @@ pub fn spawn_pause_menu(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let title_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 64.0,
-        color: Color::srgb(0.9, 0.9, 1.0),
-    };
-
-    let button_text_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 32.0,
-        color: Color::srgb(0.1, 0.1, 0.15),
-    };
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     position_type: PositionType::Absolute,
@@ -64,24 +54,29 @@ pub fn spawn_pause_menu(
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(),
-                z_index: ZIndex::Global(100),
+                z_index: ZIndex(100),
                 ..default()
             },
             PauseMenu,
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle {
-                text: Text::from_section("PAUSED", title_style),
-                style: Style {
+            parent.spawn((
+                Text::new("PAUSED"),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 64.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.9, 0.9, 1.0)),
+                Node {
                     margin: UiRect::bottom(Val::Px(50.0)),
                     ..default()
                 },
-                ..default()
-            });
+            ));
 
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(20.0),
                         ..default()
@@ -92,7 +87,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -105,13 +100,21 @@ pub fn spawn_pause_menu(
                             PauseButton::Resume,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section("Resume", button_text_style.clone()));
+                            button.spawn((
+                                Text::new("Resume"),
+                                TextFont {
+                                    font: font_bold.clone(),
+                                    font_size: 32.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
+                            ));
                         });
 
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -124,13 +127,21 @@ pub fn spawn_pause_menu(
                             PauseButton::Restart,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section("Restart", button_text_style.clone()));
+                            button.spawn((
+                                Text::new("Restart"),
+                                TextFont {
+                                    font: font_bold.clone(),
+                                    font_size: 32.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
+                            ));
                         });
 
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -143,7 +154,15 @@ pub fn spawn_pause_menu(
                             PauseButton::Quit,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section("Quit to Menu", button_text_style.clone()));
+                            button.spawn((
+                                Text::new("Quit to Menu"),
+                                TextFont {
+                                    font: font_bold.clone(),
+                                    font_size: 32.0,
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
+                            ));
                         });
                 });
         });

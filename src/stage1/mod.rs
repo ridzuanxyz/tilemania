@@ -49,10 +49,9 @@ impl Plugin for Stage1Plugin {
 
             // Gameplay
             .add_systems(OnEnter(GameState::Stage1Playing), (spawn_stage1_hud, spawn_powerup_ui))
+            // Core gameplay systems
             .add_systems(Update, (
-                // Pause handling
                 handle_pause_input,
-                // Core gameplay
                 spawn_falling_tiles,
                 update_falling_tiles,
                 handle_tile_selection,
@@ -60,22 +59,24 @@ impl Plugin for Stage1Plugin {
                 update_score_display,
                 update_timer,
                 check_game_over,
-                // Visual feedback
+            ).run_if(in_state(GameState::Stage1Playing)))
+            // Visual feedback systems
+            .add_systems(Update, (
                 update_tile_visuals,
                 update_score_popups,
                 update_validation_flash,
                 update_combo_glow,
                 update_particles,
-                // UI updates
+            ).run_if(in_state(GameState::Stage1Playing)))
+            // UI and power-up systems
+            .add_systems(Update, (
                 update_combo_display,
                 update_word_display,
-                // Power-ups
                 spawn_powerup_pickups,
                 collect_powerups,
                 activate_powerups,
                 update_powerup_timers,
                 update_powerup_display,
-                // Audio
                 play_audio_events,
             ).run_if(in_state(GameState::Stage1Playing)))
 

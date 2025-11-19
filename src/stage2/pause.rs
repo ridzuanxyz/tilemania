@@ -45,7 +45,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     position_type: PositionType::Absolute,
@@ -57,7 +57,7 @@ pub fn spawn_pause_menu(
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(), // 80% black overlay
-                z_index: ZIndex::Global(100), // Ensure it's on top
+                z_index: ZIndex(100), // Ensure it's on top
                 ..default()
             },
             PauseMenu,
@@ -81,7 +81,7 @@ pub fn spawn_pause_menu(
             // Buttons container
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(20.0),
                         ..default()
@@ -93,7 +93,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -121,7 +121,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -149,7 +149,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -189,6 +189,16 @@ pub fn spawn_pause_menu(
                 },
             ));
         });
+}
+
+/// Despawn pause menu
+pub fn despawn_pause_menu(
+    mut commands: Commands,
+    query: Query<Entity, With<PauseMenu>>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
 }
 
 /// Handle pause menu button clicks

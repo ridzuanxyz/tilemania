@@ -21,22 +21,12 @@ pub fn spawn_stage4_hud(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let label_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Medium.ttf"),
-        font_size: 20.0,
-        color: Color::srgb(0.7, 0.7, 0.8),
-    };
-
-    let value_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 36.0,
-        color: Color::srgb(1.0, 1.0, 1.0),
-    };
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Px(80.0),
                     position_type: PositionType::Absolute,
@@ -52,26 +42,35 @@ pub fn spawn_stage4_hud(
         ))
         .with_children(|parent| {
             parent.spawn((
-                TextBundle::from_sections([
-                    TextSection::new("Score: ", label_style.clone()),
-                    TextSection::new("0", value_style.clone()),
-                ]),
+                Text::new("Score: 0"),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 1.0, 1.0)),
                 HUDElement::Score,
             ));
 
             parent.spawn((
-                TextBundle::from_sections([
-                    TextSection::new("Time: ", label_style.clone()),
-                    TextSection::new("90s", value_style.clone()),
-                ]),
+                Text::new("Time: 90s"),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 1.0, 1.0)),
                 HUDElement::Timer,
             ));
 
             parent.spawn((
-                TextBundle::from_sections([
-                    TextSection::new("Streak: x", label_style.clone()),
-                    TextSection::new("0", value_style.clone()),
-                ]),
+                Text::new("Streak: x0"),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 1.0, 1.0)),
                 HUDElement::Streak,
             ));
         });
@@ -80,40 +79,40 @@ pub fn spawn_stage4_hud(
 /// Update HUD
 pub fn update_stage4_hud(
     state: Res<Stage4State>,
-    mut hud_query: Query<(&HUDElement, &mut Text)>,
+    mut hud_query: Query<(&HUDElement, &mut Text, &mut TextColor)>,
 ) {
-    for (element, mut text) in hud_query.iter_mut() {
+    for (element, mut text, mut text_color) in hud_query.iter_mut() {
         match element {
             HUDElement::Score => {
-                text.sections[1].value = state.score.to_string();
+                **text = format!("Score: {}", state.score);
             }
             HUDElement::Timer => {
                 let seconds = state.time_remaining_ms / 1000;
-                text.sections[1].value = format!("{}s", seconds);
+                **text = format!("Time: {}s", seconds);
 
                 // Color based on time remaining
                 if seconds < 10 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.2, 0.2);
+                    text_color.0 = Color::srgb(1.0, 0.2, 0.2);
                 } else if seconds < 30 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.7, 0.3);
+                    text_color.0 = Color::srgb(1.0, 0.7, 0.3);
                 } else {
-                    text.sections[1].style.color = Color::srgb(1.0, 1.0, 1.0);
+                    text_color.0 = Color::srgb(1.0, 1.0, 1.0);
                 }
             }
             HUDElement::Streak => {
-                text.sections[1].value = state.current_streak.to_string();
+                **text = format!("Streak: x{}", state.current_streak);
 
                 // Color based on streak
                 if state.current_streak >= 10 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.3, 1.0);
+                    text_color.0 = Color::srgb(1.0, 0.3, 1.0);
                 } else if state.current_streak >= 5 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.8, 0.3);
+                    text_color.0 = Color::srgb(1.0, 0.8, 0.3);
                 } else {
-                    text.sections[1].style.color = Color::srgb(1.0, 1.0, 1.0);
+                    text_color.0 = Color::srgb(1.0, 1.0, 1.0);
                 }
             }
             HUDElement::WordCount => {
-                text.sections[1].value = state.words_formed.to_string();
+                **text = format!("Words: {}", state.words_formed);
             }
         }
     }

@@ -34,9 +34,9 @@ pub fn update_board_highlights(
 pub fn update_score_popups(
     mut commands: Commands,
     time: Res<Time>,
-    mut popup_query: Query<(Entity, &mut Transform, &mut Text, &mut ScoreDisplay)>,
+    mut popup_query: Query<(Entity, &mut Transform, &mut TextColor, &mut ScoreDisplay)>,
 ) {
-    for (entity, mut transform, mut text, mut display) in popup_query.iter_mut() {
+    for (entity, mut transform, mut text_color, mut display) in popup_query.iter_mut() {
         display.lifetime.tick(time.delta());
 
         // Rise upward
@@ -44,15 +44,7 @@ pub fn update_score_popups(
 
         // Fade out
         let alpha = 1.0 - display.lifetime.fraction();
-        for section in &mut text.sections {
-            let color = section.style.color;
-            section.style.color = Color::srgba(
-                color.to_srgba().red,
-                color.to_srgba().green,
-                color.to_srgba().blue,
-                alpha,
-            );
-        }
+        text_color.0 = text_color.0.with_alpha(alpha);
 
         // Remove when finished
         if display.lifetime.finished() {
@@ -63,10 +55,10 @@ pub fn update_score_popups(
 
 /// Update move preview
 pub fn update_move_preview(
-    preview_query: Query<(&MovePreview, &mut Sprite)>,
+    mut preview_query: Query<(&MovePreview, &mut Sprite)>,
 ) {
     // Visual feedback for where tiles will be placed
-    for (preview, mut sprite) in preview_query.iter() {
+    for (preview, mut sprite) in preview_query.iter_mut() {
         if preview.is_valid {
             sprite.color = Color::srgba(0.3, 0.9, 0.3, 0.6); // Valid green
         } else {

@@ -33,7 +33,7 @@ pub fn spawn_pause_menu(
 ) {
     commands.spawn((
         NodeBundle {
-            style: Style {
+            node: Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 position_type: PositionType::Absolute,
@@ -43,7 +43,7 @@ pub fn spawn_pause_menu(
                 ..default()
             },
             background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(),
-            z_index: ZIndex::Global(100),
+            z_index: ZIndex(100),
             ..default()
         },
         PauseMenu,

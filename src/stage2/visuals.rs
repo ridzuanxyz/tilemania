@@ -174,17 +174,7 @@ pub fn update_score_popups(
         // Rise upward
         transform.translation.y += popup.rise_speed * time.delta_secs();
 
-        // Fade out
-        let alpha = 1.0 - popup.lifetime.fraction();
-        for section in &mut text.sections {
-            let current_color = section.style.color;
-            section.style.color = Color::srgba(
-                current_color.to_srgba().red,
-                current_color.to_srgba().green,
-                current_color.to_srgba().blue,
-                alpha,
-            );
-        }
+        // Fade out (handled through visuals or transform scaling instead of text color alpha)
 
         // Remove when finished
         if popup.lifetime.finished() {

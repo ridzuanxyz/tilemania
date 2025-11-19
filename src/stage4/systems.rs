@@ -95,7 +95,7 @@ pub fn validate_word(
     }
 
     // Calculate score with streak multiplier
-    let base_score = scorer.calculate_word_score(&word, &[]);
+    let base_score = scorer.calculate_score(&word, 0.0, 1.0);
     let streak_multiplier = config.streak_bonus_multiplier.powi(state.current_streak as i32);
     let final_score = (base_score as f32 * streak_multiplier) as u32;
 
@@ -140,7 +140,9 @@ pub fn refresh_rack(
 ) {
     for _event in word_events.read() {
         // Remove used tiles (in reverse to preserve indices)
-        for &idx in state.selected_indices.iter().rev() {
+        // Collect indices to avoid borrow conflicts
+        let indices_to_remove: Vec<usize> = state.selected_indices.iter().rev().copied().collect();
+        for idx in indices_to_remove {
             if idx < state.rack.len() {
                 state.rack.remove(idx);
             }

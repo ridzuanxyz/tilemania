@@ -24,23 +24,21 @@ pub fn update_timer_visuals(
 pub fn update_score_popups(
     mut commands: Commands,
     time: Res<Time>,
-    mut popup_query: Query<(Entity, &mut Transform, &mut Text, &mut ScorePopup)>,
+    mut popup_query: Query<(Entity, &mut Transform, &mut TextColor, &mut ScorePopup)>,
 ) {
-    for (entity, mut transform, mut text, mut popup) in popup_query.iter_mut() {
+    for (entity, mut transform, mut text_color, mut popup) in popup_query.iter_mut() {
         popup.lifetime.tick(time.delta());
 
         transform.translation.y += popup.rise_speed * time.delta_secs();
 
         let alpha = 1.0 - popup.lifetime.fraction();
-        for section in &mut text.sections {
-            let color = section.style.color;
-            section.style.color = Color::srgba(
-                color.to_srgba().red,
-                color.to_srgba().green,
-                color.to_srgba().blue,
-                alpha,
-            );
-        }
+        let color = text_color.0;
+        text_color.0 = Color::srgba(
+            color.to_srgba().red,
+            color.to_srgba().green,
+            color.to_srgba().blue,
+            alpha,
+        );
 
         if popup.lifetime.finished() {
             commands.entity(entity).despawn();

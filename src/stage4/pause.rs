@@ -34,7 +34,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     position_type: PositionType::Absolute,
@@ -44,20 +44,21 @@ pub fn spawn_pause_menu(
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(),
-                z_index: ZIndex::Global(100),
+                z_index: ZIndex(100),
                 ..default()
             },
             PauseMenu,
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle {
-                text: Text::from_section("PAUSED", TextStyle {
+            parent.spawn((
+                Text::new("PAUSED"),
+                TextFont {
                     font: asset_server.load("fonts/FiraSans-Bold.ttf"),
                     font_size: 64.0,
-                    color: Color::srgb(0.9, 0.9, 1.0),
-                }),
-                ..default()
-            });
+                    ..default()
+                },
+                TextColor(Color::srgb(0.9, 0.9, 1.0)),
+            ));
         });
 }
 

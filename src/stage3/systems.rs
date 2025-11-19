@@ -171,8 +171,9 @@ pub fn execute_move(
     });
 
     // Record move
+    let turn_number = state.moves_history.len() as u32 + 1;
     state.moves_history.push(super::MoveRecord {
-        turn_number: state.moves_history.len() as u32 + 1,
+        turn_number,
         player: Turn::Player,
         word: word.clone(),
         score,
@@ -294,7 +295,7 @@ fn calculate_move_score(
     scorer: &ScoreCalculator,
 ) -> u32 {
     // Simplified scoring - real implementation accounts for premium squares
-    let base_score = scorer.calculate_word_score(word, &[]);
+    let base_score = scorer.calculate_score(word, 0.0, 1.0);
 
     // Apply premium square bonuses
     let mut total_score = base_score;

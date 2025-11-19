@@ -87,10 +87,10 @@ pub fn spawn_score_popup(
 /// Updates and removes score popups
 pub fn update_score_popups(
     mut commands: Commands,
-    mut query: Query<(Entity, &mut ScorePopup, &mut Transform, &mut Text)>,
+    mut query: Query<(Entity, &mut ScorePopup, &mut Transform, &mut TextColor)>,
     time: Res<Time>,
 ) {
-    for (entity, mut popup, mut transform, mut text) in query.iter_mut() {
+    for (entity, mut popup, mut transform, mut text_color) in query.iter_mut() {
         popup.elapsed += time.delta_secs();
 
         // Float upward
@@ -98,10 +98,7 @@ pub fn update_score_popups(
 
         // Fade out
         let alpha = 1.0 - (popup.elapsed / popup.lifetime);
-        if let Some(section) = text.sections.first_mut() {
-            let current_color = section.style.color;
-            section.style.color = current_color.with_alpha(alpha);
-        }
+        text_color.0 = text_color.0.with_alpha(alpha);
 
         // Despawn when done
         if popup.elapsed >= popup.lifetime {
@@ -159,18 +156,15 @@ pub struct ComboGlow {
 
 /// Animates combo multiplier glow effect
 pub fn update_combo_glow(
-    mut query: Query<(&ComboGlow, &mut Text)>,
+    mut query: Query<(&ComboGlow, &mut TextColor)>,
     time: Res<Time>,
 ) {
-    for (glow, mut text) in query.iter_mut() {
+    for (glow, mut text_color) in query.iter_mut() {
         // Pulsing glow effect
         let pulse = (glow.time * glow.pulse_speed).sin() * 0.5 + 0.5;
         let alpha = 0.7 + pulse * 0.3;
 
-        if let Some(section) = text.sections.first_mut() {
-            let base_color = section.style.color;
-            section.style.color = base_color.with_alpha(alpha);
-        }
+        text_color.0 = text_color.0.with_alpha(alpha);
     }
 }
 
