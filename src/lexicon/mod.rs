@@ -1,7 +1,7 @@
 /// Lexicon module for word validation
 ///
 /// This module provides fast word validation using a HashSet-based approach
-/// optimized for various word list formats (CSW24, TWL, ENABLE, etc.).
+/// optimized for various word list formats (CSW24, ENABLE, etc.).
 
 use std::collections::HashSet;
 use std::fs;
@@ -65,19 +65,23 @@ impl Lexicon {
     ///
     /// Tries to load lexicons in the following order:
     /// 1. CSW24.txt (if user has licensed copy)
-    /// 2. ENABLE.txt (public domain)
-    /// 3. TWL.txt (if available)
-    /// 4. custom.txt (user-provided)
+    /// 2. TML.txt (TileMania Lexicon - RE-Enable filtered to CSW24 words, avoids US/UK confusion)
+    /// 3. RE-ENABLE.txt (full public domain RE-Enable, 172K words)
+    /// 4. ENABLE.txt (original public domain, 173K words)
+    /// 5. custom.txt (user-provided)
     ///
     /// # Returns
     /// * `Result<Lexicon, String>` - First successfully loaded lexicon or error if none found
     pub fn load_default() -> Result<Self, String> {
         let paths = vec![
             "assets/lexicons/CSW24.txt",
+            "assets/lexicons/TML.txt",
+            "assets/lexicons/RE-ENABLE.txt",
             "assets/lexicons/ENABLE.txt",
-            "assets/lexicons/TWL.txt",
             "assets/lexicons/custom.txt",
             "CSW24.txt",  // Try root directory as fallback
+            "TML.txt",
+            "RE-ENABLE.txt",
             "ENABLE.txt",
         ];
 
@@ -100,10 +104,12 @@ impl Lexicon {
             "No word list found! Tried multiple locations.\n\
              Last error: {}\n\n\
              To use TileMania, you must provide a word list:\n\
+             1. Download RE-ENABLE (recommended): https://github.com/JakesMD/Re-Enable\n\
+             2. Save as: assets/lexicons/RE-ENABLE.txt\n\
+             OR\n\
              1. Download ENABLE (public domain): http://www.puzzlers.org/pub/wordlists/enable1.txt\n\
-             2. Save as: assets/lexicons/ENABLE.txt\n\
-             3. Or provide your own word list (one word per line, uppercase)\n\n\
-             See LEGAL_CONSIDERATIONS.md for licensing information.",
+             2. Save as: assets/lexicons/ENABLE.txt\n\n\
+             See assets/lexicons/README.md for more options and licensing information.",
             last_error
         ))
     }

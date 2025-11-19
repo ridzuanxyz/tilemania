@@ -50,8 +50,8 @@ examples/
 *.zip
 *.7z
 
-# Large word lists that shouldn't be in image
-# (User must mount their own licensed lexicons)
+# Licensed word lists that shouldn't be in image
+# (User must mount their own licensed lexicons if they have them)
+# Note: TML.txt and RE-ENABLE.txt are public domain and included in the image
 assets/lexicons/CSW24.txt
-assets/lexicons/TWL*.txt
 assets/lexicons/SOWPODS.txt
