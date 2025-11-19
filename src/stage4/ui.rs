@@ -1,7 +1,7 @@
 /// UI for Stage 4 (Speed Challenge)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
+use bevy::text::{TextStyle, TextSection};
 use bevy::ui::Style;
 use super::{Stage4State, Stage4Config};
 

@@ -1,7 +1,7 @@
 /// UI for Stage 3 (Classic Board)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
+use bevy::text::{TextStyle, TextSection};
 use bevy::ui::Style;
 use super::{Stage3State, Stage3Config, Turn};
 use crate::plugins::state::GameState;
