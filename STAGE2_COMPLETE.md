@@ -21,8 +21,8 @@ A unique fusion of **Match-3 gameplay** with **Scrabble word formation** on an 8
 - [x] 8×8 tile grid with Match-3 mechanics
 - [x] Tile swapping (adjacent tiles only)
 - [x] Horizontal & vertical word detection (3-4 letters)
-- [x] CSW24 word validation
-- [x] Scrabble scoring with match bonuses
+- [x] TML word validation
+- [x] tile scoring with match bonuses
 - [x] Cascade mechanics (tiles fall to fill gaps)
 - [x] New tile spawning (weighted distribution)
 - [x] Combo system (sequential matches)
@@ -290,7 +290,7 @@ intense_theme.ogg:
 ### **Smart Match Detection**
 - Detects all valid 3-4 letter words in both directions
 - Single swap can create multiple words simultaneously
-- Validates against CSW24 lexicon (only real words count)
+- Validates against TML lexicon (only real words count)
 
 ### **Cascade Combos**
 - Cleared tiles cause tiles above to fall

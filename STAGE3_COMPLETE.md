@@ -18,7 +18,7 @@
 ## 📦 Complete Feature List
 
 ### **Board System** ✅
-- [x] 15×15 Scrabble board (225 squares)
+- [x] 15×15 word tile board (225 squares)
 - [x] Premium square layout (DW, TW, DL, TL)
   - Triple Word (TW): 8 squares (corners + mid-sides)
   - Double Word (DW): 17 squares (diagonal pattern)
@@ -40,7 +40,7 @@
 ### **Gameplay Mechanics** ✅
 - [x] Turn-based play (Player vs. AI)
 - [x] Word placement (horizontal/vertical)
-- [x] Word validation (CSW24 lexicon)
+- [x] Word validation (TML lexicon)
 - [x] Premium square application
 - [x] Bingo detection (7-letter word = +50 bonus)
 - [x] Score calculation with all bonuses
@@ -424,7 +424,7 @@ endgame_theme.ogg:
 ## 🏆 Production Status
 
 **What's Complete:**
-✅ Full 15×15 Scrabble board
+✅ Full 15×15 word tile board
 ✅ Premium square system
 ✅ 100-tile bag with distribution
 ✅ Turn-based gameplay
@@ -446,7 +446,7 @@ endgame_theme.ogg:
 
 **What's Needed to Play:**
 1. Compile with wolges crate
-2. Load CSW24 lexicon
+2. Load TML lexicon
 3. Add audio assets (optional)
 4. Playtest AI balance
 5. **PLAY!**
@@ -460,7 +460,7 @@ endgame_theme.ogg:
 **New Systems:** Board grid, AI engine, GADDAG integration, tile bag
 
 **Key Innovations:**
-- Full Scrabble board implementation
+- Full word tile board implementation
 - 5-level intelligent AI
 - Premium square calculations
 - Realistic tile distribution

@@ -162,7 +162,7 @@ assets/
 | `button_click.ogg` | <0.2s | UI click | Button pressed |
 | `pause.ogg` | <0.3s | Pause toggle | ESC pressed |
 
-#### Stage 5: AI Tournaments (12 files)
+#### Stage 5: AI Competitions (12 files)
 
 | File | Duration | Description | Trigger |
 |------|----------|-------------|---------|

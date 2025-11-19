@@ -64,13 +64,13 @@ Each stage follows the same module structure:
 
 ### Status: 🟡 Foundation Exists (Sprint 4), Needs Integration
 
-**Gameplay:** Traditional 15×15 Scrabble board with AI opponent
+**Gameplay:** Traditional 15×15 word tile board with AI opponent
 
 **Existing Code (from Sprint 4):**
 - ✅ 15×15 board system
 - ✅ Tile placement mechanics
 - ✅ AI opponent (Easy/Medium/Hard)
-- ✅ Scrabble scoring with premium squares
+- ✅ tile scoring with premium squares
 
 **What Needs Implementation (~1,000 lines):**
 ```
@@ -136,7 +136,7 @@ src/stage4/
 - Bonus multiplier (1.5x)
 
 // Scoring
-- Base: Scrabble tile values
+- Base: tile values
 - Length bonus: +10 per letter over 3
 - Speed bonus: Based on time remaining
 - Streak multiplier: 1x → 3x for consecutive words
@@ -155,11 +155,11 @@ src/stage4/
 
 ---
 
-## 🏆 Stage 5: AI Tournaments (Competitive Play)
+## 🏆 Stage 5: AI Competitions (Competitive Play)
 
 ### Status: 🔴 Not Started, Design Complete
 
-**Gameplay:** Tournament bracket vs AI opponents, best-of-3 matches
+**Gameplay:** Competition bracket vs AI opponents, best-of-3 matches
 
 **Complete Architecture (~1,500 lines):**
 ```
@@ -282,7 +282,7 @@ Total MVP:  7,700 lines
    - Streak system
 
 6. **Stage 5** (~1,500 lines)
-   - Tournament bracket
+   - Competition bracket
    - AI personalities
    - Championship match
 
@@ -293,12 +293,12 @@ Total MVP:  7,700 lines
 These systems work across ALL stages:
 
 ✅ **Lexicon** (`src/lexicon/mod.rs`)
-- 280,886 words loaded
+- 167,737 words loaded
 - O(1) validation
 - Length filtering (2-15 letters)
 
 ✅ **Scoring** (`src/scoring/mod.rs`)
-- Scrabble tile values
+- tile values
 - Time bonuses
 - Combo multipliers
 - Reusable for all stages

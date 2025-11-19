@@ -1,5 +1,5 @@
 # 🎮 Game Design Document
-**Scrabble Learning Game (TileMania)**
+**Word Tile Strategy Game (TileMania)**
 
 ---
 
@@ -196,7 +196,7 @@ Build 3-4 letter words from given tiles, developing anagram instincts.
 5. Submit or auto-submit when time expires
 
 **Visual Design:**
-- Draggable Scrabble tiles
+- Draggable tiles
 - Glow effect on selected tiles
 - Snap-to-grid animation
 - Rainbow border on multi-word submissions
@@ -334,7 +334,7 @@ Maximize points from any 7-tile rack, learning tile value and leave management.
 1. Player receives 7 random tiles (standard Scrabble distribution)
 2. Find the highest-scoring word
 3. Optional: AI shows top 3 best words after submission
-4. Scoring uses standard Scrabble tile values
+4. Scoring uses standard tile values
 
 **Visual Design:**
 - Rack display at bottom (classic Scrabble rack)
@@ -372,7 +372,7 @@ U=1  V=4  W=4  X=8  Y=4  Z=10  Blank=0
 ## ♟️ Stage 5: Strategy Board
 
 ### Learning Objective
-Apply positional strategy on a Scrabble board with premium squares.
+Apply positional strategy on a word tile board with premium squares.
 
 ### Gameplay Mechanic
 
@@ -429,7 +429,7 @@ d = Double Letter (2x)
 - Strategic blocking
 
 ### Scoring
-- Standard Scrabble scoring with premium multipliers
+- Standard tile scoring with premium multipliers
 - Bingo: +50 points
 - Endgame bonus: opponent's remaining tile values
 
@@ -456,7 +456,7 @@ Simulate real tournament conditions with full Scrabble rules.
 5. Challenge system: flag invalid words
 
 **Visual Design:**
-- Professional Scrabble board appearance
+- Professional word tile board appearance
 - Digital clock display
 - Bag counter (tiles remaining)
 - Move history panel

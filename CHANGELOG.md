@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2025-11-19 - ALL 5 STAGES COMPLETE 🎉
 
-### Added - Stage 5: AI Tournaments
-- 8-player single-elimination tournament bracket system
+### Added - Stage 5: AI Competitions
+- 8-player single-elimination competition bracket system
 - 7 unique AI opponents with personalities (Rookie Rita → Champion Chen)
 - Best-of-3 match format
 - Tournament progression: Quarterfinals → Semifinals → Finals
 - AI personality system (Aggressive, Defensive, Balanced)
-- Tournament bracket UI visualization
+- Competition bracket UI visualization
 - Victory/defeat celebration screens
 - Crowd reaction audio hooks
 - 790 lines of production code
@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/stage5/audio.rs` - Tournament audio
 
 ### Commits
-- `e6fee05` - Stage 5 COMPLETE: AI Tournaments with bracket system
+- `e6fee05` - Stage 5 COMPLETE: AI Competitions with bracket system
 
 ---
 
@@ -67,7 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2025-11-19 - Stage 3 Complete
 
 ### Added - Stage 3: Classic Board
-- Full 15×15 Scrabble board implementation
+- Full 15×15 word tile board implementation
 - Premium squares (DL, TL, DW, TW, Center Star)
 - Standard 100-tile bag with proper distribution
 - AI opponent with 5 difficulty levels
@@ -162,7 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.3] - 2025-11-18 - Core Systems
 
 ### Added - Lexicon System
-- CSW24 word validation (280,886 words)
+- TML word validation (167,737 words)
 - HashSet-based O(1) lookup
 - Case-insensitive validation
 - Length-based filtering (2-15 letters)
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 155 lines of code
 
 ### Added - Scoring System
-- Standard Scrabble tile values
+- Standard tile values
 - Premium square bonuses (DL, TL, DW, TW)
 - Time bonuses
 - Combo multipliers
@@ -215,7 +215,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/main.rs` - Application entry point
 - `Cargo.toml` - Rust dependencies
 - `README.md` - Project documentation
-- `CSW24.txt` - Lexicon database (280,886 words)
+- `CSW24.txt` - Lexicon database (167,737 words)
 
 ---
 
@@ -230,11 +230,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features Delivered
 - ✅ 5 complete gameplay stages
-- ✅ CSW24 lexicon integration
-- ✅ Scrabble scoring engine
+- ✅ TML lexicon integration
+- ✅ tile scoring engine
 - ✅ 25 difficulty levels (5 per stage)
 - ✅ AI opponent system
-- ✅ Tournament bracket system
+- ✅ Competition bracket system
 - ✅ Complete UI flows
 - ✅ Visual effects system
 - ✅ Audio event hooks
@@ -259,7 +259,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description | Lines Added |
 |---------|------|-------------|-------------|
-| 0.5.0 | 2025-11-19 | Stage 5: AI Tournaments | 790 |
+| 0.5.0 | 2025-11-19 | Stage 5: AI Competitions | 790 |
 | 0.4.0 | 2025-11-19 | Stage 4: Speed Challenge | 950 |
 | 0.3.0 | 2025-11-19 | Stage 3: Classic Board | 2,136 |
 | 0.2.0 | 2025-11-19 | Stage 2: Tile Matching | 2,238 |

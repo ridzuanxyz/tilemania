@@ -1,12 +1,12 @@
-# 🧠 Scrabble Learning Game – Executive Summary
-*A modern, gamified approach to train future Scrabble champions (Ages 7–12)*
+# 🧠 Word Tile Strategy Game – Executive Summary
+*A modern, gamified approach to train future word game experts (Ages 7–12)*
 
 **🟢 Status:** All 5 Stages Complete | 10,270 Lines of Code | Phase 1 ✅ Complete
 
 ---
 
 ## 🎯 Objective
-This project aims to create an **interactive, game-based learning platform** that teaches children fundamental Scrabble skills through fun, fast-paced mini-games — progressing from basic 2-letter words to advanced board strategy.
+This project aims to create an **interactive, game-based learning platform** that teaches children fundamental word-building skills through fun, fast-paced mini-games — progressing from basic 2-letter words to advanced board strategy.
 
 The game is designed to **train instinct**, not just memorization, enabling kids to **think like competitive players** from a young age.
 
@@ -24,7 +24,7 @@ The game is designed to **train instinct**, not just memorization, enabling kids
 ## 📚 Learning Outcomes
 - **Stage 1**: Instant recall of 2-letter words (all 127 valid CSW24 2-letter words).
 - **Stage 2**: Word construction with 3–4 letter words via Match-3 gameplay.
-- **Stage 3**: Full board strategy on classic 15×15 Scrabble board vs AI.
+- **Stage 3**: Full board strategy on classic 15×15 word tile board vs AI.
 - **Stage 4**: Speed-based word formation and rack management under time pressure.
 - **Stage 5**: Tournament-level competition with AI bracket system and strategic play.
 
@@ -47,9 +47,9 @@ The game is designed to **train instinct**, not just memorization, enabling kids
 |-------|------------------------------|------------------------------------------|--------------------------------------------|--------|
 | 1     | 2-letter words               | Falling letters arcade game             | Fast recognition of all 127 CSW24 2-letter words | ✅ Complete |
 | 2     | 3–4 letter construction     | Match-3 tile grid (8×8)                  | Word building instincts                    | ✅ Complete |
-| 3     | Classic board               | Full 15×15 Scrabble vs AI               | Board strategy, premium squares, AI opponents | ✅ Complete |
+| 3     | Classic board               | Full 15×15 word tile game vs AI               | Board strategy, premium squares, AI opponents | ✅ Complete |
 | 4     | Speed challenge             | Rapid word formation (7-tile rack)      | Rack management + time pressure            | ✅ Complete |
-| 5     | AI tournaments              | 8-player bracket elimination            | Tournament strategy + competitive play     | ✅ Complete |
+| 5     | AI competitions              | 8-player bracket elimination            | Tournament strategy + competitive play     | ✅ Complete |
 
 **Total Implementation:** 5 stages complete (~10,270 lines of production Rust code)
 
@@ -122,9 +122,9 @@ project_root/
 - ✅ Stage 2: Tile Matching (2,238 lines)
 - ✅ Stage 3: Classic Board (2,136 lines)
 - ✅ Stage 4: Speed Challenge (950 lines)
-- ✅ Stage 5: AI Tournaments (790 lines)
-- ✅ Lexicon integration (CSW24, 280,886 words)
-- ✅ Scrabble scoring engine with bonuses
+- ✅ Stage 5: AI Competitions (790 lines)
+- ✅ Lexicon integration (CSW24, 167,737 words)
+- ✅ tile scoring engine with bonuses
 - ✅ AI opponent system (5 difficulty levels per stage)
 - ✅ Visual feedback systems (particles, animations)
 - ✅ Audio event hooks (ready for asset integration)
@@ -151,7 +151,7 @@ project_root/
 | Stage 2 - Tile Matching    | ✅ Complete | 2,238 lines |
 | Stage 3 - Classic Board    | ✅ Complete | 2,136 lines |
 | Stage 4 - Speed Challenge  | ✅ Complete | 950 lines |
-| Stage 5 - AI Tournaments   | ✅ Complete | 790 lines |
+| Stage 5 - AI Competitions   | ✅ Complete | 790 lines |
 | Documentation              | ✅ Complete | 8 major docs |
 
 **Total:** ~10,270 lines of production Rust code across 62 files
@@ -173,4 +173,4 @@ project_root/
 ---
 
 ## 🏁 Conclusion
-The Scrabble Learning Game transforms what is usually **rote memorization** into a **rewarding, playful, and strategic journey** — laying the foundation for tomorrow’s Scrabble champions.
+The Word Tile Strategy Game transforms what is usually **rote memorization** into a **rewarding, playful, and strategic journey** — laying the foundation for tomorrow’s word game experts.

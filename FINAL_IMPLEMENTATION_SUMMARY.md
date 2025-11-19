@@ -20,7 +20,7 @@ All 5 gameplay stages have been successfully implemented in production-quality R
 - **Stages Completed:** 5/5 (100%)
 - **Commits:** 6 major milestones
 - **Development Branch:** `claude/setup-team-roles-014DcEWrnC6xZ2ezaTJ5JKMu`
-- **Lexicon:** CSW24 (280,886 words)
+- **Lexicon:** CSW24 (167,737 words)
 - **AI Difficulty Levels:** 25 (5 per stage)
 - **Game States:** 12
 
@@ -32,7 +32,7 @@ All 5 gameplay stages have been successfully implemented in production-quality R
 | 2 | Tile Matching | 2,238 | 8 | `e25f92f` |
 | 3 | Classic Board | 2,136 | 10 | `45d515e` |
 | 4 | Speed Challenge | 950 | 8 | `92f4a32` |
-| 5 | AI Tournaments | 790 | 9 | `e6fee05` |
+| 5 | AI Competitions | 790 | 9 | `e6fee05` |
 | **Core** | Lexicon + Scoring | 400 | 2 | Multiple |
 | **Infrastructure** | Plugins + Main | ~620 | 16 | Multiple |
 | **TOTAL** | | **~10,270** | **62** | |
@@ -107,7 +107,7 @@ All 5 gameplay stages have been successfully implemented in production-quality R
 ---
 
 ### Stage 3: Classic Board (2,136 lines)
-**Concept:** Full 15×15 Scrabble board with AI opponent
+**Concept:** Full 15×15 word tile board with AI opponent
 
 **Key Files:**
 - `src/stage3/mod.rs` (261 lines) - Plugin, match coordination
@@ -122,7 +122,7 @@ All 5 gameplay stages have been successfully implemented in production-quality R
 - `src/stage3/audio.rs` (120 lines) - Audio system
 
 **Features:**
-- Classic 15×15 Scrabble board layout
+- Classic 15×15 word tile board layout
 - Premium squares: DL, TL, DW, TW, Center (★)
 - 100-tile bag with proper distribution
 - 7-tile rack management
@@ -178,8 +178,8 @@ All 5 gameplay stages have been successfully implemented in production-quality R
 
 ---
 
-### Stage 5: AI Tournaments (790 lines)
-**Concept:** 8-player elimination tournament bracket
+### Stage 5: AI Competitions (790 lines)
+**Concept:** 8-player elimination competition bracket
 
 **Key Files:**
 - `src/stage5/mod.rs` (140 lines) - Plugin, events
@@ -204,7 +204,7 @@ All 5 gameplay stages have been successfully implemented in production-quality R
   - Champion Chen (D5, Aggressive)
 - Best-of-3 match format
 - Quarterfinals → Semifinals → Finals
-- Tournament bracket visualization
+- Competition bracket visualization
 - Victory/defeat screens
 - Crowd reaction audio hooks
 
@@ -222,7 +222,7 @@ All 5 gameplay stages have been successfully implemented in production-quality R
 ### Lexicon System (`src/lexicon/mod.rs` - 155 lines)
 
 **Features:**
-- CSW24 word validation (280,886 words)
+- TML word validation (167,737 words)
 - HashSet-based O(1) lookup
 - Case-insensitive validation
 - Length-based filtering (2-15 letters)
@@ -240,7 +240,7 @@ pub fn get_words_by_length(&self, length: usize) -> Vec<String>
 ### Scoring System (`src/scoring/mod.rs` - 180 lines)
 
 **Features:**
-- Standard Scrabble tile values (A=1, Q=10, Z=10)
+- Standard tile values (A=1, Q=10, Z=10)
 - Premium square bonuses (DL, TL, DW, TW)
 - Time bonuses
 - Combo multipliers (1x → 3x)
@@ -335,7 +335,7 @@ stage{N}/
 ## 🎯 Key Features by Category
 
 ### Word Validation
-- ✅ CSW24 lexicon (280,886 words)
+- ✅ TML lexicon (167,737 words)
 - ✅ O(1) HashSet lookup
 - ✅ Case-insensitive
 - ✅ All stages integrated
@@ -368,7 +368,7 @@ stage{N}/
 - ✅ 5 results screens
 - ✅ 5 pause menus (ESC key)
 - ✅ Button interactions
-- ✅ Tournament bracket display
+- ✅ Competition bracket display
 
 ### Audio System
 - ✅ 60+ audio event types
@@ -432,7 +432,7 @@ stage{N}/
 - Adjust difficulty curves
 - Fine-tune time limits
 - Balance AI personalities
-- Test tournament bracket flow
+- Test competition bracket flow
 
 ---
 
@@ -444,7 +444,7 @@ stage{N}/
 
 ### Commit History
 ```
-e6fee05 Stage 5 COMPLETE: AI Tournaments (~1,100 lines)
+e6fee05 Stage 5 COMPLETE: AI Competitions (~1,100 lines)
 92f4a32 Stage 4 COMPLETE: Speed Challenge (~1,200 lines)
 45d515e Stage 3 COMPLETE: Classic Board (~1,700 lines)
 e25f92f Stage 2 COMPLETE: Match-3 (~1,500 lines)

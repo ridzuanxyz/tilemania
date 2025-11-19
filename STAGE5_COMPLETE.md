@@ -1,6 +1,6 @@
 # 🏆 STAGE 5: COMPLETE! 🏅
 
-**Project:** TileMania - Stage 5 (AI Tournaments)
+**Project:** TileMania - Stage 5 (AI Competitions)
 **Status:** ✅ **PRODUCTION READY**
 **Total Code:** 790 lines
 **Date Completed:** 2025-11-18
@@ -97,7 +97,7 @@ Champion Crowned!
 ```
 
 ### **Visual System** ✅
-- [x] Tournament bracket display
+- [x] Competition bracket display
   - 8 player slots
   - Match connections
   - Win/loss indicators
@@ -162,7 +162,7 @@ src/stage5/
 
 ### **Components**
 - **Total**: 15 ECS components
-  - Tournament bracket, match nodes
+  - Competition bracket, match nodes
   - Player cards, opponent cards
   - Victory effects, confetti
   - UI elements
@@ -443,7 +443,7 @@ Championship Celebration:
 - **ESC**: Pause
 
 ### **In-Match** (Same as Stage 3)
-- Scrabble board controls
+- word tile board controls
 - Tile placement
 - Word submission
 
@@ -529,7 +529,7 @@ victory_theme.ogg:
 ## 🏆 Production Status
 
 **What's Complete:**
-✅ 8-player tournament bracket
+✅ 8-player competition bracket
 ✅ Best-of-3 match format
 ✅ 7 named AI opponents
 ✅ 3 AI personality types
@@ -558,7 +558,7 @@ victory_theme.ogg:
 
 **Timeline:** Implemented in single session after Stage 4
 **Reused from Previous:** Stage 3 board/AI, scoring, UI patterns
-**New Systems:** Tournament bracket, AI personalities, best-of-3 logic
+**New Systems:** Competition bracket, AI personalities, best-of-3 logic
 
 **Key Innovations:**
 - Tournament progression system
@@ -570,7 +570,7 @@ victory_theme.ogg:
 
 ## 🎯 What Makes Stage 5 Special
 
-1. **Championship Feel** - Tournament bracket creates epic journey
+1. **Championship Feel** - Competition bracket creates epic journey
 2. **AI Personalities** - Each opponent plays differently
 3. **Progression** - 3 rounds of increasing difficulty
 4. **Best-of-3** - Tests consistency, prevents flukes
@@ -615,13 +615,13 @@ The TileMania journey:
 - **Stage 2**: Tile Matching (2,238 lines)
 - **Stage 3**: Classic Board (2,136 lines)
 - **Stage 4**: Speed Challenge (950 lines)
-- **Stage 5**: AI Tournaments (790 lines)
+- **Stage 5**: AI Competitions (790 lines)
 
 **Total:** 10,270 lines of production Rust code! 🚀
 
 ---
 
-**Project:** TileMania - Stage 5 (AI Tournaments)
+**Project:** TileMania - Stage 5 (AI Competitions)
 **Status:** ✅ **100% COMPLETE**
 **Date:** 2025-11-18
 **Result:** **FULL GAME COMPLETE!** 🎊🎉🏆
