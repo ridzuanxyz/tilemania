@@ -1,6 +1,7 @@
 /// Visual effects for Stage 2 (Match-3 gameplay)
 
 use bevy::prelude::*;
+use bevy::text::TextStyle;
 use super::components::*;
 
 /// Color scheme for Stage 2 tiles

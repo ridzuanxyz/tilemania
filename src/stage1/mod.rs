@@ -23,7 +23,7 @@ use visuals::*;
 use ui::*;
 use pause::*;
 use powerups::*;
-use audio::*;
+use audio::{AudioEvent, BackgroundMusic, play_audio_events};
 
 /// Plugin for Stage 1 gameplay
 pub struct Stage1Plugin;
