@@ -283,7 +283,7 @@ pub fn spawn_powerup_ui(
 
     commands
         .spawn(NodeBundle {
-            style: Node {
+            node: Node {
                 position_type: PositionType::Absolute,
                 bottom: Val::Px(20.0),
                 left: Val::Px(20.0),

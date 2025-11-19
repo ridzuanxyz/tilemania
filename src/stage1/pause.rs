@@ -46,7 +46,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -77,7 +77,7 @@ pub fn spawn_pause_menu(
             parent
                 .spawn((
                     ButtonBundle {
-                        style: Node {
+                        node: Node {
                             width: Val::Px(250.0),
                             height: Val::Px(70.0),
                             justify_content: JustifyContent::Center,
@@ -105,7 +105,7 @@ pub fn spawn_pause_menu(
             // Restart button
             parent
                 .spawn(ButtonBundle {
-                    style: Node {
+                    node: Node {
                         width: Val::Px(250.0),
                         height: Val::Px(70.0),
                         justify_content: JustifyContent::Center,
@@ -131,7 +131,7 @@ pub fn spawn_pause_menu(
             parent
                 .spawn((
                     ButtonBundle {
-                        style: Node {
+                        node: Node {
                             width: Val::Px(250.0),
                             height: Val::Px(70.0),
                             justify_content: JustifyContent::Center,

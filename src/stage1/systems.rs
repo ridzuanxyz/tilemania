@@ -123,7 +123,7 @@ pub fn handle_tile_selection(
     let (camera, camera_transform) = camera_query.single();
 
     if let Some(cursor_pos) = window.cursor_position() {
-        if let Some(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
+        if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
             // Check if click hit a tile
             for (entity, mut tile, transform) in tile_query.iter_mut() {
                 let tile_pos = transform.translation.truncate();

@@ -45,7 +45,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     position_type: PositionType::Absolute,
@@ -81,7 +81,7 @@ pub fn spawn_pause_menu(
             // Buttons container
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(20.0),
                         ..default()
@@ -93,7 +93,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Node {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -121,7 +121,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Node {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -149,7 +149,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Node {
+                                node: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,

@@ -35,7 +35,7 @@ pub fn spawn_stage3_hud(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Px(70.0),
                     position_type: PositionType::Absolute,
@@ -66,7 +66,7 @@ pub fn spawn_stage3_hud(
             // Center: Timer and turn indicator
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
                         ..default()
@@ -100,7 +100,7 @@ pub fn spawn_stage3_hud(
             // Right: AI score and tiles remaining
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::FlexEnd,
                         ..default()
@@ -144,7 +144,7 @@ fn spawn_rack_ui(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Px(560.0),
                     height: Val::Px(80.0),
                     position_type: PositionType::Absolute,
@@ -164,7 +164,7 @@ fn spawn_rack_ui(
             // Placeholder for 7 rack tiles (will be populated dynamically)
             for _ in 0..7 {
                 parent.spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         width: Val::Px(70.0),
                         height: Val::Px(70.0),
                         ..default()

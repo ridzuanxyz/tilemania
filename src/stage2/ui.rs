@@ -52,7 +52,7 @@ pub fn spawn_start_screen(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -114,7 +114,7 @@ pub fn spawn_start_screen(
             // Difficulty buttons container
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(15.0),
                         ..default()
@@ -126,7 +126,7 @@ pub fn spawn_start_screen(
                         buttons
                             .spawn((
                                 ButtonBundle {
-                                    style: Node {
+                                    node: Node {
                                         width: Val::Px(500.0),
                                         height: Val::Px(80.0),
                                         justify_content: JustifyContent::Center,
@@ -243,7 +243,7 @@ pub fn spawn_stage2_hud(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Px(80.0),
                     position_type: PositionType::Absolute,
@@ -262,7 +262,7 @@ pub fn spawn_stage2_hud(
             // Left section: Score and Target
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(5.0),
                         ..default()
@@ -285,7 +285,7 @@ pub fn spawn_stage2_hud(
             // Center section: Timer
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
                         ..default()
@@ -308,7 +308,7 @@ pub fn spawn_stage2_hud(
             // Right section: Moves and Combo
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::FlexEnd,
                         row_gap: Val::Px(5.0),
@@ -419,7 +419,7 @@ pub fn spawn_results_screen(
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -455,7 +455,7 @@ pub fn spawn_results_screen(
             // Stats container
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(15.0),
                         margin: UiRect::bottom(Val::Px(40.0)),
@@ -508,7 +508,7 @@ pub fn spawn_results_screen(
             // Buttons container
             parent
                 .spawn(NodeBundle {
-                    style: Node {
+                    node: Node {
                         flex_direction: FlexDirection::Row,
                         column_gap: Val::Px(20.0),
                         ..default()
@@ -520,7 +520,7 @@ pub fn spawn_results_screen(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Node {
+                                node: Node {
                                     width: Val::Px(200.0),
                                     height: Val::Px(60.0),
                                     justify_content: JustifyContent::Center,
@@ -548,7 +548,7 @@ pub fn spawn_results_screen(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Node {
+                                node: Node {
                                     width: Val::Px(200.0),
                                     height: Val::Px(60.0),
                                     justify_content: JustifyContent::Center,

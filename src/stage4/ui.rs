@@ -21,16 +21,12 @@ pub fn spawn_stage4_hud(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let text_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 36.0,
-        color: Color::srgb(1.0, 1.0, 1.0),
-    };
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     commands
         .spawn((
             NodeBundle {
-                style: Node {
+                node: Node {
                     width: Val::Percent(100.0),
                     height: Val::Px(80.0),
                     position_type: PositionType::Absolute,
@@ -47,19 +43,34 @@ pub fn spawn_stage4_hud(
         .with_children(|parent| {
             parent.spawn((
                 Text::new("Score: 0"),
-                text_style.clone(),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 1.0, 1.0)),
                 HUDElement::Score,
             ));
 
             parent.spawn((
                 Text::new("Time: 90s"),
-                text_style.clone(),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 1.0, 1.0)),
                 HUDElement::Timer,
             ));
 
             parent.spawn((
                 Text::new("Streak: x0"),
-                text_style.clone(),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 36.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 1.0, 1.0)),
                 HUDElement::Streak,
             ));
         });

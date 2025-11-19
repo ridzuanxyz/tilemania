@@ -22,7 +22,7 @@ pub fn spawn_tournament_bracket(
     // Spawn 8-player bracket visualization
     commands.spawn((
         NodeBundle {
-            style: Node {
+            node: Node {
                 width: Val::Px(800.0),
                 height: Val::Px(600.0),
                 position_type: PositionType::Absolute,
