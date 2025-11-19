@@ -190,7 +190,7 @@ pub fn handle_difficulty_selection(
         match *interaction {
             Interaction::Pressed => {
                 // Initialize game with selected difficulty
-                let difficulty = get_difficulty_config(button.level);
+                let difficulty = get_difficulty(button.level);
 
                 commands.insert_resource(Stage2Config {
                     difficulty: button.level,
@@ -236,8 +236,8 @@ pub fn spawn_stage2_hud(
     asset_server: Res<AssetServer>,
     config: Res<Stage2Config>,
 ) {
-    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
-    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium: Handle<Font> = asset_server.load("fonts/FiraSans-Medium.ttf");
+    let font_bold: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     // Root HUD container
     commands
@@ -406,8 +406,8 @@ pub fn spawn_results_screen(
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
 ) {
-    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
-    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
+    let font_bold: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium: Handle<Font> = asset_server.load("fonts/FiraSans-Medium.ttf");
 
     let title_color = if state.score >= config.target_score {
         Color::srgb(0.3, 0.9, 0.3) // Success green

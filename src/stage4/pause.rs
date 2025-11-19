@@ -44,7 +44,7 @@ pub fn spawn_pause_menu(
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(),
-                z_index: ZIndex::Global(100),
+                z_index: ZIndex(100),
                 ..default()
             },
             PauseMenu,

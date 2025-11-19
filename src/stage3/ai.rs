@@ -107,8 +107,9 @@ pub fn execute_ai_move(
         });
 
         // Record move
+        let turn_number = state.moves_history.len() as u32 + 1;
         state.moves_history.push(super::MoveRecord {
-            turn_number: state.moves_history.len() as u32 + 1,
+            turn_number,
             player: Turn::AI,
             word: ai_move.word.clone(),
             score: ai_move.score,
@@ -178,7 +179,7 @@ fn find_first_move_candidates(
         for word in words {
             // First move must go through center (7, 7)
             // Try horizontal placement
-            let score = scorer.calculate_word_score(&word, &[]);
+            let score = scorer.calculate_score(&word, 0.0, 1.0);
             moves.push(AIMove {
                 word: word.clone(),
                 position: (7, 7 - (word.len() / 2)),

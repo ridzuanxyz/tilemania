@@ -58,7 +58,7 @@ pub fn update_move_preview(
     preview_query: Query<(&MovePreview, &mut Sprite)>,
 ) {
     // Visual feedback for where tiles will be placed
-    for (preview, mut sprite) in preview_query.iter() {
+    for (preview, mut sprite) in preview_query.iter_mut() {
         if preview.is_valid {
             sprite.color = Color::srgba(0.3, 0.9, 0.3, 0.6); // Valid green
         } else {

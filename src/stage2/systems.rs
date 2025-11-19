@@ -88,6 +88,13 @@ pub fn handle_tile_selection(
 
     if let Some(cursor_pos) = window.cursor_position() {
         if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) {
+            // Get selected tile's grid position before iterating (to avoid borrow conflicts)
+            let selected_grid_pos = if let Some(selected_entity) = state.selected_tile {
+                tile_query.get(selected_entity).ok().map(|(_, tile, _)| tile.grid_pos)
+            } else {
+                None
+            };
+
             // Check if click hit a tile
             for (entity, mut tile, transform) in tile_query.iter_mut() {
                 let tile_pos = transform.translation.truncate();
@@ -97,8 +104,7 @@ pub fn handle_tile_selection(
                     if let Some(selected) = state.selected_tile {
                         // Second tile selected - check if adjacent
                         if selected != entity {
-                            if let Ok((_, selected_tile, _)) = tile_query.get(selected) {
-                                let (r1, c1) = selected_tile.grid_pos;
+                            if let Some((r1, c1)) = selected_grid_pos {
                                 let (r2, c2) = tile.grid_pos;
 
                                 // Check if adjacent (not diagonal)

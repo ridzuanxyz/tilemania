@@ -28,8 +28,8 @@ pub fn spawn_stage3_hud(
     asset_server: Res<AssetServer>,
     config: Res<Stage3Config>,
 ) {
-    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
-    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium: Handle<Font> = asset_server.load("fonts/FiraSans-Medium.ttf");
+    let font_bold: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     // Root HUD container
     commands

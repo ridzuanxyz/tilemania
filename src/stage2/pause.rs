@@ -57,7 +57,7 @@ pub fn spawn_pause_menu(
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(), // 80% black overlay
-                z_index: ZIndex::Global(100), // Ensure it's on top
+                z_index: ZIndex(100), // Ensure it's on top
                 ..default()
             },
             PauseMenu,
