@@ -351,39 +351,47 @@ pub fn spawn_stage2_hud(
 pub fn update_stage2_hud(
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
-    mut hud_query: Query<(&HUDElement, &mut Text)>,
+    mut hud_query: Query<(&HUDElement, &mut Text, Option<&mut TextColor>)>,
 ) {
-    for (element, mut text) in hud_query.iter_mut() {
+    for (element, mut text, text_color) in hud_query.iter_mut() {
         match element {
             HUDElement::Score => {
-                text.sections[1].value = state.score.to_string();
+                **text = format!("Score: {} / {}", state.score, config.target_score);
             }
             HUDElement::Timer => {
                 let seconds = state.time_remaining_ms / 1000;
-                text.sections[1].value = format!("{}s", seconds);
+                **text = format!("Time: {}s", seconds);
 
                 // Change color when time is low
-                if seconds < 10 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.3, 0.3);
-                } else if seconds < 30 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.8, 0.3);
-                } else {
-                    text.sections[1].style.color = Color::srgb(1.0, 1.0, 1.0);
+                if let Some(mut color) = text_color {
+                    if seconds < 10 {
+                        color.0 = Color::srgb(1.0, 0.3, 0.3);
+                    } else if seconds < 30 {
+                        color.0 = Color::srgb(1.0, 0.8, 0.3);
+                    } else {
+                        color.0 = Color::WHITE;
+                    }
                 }
             }
             HUDElement::Moves => {
-                text.sections[1].value = state.moves_made.to_string();
+                if config.moves_limit == 0 {
+                    **text = format!("Moves: {}", state.moves_made);
+                } else {
+                    **text = format!("Moves: {} / {}", state.moves_made, config.moves_limit);
+                }
             }
             HUDElement::ComboCounter => {
-                text.sections[1].value = state.combo_count.to_string();
+                **text = format!("Combo: x{}", state.combo_count);
 
                 // Change color based on combo
-                if state.combo_count >= 5 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.3, 1.0); // Purple
-                } else if state.combo_count >= 3 {
-                    text.sections[1].style.color = Color::srgb(1.0, 0.8, 0.3); // Gold
-                } else {
-                    text.sections[1].style.color = Color::srgb(1.0, 1.0, 1.0); // White
+                if let Some(mut color) = text_color {
+                    if state.combo_count >= 5 {
+                        color.0 = Color::srgb(1.0, 0.3, 1.0); // Purple
+                    } else if state.combo_count >= 3 {
+                        color.0 = Color::srgb(1.0, 0.8, 0.3); // Gold
+                    } else {
+                        color.0 = Color::WHITE;
+                    }
                 }
             }
             HUDElement::Target => {}

@@ -440,7 +440,7 @@ pub fn update_score_display(
     config: Res<Stage2Config>,
 ) {
     for mut text in query.iter_mut() {
-        text.sections[0].value = format!("Score: {} / {}", state.score, config.target_score);
+        **text = format!("Score: {} / {}", state.score, config.target_score);
     }
 }
 
@@ -459,7 +459,7 @@ pub fn update_timer(
 
     for mut text in query.iter_mut() {
         let seconds = state.time_remaining_ms / 1000;
-        text.sections[0].value = format!("Time: {}s", seconds);
+        **text = format!("Time: {}s", seconds);
     }
 }
 
@@ -471,10 +471,10 @@ pub fn update_moves_display(
 ) {
     for mut text in query.iter_mut() {
         if config.moves_limit > 0 {
-            text.sections[0].value = format!("Moves: {} / {}",
+            **text = format!("Moves: {} / {}",
                 state.moves_made, config.moves_limit);
         } else {
-            text.sections[0].value = format!("Moves: {}", state.moves_made);
+            **text = format!("Moves: {}", state.moves_made);
         }
     }
 }
