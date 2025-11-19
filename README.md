@@ -62,6 +62,13 @@ cargo build --release --target wasm32-unknown-unknown
 
 ## 📚 Documentation
 
+### For Players
+
+| Document | Purpose |
+|----------|---------|
+| **[USER_GUIDE.md](USER_GUIDE.md)** | **Complete player manual - How to play all 5 stages** |
+| [BUILD_GUIDE.md](BUILD_GUIDE.md) | Installation and setup instructions |
+
 ### For Developers
 
 | Document | Purpose |
@@ -69,7 +76,6 @@ cargo build --release --target wasm32-unknown-unknown
 | [EXECUTIVE_SUMMARY.md](EXECUTIVE_SUMMARY.md) | Project overview and vision |
 | [FINAL_IMPLEMENTATION_SUMMARY.md](FINAL_IMPLEMENTATION_SUMMARY.md) | Detailed implementation breakdown |
 | [CHANGELOG.md](CHANGELOG.md) | Version history and changes |
-| [BUILD_GUIDE.md](BUILD_GUIDE.md) | Platform-specific build instructions |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [ASSET_SPECIFICATIONS.md](ASSET_SPECIFICATIONS.md) | Asset requirements (audio, visual) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
