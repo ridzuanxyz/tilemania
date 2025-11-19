@@ -53,18 +53,13 @@ pub fn spawn_stage3_hud(
         .with_children(|parent| {
             // Left: Player score
             parent.spawn((
-                TextBundle::from_sections([
-                    TextSection::new("Player: ", TextStyle {
-                        font: font_medium.clone(),
-                        font_size: 18.0,
-                        color: Color::srgb(0.7, 0.7, 0.8),
-                    }),
-                    TextSection::new("0", TextStyle {
-                        font: font_bold.clone(),
-                        font_size: 28.0,
-                        color: Color::srgb(1.0, 1.0, 1.0),
-                    }),
-                ]),
+                Text::new("Player: 0"),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
                 HUDElement::PlayerScore,
             ));
 
@@ -80,27 +75,24 @@ pub fn spawn_stage3_hud(
                 })
                 .with_children(|center| {
                     center.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("Time: ", TextStyle {
-                                font: font_medium.clone(),
-                                font_size: 18.0,
-                                color: Color::srgb(0.7, 0.7, 0.8),
-                            }),
-                            TextSection::new(&format!("{}:00", config.time_limit_seconds / 60), TextStyle {
-                                font: font_bold.clone(),
-                                font_size: 28.0,
-                                color: Color::srgb(1.0, 1.0, 1.0),
-                            }),
-                        ]),
+                        Text::new(format!("Time: {}:00", config.time_limit_seconds / 60)),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::Timer,
                     ));
 
                     center.spawn((
-                        TextBundle::from_section("Your Turn", TextStyle {
+                        Text::new("Your Turn"),
+                        TextFont {
                             font: font_bold.clone(),
                             font_size: 16.0,
-                            color: Color::srgb(0.3, 0.9, 0.3),
-                        }),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.3, 0.9, 0.3)),
                         HUDElement::TurnIndicator,
                     ));
                 });
@@ -117,34 +109,24 @@ pub fn spawn_stage3_hud(
                 })
                 .with_children(|right| {
                     right.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("AI: ", TextStyle {
-                                font: font_medium.clone(),
-                                font_size: 18.0,
-                                color: Color::srgb(0.7, 0.7, 0.8),
-                            }),
-                            TextSection::new("0", TextStyle {
-                                font: font_bold.clone(),
-                                font_size: 28.0,
-                                color: Color::srgb(1.0, 1.0, 1.0),
-                            }),
-                        ]),
+                        Text::new("AI: 0"),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::AIScore,
                     ));
 
                     right.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("Tiles: ", TextStyle {
-                                font: font_medium.clone(),
-                                font_size: 18.0,
-                                color: Color::srgb(0.7, 0.7, 0.8),
-                            }),
-                            TextSection::new("100", TextStyle {
-                                font: font_bold.clone(),
-                                font_size: 28.0,
-                                color: Color::srgb(1.0, 1.0, 1.0),
-                            }),
-                        ]),
+                        Text::new("Tiles: 100"),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::TilesRemaining,
                     ));
                 });

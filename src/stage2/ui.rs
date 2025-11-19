@@ -456,57 +456,45 @@ pub fn spawn_results_screen(
                     ..default()
                 })
                 .with_children(|stats| {
-                    stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Final Score: ", TextStyle {
-                            font: font_medium.clone(),
-                            font_size: 22.0,
-                            color: Color::srgb(0.7, 0.7, 0.8),
-                        }),
-                        TextSection::new(&state.score.to_string(), TextStyle {
+                    stats.spawn((
+                        Text::new(format!("Final Score: {}", state.score)),
+                        TextFont {
                             font: font_bold.clone(),
-                            font_size: 32.0,
-                            color: Color::srgb(1.0, 1.0, 1.0),
-                        }),
-                    ]));
+                            font_size: 28.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                    ));
 
-                    stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Words Found: ", TextStyle {
-                            font: font_medium.clone(),
-                            font_size: 22.0,
-                            color: Color::srgb(0.7, 0.7, 0.8),
-                        }),
-                        TextSection::new(&state.words_found.len().to_string(), TextStyle {
+                    stats.spawn((
+                        Text::new(format!("Words Found: {}", state.words_found.len())),
+                        TextFont {
                             font: font_bold.clone(),
-                            font_size: 32.0,
-                            color: Color::srgb(1.0, 1.0, 1.0),
-                        }),
-                    ]));
+                            font_size: 28.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                    ));
 
-                    stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Moves Made: ", TextStyle {
-                            font: font_medium.clone(),
-                            font_size: 22.0,
-                            color: Color::srgb(0.7, 0.7, 0.8),
-                        }),
-                        TextSection::new(&state.moves_made.to_string(), TextStyle {
+                    stats.spawn((
+                        Text::new(format!("Moves Made: {}", state.moves_made)),
+                        TextFont {
                             font: font_bold.clone(),
-                            font_size: 32.0,
-                            color: Color::srgb(1.0, 1.0, 1.0),
-                        }),
-                    ]));
+                            font_size: 28.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                    ));
 
-                    stats.spawn(TextBundle::from_sections([
-                        TextSection::new("Max Combo: ", TextStyle {
-                            font: font_medium.clone(),
-                            font_size: 22.0,
-                            color: Color::srgb(0.7, 0.7, 0.8),
-                        }),
-                        TextSection::new(&state.combo_count.to_string(), TextStyle {
+                    stats.spawn((
+                        Text::new(format!("Max Combo: {}", state.combo_count)),
+                        TextFont {
                             font: font_bold.clone(),
-                            font_size: 32.0,
-                            color: Color::srgb(1.0, 1.0, 1.0),
-                        }),
-                    ]));
+                            font_size: 28.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                    ));
                 });
 
             // Buttons container
@@ -537,13 +525,14 @@ pub fn spawn_results_screen(
                             ResultsButton::PlayAgain,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section(
-                                "Play Again",
-                                TextStyle {
+                            button.spawn((
+                                Text::new("Play Again"),
+                                TextFont {
                                     font: font_bold.clone(),
                                     font_size: 28.0,
-                                    color: Color::srgb(0.1, 0.1, 0.15),
+                                    ..default()
                                 },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
                             ));
                         });
 
@@ -564,13 +553,14 @@ pub fn spawn_results_screen(
                             ResultsButton::MainMenu,
                         ))
                         .with_children(|button| {
-                            button.spawn(TextBundle::from_section(
-                                "Main Menu",
-                                TextStyle {
+                            button.spawn((
+                                Text::new("Main Menu"),
+                                TextFont {
                                     font: font_bold.clone(),
                                     font_size: 28.0,
-                                    color: Color::srgb(0.1, 0.1, 0.15),
+                                    ..default()
                                 },
+                                TextColor(Color::srgb(0.1, 0.1, 0.15)),
                             ));
                         });
                 });
