@@ -55,7 +55,7 @@ pub fn update_score_popups(
 
 /// Update move preview
 pub fn update_move_preview(
-    preview_query: Query<(&MovePreview, &mut Sprite)>,
+    mut preview_query: Query<(&MovePreview, &mut Sprite)>,
 ) {
     // Visual feedback for where tiles will be placed
     for (preview, mut sprite) in preview_query.iter_mut() {
