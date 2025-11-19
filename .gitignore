@@ -1,1 +1,50 @@
+# Rust
 target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Bevy WASM
+*.wasm
+wasm-bindgen/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ⚠️ CRITICAL: Protected/Licensed Word Lists (DO NOT COMMIT)
+assets/lexicons/CSW24.txt
+assets/lexicons/TWL*.txt
+assets/lexicons/SOWPODS.txt
+
+# Audio assets (to be created/licensed separately)
+assets/audio/**/*.ogg
+assets/audio/**/*.wav
+assets/audio/**/*.mp3
+
+# Visual assets
+assets/fonts/*.ttf
+assets/sprites/**/*.png
+
+# Build artifacts
+dist/
+*.deb
+*.rpm
+*.dmg
+*.exe
+*.msi
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
