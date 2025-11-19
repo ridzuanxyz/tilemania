@@ -253,7 +253,7 @@ pub fn update_score_display(
     state: Res<Stage1State>,
 ) {
     for mut text in query.iter_mut() {
-        text.sections[0].value = format!("Score: {}", state.score);
+        **text = format!("Score: {}", state.score);
     }
 }
 
@@ -275,7 +275,7 @@ pub fn update_timer(
     // Update display
     for mut text in query.iter_mut() {
         let seconds = state.time_remaining_ms / 1000;
-        text.sections[0].value = format!("Time: {}s", seconds);
+        **text = format!("Time: {}s", seconds);
     }
 }
 

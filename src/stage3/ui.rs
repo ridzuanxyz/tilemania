@@ -180,32 +180,34 @@ fn spawn_rack_ui(
 pub fn update_stage3_hud(
     state: Res<Stage3State>,
     tile_bag: Res<super::board::TileBag>,
-    mut hud_query: Query<(&HUDElement, &mut Text)>,
+    mut hud_query: Query<(&HUDElement, &mut Text, Option<&mut TextColor>)>,
 ) {
-    for (element, mut text) in hud_query.iter_mut() {
+    for (element, mut text, text_color) in hud_query.iter_mut() {
         match element {
             HUDElement::PlayerScore => {
-                text.sections[1].value = state.player_score.to_string();
+                **text = format!("Player: {}", state.player_score);
             }
             HUDElement::AIScore => {
-                text.sections[1].value = state.ai_score.to_string();
+                **text = format!("AI: {}", state.ai_score);
             }
             HUDElement::Timer => {
                 if state.time_remaining_ms > 0 {
                     let minutes = state.time_remaining_ms / 60000;
                     let seconds = (state.time_remaining_ms % 60000) / 1000;
-                    text.sections[1].value = format!("{}:{:02}", minutes, seconds);
+                    **text = format!("Time: {}:{:02}", minutes, seconds);
 
                     // Color warning when time is low
                     if minutes == 0 && seconds < 60 {
-                        text.sections[1].style.color = Color::srgb(1.0, 0.3, 0.3);
+                        if let Some(mut color) = text_color {
+                            color.0 = Color::srgb(1.0, 0.3, 0.3);
+                        }
                     }
                 } else {
-                    text.sections[1].value = "0:00".to_string();
+                    **text = "Time: 0:00".to_string();
                 }
             }
             HUDElement::TilesRemaining => {
-                text.sections[1].value = tile_bag.count().to_string();
+                **text = format!("Tiles: {}", tile_bag.count());
             }
             HUDElement::TurnIndicator => {}
         }
@@ -224,18 +226,18 @@ pub fn update_rack_display(
 /// Update turn indicator
 pub fn update_turn_indicator(
     state: Res<Stage3State>,
-    mut hud_query: Query<(&HUDElement, &mut Text)>,
+    mut hud_query: Query<(&HUDElement, &mut Text, &mut TextColor)>,
 ) {
-    for (element, mut text) in hud_query.iter_mut() {
+    for (element, mut text, mut text_color) in hud_query.iter_mut() {
         if matches!(element, HUDElement::TurnIndicator) {
             match state.current_turn {
                 Turn::Player => {
-                    text.sections[0].value = "Your Turn".to_string();
-                    text.sections[0].style.color = Color::srgb(0.3, 0.9, 0.3);
+                    **text = "Your Turn".to_string();
+                    text_color.0 = Color::srgb(0.3, 0.9, 0.3);
                 }
                 Turn::AI => {
-                    text.sections[0].value = "AI Thinking...".to_string();
-                    text.sections[0].style.color = Color::srgb(0.9, 0.7, 0.3);
+                    **text = "AI Thinking...".to_string();
+                    text_color.0 = Color::srgb(0.9, 0.7, 0.3);
                 }
             }
         }

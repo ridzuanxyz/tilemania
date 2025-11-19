@@ -107,28 +107,28 @@ pub fn spawn_stage1_hud(
 
 /// Updates combo display with current multiplier
 pub fn update_combo_display(
-    mut query: Query<&mut Text, With<ComboDisplay>>,
+    mut query: Query<(&mut Text, &mut TextColor), With<ComboDisplay>>,
     state: Res<Stage1State>,
 ) {
     if !state.is_changed() {
         return;
     }
 
-    for mut text in query.iter_mut() {
+    for (mut text, mut text_color) in query.iter_mut() {
         let multiplier = if state.combo_count == 0 {
             1.0
         } else {
             (1.0 + (state.combo_count as f32 * 0.5)).min(3.0)
         };
 
-        text.sections[0].value = if state.combo_count > 0 {
+        **text = if state.combo_count > 0 {
             format!("Combo: {}x ({:.1}x)", state.combo_count, multiplier)
         } else {
             "Combo: 0x".to_string()
         };
 
         // Color based on combo level
-        text.sections[0].style.color = match state.combo_count {
+        text_color.0 = match state.combo_count {
             0 => Color::srgb(0.7, 0.7, 0.7),
             1 => Color::srgb(1.0, 1.0, 1.0),
             2 => Color::srgb(0.5, 0.9, 1.0),
@@ -157,7 +157,7 @@ pub fn update_word_display(
             }
         }
 
-        text.sections[0].value = if word.is_empty() {
+        **text = if word.is_empty() {
             "Select 2 tiles...".to_string()
         } else {
             word

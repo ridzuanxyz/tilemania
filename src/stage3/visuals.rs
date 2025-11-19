@@ -34,9 +34,9 @@ pub fn update_board_highlights(
 pub fn update_score_popups(
     mut commands: Commands,
     time: Res<Time>,
-    mut popup_query: Query<(Entity, &mut Transform, &mut Text, &mut ScoreDisplay)>,
+    mut popup_query: Query<(Entity, &mut Transform, &mut TextColor, &mut ScoreDisplay)>,
 ) {
-    for (entity, mut transform, mut text, mut display) in popup_query.iter_mut() {
+    for (entity, mut transform, mut text_color, mut display) in popup_query.iter_mut() {
         display.lifetime.tick(time.delta());
 
         // Rise upward
@@ -44,15 +44,7 @@ pub fn update_score_popups(
 
         // Fade out
         let alpha = 1.0 - display.lifetime.fraction();
-        for section in &mut text.sections {
-            let color = section.style.color;
-            section.style.color = Color::srgba(
-                color.to_srgba().red,
-                color.to_srgba().green,
-                color.to_srgba().blue,
-                alpha,
-            );
-        }
+        text_color.0 = text_color.0.with_alpha(alpha);
 
         // Remove when finished
         if display.lifetime.finished() {
