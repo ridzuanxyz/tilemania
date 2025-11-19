@@ -59,7 +59,7 @@ pub fn calculate_ai_move(
         ai_state.current_best_move = best_move;
     } else {
         // Simulate thinking time
-        ai_state.think_timer_ms += (time.delta_seconds() * 1000.0) as u32;
+        ai_state.think_timer_ms += (time.delta_secs() * 1000.0) as u32;
     }
 }
 

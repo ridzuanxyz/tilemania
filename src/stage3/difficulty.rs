@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 /// AI difficulty level configuration
 #[derive(Debug, Clone)]
-pub struct AIFifficulty {
+pub struct AIDifficulty {
     pub level: u8,
     pub name: &'static str,
     pub move_quality: f32,      // 0.0-1.0, higher = better moves

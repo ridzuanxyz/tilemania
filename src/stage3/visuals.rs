@@ -41,7 +41,7 @@ pub fn update_score_popups(
         display.lifetime.tick(time.delta());
 
         // Rise upward
-        transform.translation.y += 50.0 * time.delta_seconds();
+        transform.translation.y += 50.0 * time.delta_secs();
 
         // Fade out
         let alpha = 1.0 - display.lifetime.fraction();

@@ -100,7 +100,7 @@ pub fn update_falling_tiles(
 
     for (entity, mut transform, tile) in query.iter_mut() {
         // Move tile downward (with power-up speed modifier)
-        transform.translation.y -= tile.speed * speed_multiplier * time.delta_seconds();
+        transform.translation.y -= tile.speed * speed_multiplier * time.delta_secs();
 
         // Despawn if off-screen
         if transform.translation.y < -400.0 {
@@ -273,7 +273,7 @@ pub fn update_timer(
     }
 
     // Countdown timer
-    let delta_ms = (time.delta_seconds() * 1000.0) as u32;
+    let delta_ms = (time.delta_secs() * 1000.0) as u32;
     state.time_remaining_ms = state.time_remaining_ms.saturating_sub(delta_ms);
 
     // Update display

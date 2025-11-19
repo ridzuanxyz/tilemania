@@ -35,7 +35,7 @@ pub fn spawn_powerup_pickups(
     config: Res<Stage1Config>,
     asset_server: Res<AssetServer>,
 ) {
-    *last_spawn_time += time.delta_seconds();
+    *last_spawn_time += time.delta_secs();
 
     // Try to spawn a power-up every 15 seconds
     if *last_spawn_time >= 15.0 {
@@ -238,7 +238,7 @@ pub fn update_powerup_timers(
     time: Res<Time>,
 ) {
     if active.slow_motion_remaining_ms > 0 {
-        let delta_ms = (time.delta_seconds() * 1000.0) as u32;
+        let delta_ms = (time.delta_secs() * 1000.0) as u32;
         active.slow_motion_remaining_ms = active.slow_motion_remaining_ms.saturating_sub(delta_ms);
 
         if active.slow_motion_remaining_ms == 0 {
