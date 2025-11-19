@@ -45,35 +45,14 @@ pub fn spawn_start_screen(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let title_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 64.0,
-        color: Color::srgb(0.9, 0.9, 1.0),
-    };
-
-    let subtitle_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Medium.ttf"),
-        font_size: 24.0,
-        color: Color::srgb(0.7, 0.7, 0.8),
-    };
-
-    let button_text_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 28.0,
-        color: Color::srgb(0.1, 0.1, 0.15),
-    };
-
-    let description_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Medium.ttf"),
-        font_size: 18.0,
-        color: Color::srgb(0.5, 0.5, 0.6),
-    };
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
 
     // Root container
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -88,39 +67,54 @@ pub fn spawn_start_screen(
         ))
         .with_children(|parent| {
             // Title
-            parent.spawn(TextBundle {
-                text: Text::from_section("STAGE 2: TILE MATCHING", title_style),
-                style: Style {
+            parent.spawn((
+                Text::new("STAGE 2: TILE MATCHING"),
+                TextFont {
+                    font: font_bold.clone(),
+                    font_size: 64.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.9, 0.9, 1.0)),
+                Node {
                     margin: UiRect::bottom(Val::Px(20.0)),
                     ..default()
                 },
-                ..default()
-            });
+            ));
 
             // Subtitle
-            parent.spawn(TextBundle {
-                text: Text::from_section("Match 3-4 letter words in the grid!", subtitle_style),
-                style: Style {
+            parent.spawn((
+                Text::new("Match 3-4 letter words in the grid!"),
+                TextFont {
+                    font: font_medium.clone(),
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.7, 0.7, 0.8)),
+                Node {
                     margin: UiRect::bottom(Val::Px(50.0)),
                     ..default()
                 },
-                ..default()
-            });
+            ));
 
             // Difficulty selection
-            parent.spawn(TextBundle {
-                text: Text::from_section("Select Difficulty:", subtitle_style.clone()),
-                style: Style {
+            parent.spawn((
+                Text::new("Select Difficulty:"),
+                TextFont {
+                    font: font_medium.clone(),
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(0.7, 0.7, 0.8)),
+                Node {
                     margin: UiRect::bottom(Val::Px(20.0)),
                     ..default()
                 },
-                ..default()
-            });
+            ));
 
             // Difficulty buttons container
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(15.0),
                         ..default()
@@ -132,7 +126,7 @@ pub fn spawn_start_screen(
                         buttons
                             .spawn((
                                 ButtonBundle {
-                                    style: Style {
+                                    style: Node {
                                         width: Val::Px(500.0),
                                         height: Val::Px(80.0),
                                         justify_content: JustifyContent::Center,
@@ -148,28 +142,34 @@ pub fn spawn_start_screen(
                                 },
                             ))
                             .with_children(|button| {
-                                button.spawn(
-                                    TextBundle::from_section(
-                                        format!("D{}: {}", difficulty.level, difficulty.name),
-                                        button_text_style.clone(),
-                                    )
-                                    .with_style(Style {
+                                button.spawn((
+                                    Text::new(format!("D{}: {}", difficulty.level, difficulty.name)),
+                                    TextFont {
+                                        font: font_bold.clone(),
+                                        font_size: 28.0,
+                                        ..default()
+                                    },
+                                    TextColor(Color::srgb(0.1, 0.1, 0.15)),
+                                    Node {
                                         flex_grow: 1.0,
                                         ..default()
-                                    }),
-                                );
+                                    },
+                                ));
 
-                                button.spawn(
-                                    TextBundle::from_section(
-                                        format!(
-                                            "{}s | Target: {} | Moves: {}",
-                                            difficulty.time_limit_seconds,
-                                            difficulty.target_score,
-                                            if difficulty.moves_limit == 0 { "∞".to_string() } else { difficulty.moves_limit.to_string() }
-                                        ),
-                                        description_style.clone(),
-                                    ),
-                                );
+                                button.spawn((
+                                    Text::new(format!(
+                                        "{}s | Target: {} | Moves: {}",
+                                        difficulty.time_limit_seconds,
+                                        difficulty.target_score,
+                                        if difficulty.moves_limit == 0 { "∞".to_string() } else { difficulty.moves_limit.to_string() }
+                                    )),
+                                    TextFont {
+                                        font: font_medium.clone(),
+                                        font_size: 18.0,
+                                        ..default()
+                                    },
+                                    TextColor(Color::srgb(0.5, 0.5, 0.6)),
+                                ));
                             });
                     }
                 });
@@ -236,23 +236,14 @@ pub fn spawn_stage2_hud(
     asset_server: Res<AssetServer>,
     config: Res<Stage2Config>,
 ) {
-    let label_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Medium.ttf"),
-        font_size: 20.0,
-        color: Color::srgb(0.7, 0.7, 0.8),
-    };
-
-    let value_style = TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size: 32.0,
-        color: Color::srgb(1.0, 1.0, 1.0),
-    };
+    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     // Root HUD container
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Px(80.0),
                     position_type: PositionType::Absolute,
@@ -271,7 +262,7 @@ pub fn spawn_stage2_hud(
             // Left section: Score and Target
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(5.0),
                         ..default()
@@ -280,11 +271,13 @@ pub fn spawn_stage2_hud(
                 })
                 .with_children(|section| {
                     section.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("Score: ", label_style.clone()),
-                            TextSection::new("0", value_style.clone()),
-                            TextSection::new(&format!(" / {}", config.target_score), label_style.clone()),
-                        ]),
+                        Text::new(format!("Score: 0 / {}", config.target_score)),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::Score,
                     ));
                 });
@@ -292,7 +285,7 @@ pub fn spawn_stage2_hud(
             // Center section: Timer
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
                         ..default()
@@ -301,13 +294,13 @@ pub fn spawn_stage2_hud(
                 })
                 .with_children(|section| {
                     section.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("Time: ", label_style.clone()),
-                            TextSection::new(
-                                &format!("{}s", config.time_limit_seconds),
-                                value_style.clone(),
-                            ),
-                        ]),
+                        Text::new(format!("Time: {}s", config.time_limit_seconds)),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::Timer,
                     ));
                 });
@@ -315,7 +308,7 @@ pub fn spawn_stage2_hud(
             // Right section: Moves and Combo
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::FlexEnd,
                         row_gap: Val::Px(5.0),
@@ -324,27 +317,30 @@ pub fn spawn_stage2_hud(
                     ..default()
                 })
                 .with_children(|section| {
+                    let moves_text = if config.moves_limit == 0 {
+                        "Moves: 0".to_string()
+                    } else {
+                        format!("Moves: 0 / {}", config.moves_limit)
+                    };
                     section.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("Moves: ", label_style.clone()),
-                            TextSection::new("0", value_style.clone()),
-                            TextSection::new(
-                                if config.moves_limit == 0 {
-                                    "".to_string()
-                                } else {
-                                    format!(" / {}", config.moves_limit)
-                                },
-                                label_style.clone(),
-                            ),
-                        ]),
+                        Text::new(moves_text),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::Moves,
                     ));
 
                     section.spawn((
-                        TextBundle::from_sections([
-                            TextSection::new("Combo: x", label_style.clone()),
-                            TextSection::new("1", value_style.clone()),
-                        ]),
+                        Text::new("Combo: x1"),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
                         HUDElement::ComboCounter,
                     ));
                 });
@@ -434,7 +430,7 @@ pub fn spawn_results_screen(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -458,7 +454,7 @@ pub fn spawn_results_screen(
                     },
                     title_style,
                 ),
-                style: Style {
+                style: Node {
                     margin: UiRect::bottom(Val::Px(40.0)),
                     ..default()
                 },
@@ -468,7 +464,7 @@ pub fn spawn_results_screen(
             // Stats container
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(15.0),
                         margin: UiRect::bottom(Val::Px(40.0)),
@@ -501,7 +497,7 @@ pub fn spawn_results_screen(
             // Buttons container
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Row,
                         column_gap: Val::Px(20.0),
                         ..default()
@@ -513,7 +509,7 @@ pub fn spawn_results_screen(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                style: Node {
                                     width: Val::Px(200.0),
                                     height: Val::Px(60.0),
                                     justify_content: JustifyContent::Center,
@@ -536,7 +532,7 @@ pub fn spawn_results_screen(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                style: Node {
                                     width: Val::Px(200.0),
                                     height: Val::Px(60.0),
                                     justify_content: JustifyContent::Center,

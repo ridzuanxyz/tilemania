@@ -1,7 +1,6 @@
 /// UI elements for Stage 1 (HUD, start screen, results)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::components::*;
 use super::{Stage1Config, Stage1State};
 use super::difficulty::{get_difficulty, DIFFICULTY_LEVELS};
@@ -17,7 +16,7 @@ pub fn spawn_stage1_hud(
     // Root HUD container
     commands
         .spawn(NodeBundle {
-            style: Style {
+            style: Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 justify_content: JustifyContent::SpaceBetween,
@@ -30,7 +29,7 @@ pub fn spawn_stage1_hud(
             // Top bar (score, timer, combo)
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Percent(100.0),
                         justify_content: JustifyContent::SpaceBetween,
                         ..default()
@@ -81,7 +80,7 @@ pub fn spawn_stage1_hud(
             // Current word display (bottom-center)
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         position_type: PositionType::Absolute,
                         bottom: Val::Px(100.0),
                         left: Val::Percent(50.0),
@@ -99,7 +98,7 @@ pub fn spawn_stage1_hud(
                                 color: Color::srgb(1.0, 1.0, 0.5),
                             },
                         )
-                        .with_style(Style {
+                        .with_style(Node {
                             position_type: PositionType::Relative,
                             left: Val::Px(-100.0), // Center adjustment
                             ..default()
@@ -188,7 +187,7 @@ pub fn spawn_start_screen(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -237,7 +236,7 @@ pub fn spawn_start_screen(
                 parent
                     .spawn((
                         ButtonBundle {
-                            style: Style {
+                            style: Node {
                                 width: Val::Px(300.0),
                                 height: Val::Px(60.0),
                                 justify_content: JustifyContent::Center,
@@ -340,7 +339,7 @@ pub fn spawn_results_screen(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -408,7 +407,7 @@ pub fn spawn_results_screen(
             // Play again button
             parent
                 .spawn(ButtonBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Px(200.0),
                         height: Val::Px(60.0),
                         justify_content: JustifyContent::Center,
@@ -433,7 +432,7 @@ pub fn spawn_results_screen(
             // Back to menu button
             parent
                 .spawn(ButtonBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Px(200.0),
                         height: Val::Px(60.0),
                         justify_content: JustifyContent::Center,

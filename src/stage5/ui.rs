@@ -1,7 +1,6 @@
 /// UI for Stage 5 (AI Tournaments)
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use super::{TournamentState, CurrentMatch};
 use super::components::*;
 
@@ -23,7 +22,7 @@ pub fn spawn_tournament_bracket(
     // Spawn 8-player bracket visualization
     commands.spawn((
         NodeBundle {
-            style: Style {
+            style: Node {
                 width: Val::Px(800.0),
                 height: Val::Px(600.0),
                 position_type: PositionType::Absolute,

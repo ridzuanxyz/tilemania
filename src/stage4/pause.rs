@@ -34,7 +34,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     position_type: PositionType::Absolute,

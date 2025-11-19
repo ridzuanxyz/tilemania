@@ -1,7 +1,6 @@
 /// Pause menu for Stage 1
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use crate::plugins::state::GameState;
 
 /// Marker component for pause menu
@@ -47,7 +46,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
@@ -77,7 +76,7 @@ pub fn spawn_pause_menu(
             parent
                 .spawn((
                     ButtonBundle {
-                        style: Style {
+                        style: Node {
                             width: Val::Px(250.0),
                             height: Val::Px(70.0),
                             justify_content: JustifyContent::Center,
@@ -104,7 +103,7 @@ pub fn spawn_pause_menu(
             // Restart button
             parent
                 .spawn(ButtonBundle {
-                    style: Style {
+                    style: Node {
                         width: Val::Px(250.0),
                         height: Val::Px(70.0),
                         justify_content: JustifyContent::Center,
@@ -129,7 +128,7 @@ pub fn spawn_pause_menu(
             parent
                 .spawn((
                     ButtonBundle {
-                        style: Style {
+                        style: Node {
                             width: Val::Px(250.0),
                             height: Val::Px(70.0),
                             justify_content: JustifyContent::Center,

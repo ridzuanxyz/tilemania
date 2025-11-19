@@ -1,7 +1,6 @@
 /// Power-ups system for Stage 1
 
 use bevy::prelude::*;
-use bevy::text::TextStyle;
 use rand::Rng;
 use super::components::*;
 use super::{Stage1Config, Stage1State};
@@ -284,7 +283,7 @@ pub fn spawn_powerup_ui(
 
     commands
         .spawn(NodeBundle {
-            style: Style {
+            style: Node {
                 position_type: PositionType::Absolute,
                 bottom: Val::Px(20.0),
                 left: Val::Px(20.0),

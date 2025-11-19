@@ -36,7 +36,7 @@ pub fn spawn_stage4_hud(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Px(80.0),
                     position_type: PositionType::Absolute,

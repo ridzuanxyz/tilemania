@@ -54,7 +54,7 @@ pub fn spawn_pause_menu(
     commands
         .spawn((
             NodeBundle {
-                style: Style {
+                style: Node {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     position_type: PositionType::Absolute,
@@ -72,7 +72,7 @@ pub fn spawn_pause_menu(
         .with_children(|parent| {
             parent.spawn(TextBundle {
                 text: Text::from_section("PAUSED", title_style),
-                style: Style {
+                style: Node {
                     margin: UiRect::bottom(Val::Px(50.0)),
                     ..default()
                 },
@@ -81,7 +81,7 @@ pub fn spawn_pause_menu(
 
             parent
                 .spawn(NodeBundle {
-                    style: Style {
+                    style: Node {
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(20.0),
                         ..default()
@@ -92,7 +92,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                style: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -111,7 +111,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                style: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
@@ -130,7 +130,7 @@ pub fn spawn_pause_menu(
                     buttons
                         .spawn((
                             ButtonBundle {
-                                style: Style {
+                                style: Node {
                                     width: Val::Px(300.0),
                                     height: Val::Px(70.0),
                                     justify_content: JustifyContent::Center,
