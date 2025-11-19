@@ -3,12 +3,13 @@
 /// This module provides fast word validation using a HashSet-based approach
 /// optimized for various word list formats (CSW24, ENABLE, etc.).
 
+use bevy::prelude::*;
 use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
 /// Lexicon structure containing all valid words
-#[derive(Debug, Clone)]
+#[derive(Resource, Debug, Clone)]
 pub struct Lexicon {
     /// All valid words stored in a HashSet for O(1) lookup
     words: HashSet<String>,

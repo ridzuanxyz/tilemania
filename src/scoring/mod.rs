@@ -2,6 +2,7 @@
 ///
 /// Implements standard tile point values and scoring rules
 
+use bevy::prelude::*;
 use std::collections::HashMap;
 
 /// Tile point values (standard letter distribution)
@@ -83,6 +84,7 @@ impl Default for TileValues {
 }
 
 /// Scoring calculator for gameplay
+#[derive(Resource)]
 pub struct ScoreCalculator {
     tile_values: TileValues,
 }
