@@ -12,6 +12,8 @@ pub enum GameState {
     Stage2Paused,
     Stage3Playing,
     Stage3Paused,
+    Stage4Playing,
+    Stage4Paused,
     Results,
     Settings,
 }
