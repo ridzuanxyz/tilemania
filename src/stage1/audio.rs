@@ -150,35 +150,35 @@ pub fn update_background_music(
     }
 }
 
-/// Suggested sound effects for Stage 1:
-///
-/// UI Sounds:
-/// - sounds/button_click.ogg (sharp click)
-/// - sounds/button_hover.ogg (soft whoosh)
-///
-/// Gameplay:
-/// - sounds/tile_select.ogg (soft pop)
-/// - sounds/word_valid.ogg (pleasant ding/chime)
-/// - sounds/word_invalid.ogg (gentle buzz)
-/// - sounds/tile_spawn.ogg (subtle whoosh)
-///
-/// Power-ups:
-/// - sounds/powerup_collect.ogg (sparkle sound)
-/// - sounds/powerup_slowmotion.ogg (time-slow effect)
-/// - sounds/powerup_bomb.ogg (explosion)
-/// - sounds/powerup_shuffle.ogg (shuffle/mix sound)
-/// - sounds/powerup_extratime.ogg (clock tick)
-///
-/// Combos:
-/// - sounds/combo_up.ogg (ascending pitch)
-/// - sounds/combo_break.ogg (descending pitch)
-///
-/// Music:
-/// - music/gameplay_theme.ogg (upbeat, ~120 BPM)
-/// - music/intense_theme.ogg (faster, ~140 BPM)
-///
-/// All sounds should be:
-/// - Short (<1 second for SFX)
-/// - Normalized volume
-/// - OGG Vorbis format (best for games)
-/// - 44.1kHz sample rate
+// Suggested sound effects for Stage 1:
+//
+// UI Sounds:
+// - sounds/button_click.ogg (sharp click)
+// - sounds/button_hover.ogg (soft whoosh)
+//
+// Gameplay:
+// - sounds/tile_select.ogg (soft pop)
+// - sounds/word_valid.ogg (pleasant ding/chime)
+// - sounds/word_invalid.ogg (gentle buzz)
+// - sounds/tile_spawn.ogg (subtle whoosh)
+//
+// Power-ups:
+// - sounds/powerup_collect.ogg (sparkle sound)
+// - sounds/powerup_slowmotion.ogg (time-slow effect)
+// - sounds/powerup_bomb.ogg (explosion)
+// - sounds/powerup_shuffle.ogg (shuffle/mix sound)
+// - sounds/powerup_extratime.ogg (clock tick)
+//
+// Combos:
+// - sounds/combo_up.ogg (ascending pitch)
+// - sounds/combo_break.ogg (descending pitch)
+//
+// Music:
+// - music/gameplay_theme.ogg (upbeat, ~120 BPM)
+// - music/intense_theme.ogg (faster, ~140 BPM)
+//
+// All sounds should be:
+// - Short (<1 second for SFX)
+// - Normalized volume
+// - OGG Vorbis format (best for games)
+// - 44.1kHz sample rate
