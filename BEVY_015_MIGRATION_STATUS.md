@@ -607,8 +607,8 @@ INFO tilemania::plugins::state: 📋 Entering Main Menu
 - ✅ Can navigate: Menu → Settings → Game Board → Results
 - ✅ Exit dialog has labeled "Yes" and "No" buttons
 
-**Current limitations (Sprint 1):**
-- ⚠️ Settings screen shows "Coming in Sprint 1, Week 3"
+**Sprint 1 Status:**
+- ✅ Settings system fully implemented (Sprint 1, Week 3)
 - ⚠️ Gameplay shows "Coming in Sprint 2-4"
 - ✅ UI navigation fully functional
 
@@ -743,7 +743,64 @@ cargo run
 - [x] Download FiraSans fonts
 - [x] Verify runtime behavior - **GAME RUNS** ✅
 - [x] Test UI navigation (Menu → Settings → GameBoard → Results) ✅
+- [x] Implement settings system (Sprint 1, Week 3) ✅
+- [x] Settings persistence and UI complete ✅
 - [ ] Test all 5 game stages (Sprint 2-4 implementation pending)
+
+---
+
+## 🎉 Sprint 1, Week 3: Settings System Implementation
+
+**Status**: ✅ Complete (2025-11-20)
+
+Following the successful Bevy 0.15 migration, Sprint 1 Week 3 delivered a fully functional settings system:
+
+### Features Implemented
+
+**Settings Resource** (`src/plugins/settings.rs`):
+- GameSettings resource with persistence
+- Audio preferences (music/SFX toggle + volume)
+- Gameplay defaults (dictionary, timer, difficulty)
+- TOML-based storage with platform-specific paths
+- Auto-load on game startup
+
+**Interactive UI** (`src/ui/settings.rs`):
+- 7 configurable settings (music, SFX, volume, dictionary, timer, difficulty)
+- Real-time updates with button interactions
+- Volume controls with +/- buttons
+- Cycle buttons for discrete options
+- Save button for persistence
+- ESC key for quick exit
+
+**Technical Details**:
+- 775 lines of new code (2 files)
+- Uses Bevy 0.15 patterns (Text::new, TextFont, TextColor, Node)
+- Clean separation: data layer (persistence) + UI layer (interaction)
+- Settings accessible via `Res<GameSettings>` in any system
+
+### Storage Location
+
+Settings persist in TOML format:
+- **Linux**: `~/.config/tilemania/settings.toml`
+- **Windows**: `%APPDATA%\TileMania\settings.toml`
+
+### Integration Ready
+
+The settings system is ready for integration:
+```rust
+// Example: Audio system integration
+fn play_music(settings: Res<GameSettings>, audio: Res<Audio>) {
+    if settings.audio.music_enabled {
+        audio.set_volume(settings.audio.music_volume);
+    }
+}
+```
+
+### Documentation
+
+Complete documentation available:
+- **[SETTINGS_SYSTEM.md](SETTINGS_SYSTEM.md)** - User guide + API reference
+- **[SPRINT_1_WEEK_3_COMPLETION.md](SPRINT_1_WEEK_3_COMPLETION.md)** - Implementation summary
 
 ---
 
@@ -761,14 +818,23 @@ cargo run
 
 ---
 
-## 📊 Migration Statistics
+## 📊 Migration & Sprint 1 Statistics
 
+**Bevy 0.15 Migration:**
 - **Total Errors Fixed**: 240+ → 0
 - **Files Modified**: 50+
-- **Commits**: 7
+- **Commits**: 6 migration commits
 - **API Changes Applied**: 10+ different Bevy 0.15 patterns
 - **Time**: Multiple sessions
 - **Success Rate**: 100% ✅
+
+**Sprint 1, Week 3 (Settings System):**
+- **Lines Added**: 775
+- **Files Created**: 1 source + 2 docs
+- **Files Modified**: 5
+- **Commits**: 1
+- **Build Time**: 1m 22s
+- **Errors**: 0
 
 ---
 
