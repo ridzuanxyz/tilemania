@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
+use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable, apply_focused_activation, apply_focus_visual};
 
 #[derive(Component)]
 pub struct StageSelectScreen;
@@ -20,10 +21,28 @@ pub fn update_stage_select(
     mut next_state: ResMut<NextState<GameState>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     asset_server: Res<AssetServer>,
+    focus: Option<ResMut<KeyboardFocus>>,
+    nav_query: Query<(&KeyboardNavigable, &mut Interaction), With<Button>>,
 ) {
     if *state.get() == GameState::StageSelect {
         if query.is_empty() {
             spawn_stage_select_ui(&mut commands, &asset_server);
+            // Initialize keyboard focus with 5 stage cards
+            commands.insert_resource(KeyboardFocus::new(5));
+        }
+
+        // Handle keyboard navigation
+        if let Some(mut focus) = focus {
+            // Arrow key navigation
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+                focus.move_up();
+            }
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+                focus.move_down();
+            }
+
+            // Activate focused button with Enter
+            apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
         }
 
         // Keyboard shortcut: ESC to return to main menu
@@ -51,6 +70,7 @@ pub fn update_stage_select(
         for entity in query.iter() {
             commands.entity(entity).despawn_recursive();
         }
+        commands.remove_resource::<KeyboardFocus>();
     }
 }
 
@@ -129,7 +149,7 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
                 })
                 .with_children(|stages| {
                     // Stage 1
-                    spawn_stage_card(
+                    let stage1 = spawn_stage_card(
                         stages,
                         &font_bold,
                         &font_medium,
@@ -138,10 +158,11 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
                         "🔤",
                         StageButton::Stage1,
                         Color::srgb(0.3, 0.5, 0.7),
+                        0,
                     );
 
                     // Stage 2
-                    spawn_stage_card(
+                    let stage2 = spawn_stage_card(
                         stages,
                         &font_bold,
                         &font_medium,
@@ -150,10 +171,11 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
                         "🎮",
                         StageButton::Stage2,
                         Color::srgb(0.4, 0.6, 0.3),
+                        1,
                     );
 
                     // Stage 3
-                    spawn_stage_card(
+                    let stage3 = spawn_stage_card(
                         stages,
                         &font_bold,
                         &font_medium,
@@ -162,10 +184,11 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
                         "📋",
                         StageButton::Stage3,
                         Color::srgb(0.6, 0.4, 0.5),
+                        2,
                     );
 
                     // Stage 4
-                    spawn_stage_card(
+                    let stage4 = spawn_stage_card(
                         stages,
                         &font_bold,
                         &font_medium,
@@ -174,10 +197,11 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
                         "⚡",
                         StageButton::Stage4,
                         Color::srgb(0.7, 0.5, 0.2),
+                        3,
                     );
 
                     // Stage 5
-                    spawn_stage_card(
+                    let stage5 = spawn_stage_card(
                         stages,
                         &font_bold,
                         &font_medium,
@@ -186,12 +210,13 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
                         "🏆",
                         StageButton::Stage5,
                         Color::srgb(0.5, 0.3, 0.6),
+                        4,
                     );
                 });
 
             // Instructions
             parent.spawn((
-                Text::new("Click a stage or press 1-5 • ESC: Back to Menu"),
+                Text::new("Arrow Keys: Navigate | Enter: Select | 1-5: Quick Jump | ESC: Back"),
                 TextFont {
                     font: font_medium.clone(),
                     font_size: 18.0,
@@ -215,7 +240,8 @@ fn spawn_stage_card(
     icon: &str,
     button_type: StageButton,
     color: Color,
-) {
+    index: usize,
+) -> Entity {
     parent
         .spawn((
             Button,
@@ -230,6 +256,8 @@ fn spawn_stage_card(
             },
             BackgroundColor(color),
             button_type,
+            KeyboardNavigable { index },
+            BorderColor(Color::NONE),
         ))
         .with_children(|card| {
             // Icon
@@ -272,5 +300,6 @@ fn spawn_stage_card(
                     TextColor(Color::srgba(1.0, 1.0, 1.0, 0.8)),
                 ));
             });
-        });
+        })
+        .id()
 }
