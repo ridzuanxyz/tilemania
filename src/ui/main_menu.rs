@@ -149,7 +149,7 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
     // Instructions (using TextComponent)
     let instructions = TextComponent::spawn(
         commands,
-        "Arrow Keys: Navigate | Enter: Select | ESC: Quit",
+        "↑↓: Navigate | Enter: Select | ESC: Quit",
         TextStyle::Caption,
         TextColorVariant::Muted,
     );

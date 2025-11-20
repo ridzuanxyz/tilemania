@@ -69,8 +69,8 @@ pub fn update_settings(
             apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
         }
 
-        // Keyboard shortcut: ESC to return to main menu
-        if keyboard.just_pressed(KeyCode::Escape) {
+        // Keyboard shortcuts: ESC or Backspace to return to main menu
+        if keyboard.just_pressed(KeyCode::Escape) || keyboard.just_pressed(KeyCode::Backspace) {
             next_state.set(GameState::MainMenu);
         }
     } else {
@@ -351,7 +351,7 @@ fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_ser
 
             // Instructions
             parent.spawn((
-                Text::new("Arrow Keys: Navigate | Enter: Select | ESC: Back"),
+                Text::new("↑↓: Navigate | Enter: Select | Backspace: Back"),
                 TextFont {
                     font: font_medium.clone(),
                     font_size: 18.0,

@@ -45,8 +45,8 @@ pub fn update_stage_select(
             apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
         }
 
-        // Keyboard shortcut: ESC to return to main menu
-        if keyboard.just_pressed(KeyCode::Escape) {
+        // Keyboard shortcuts: ESC or Backspace to return to main menu
+        if keyboard.just_pressed(KeyCode::Escape) || keyboard.just_pressed(KeyCode::Backspace) {
             next_state.set(GameState::MainMenu);
         }
 
@@ -216,7 +216,7 @@ fn spawn_stage_select_ui(commands: &mut Commands, asset_server: &AssetServer) {
 
             // Instructions
             parent.spawn((
-                Text::new("Arrow Keys: Navigate | Enter: Select | 1-5: Quick Jump | ESC: Back"),
+                Text::new("↑↓: Navigate | Enter: Select | 1-5: Quick Jump | Backspace: Back"),
                 TextFont {
                     font: font_medium.clone(),
                     font_size: 18.0,
