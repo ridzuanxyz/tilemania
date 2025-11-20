@@ -21,6 +21,7 @@ impl Plugin for UiPlugin {
                 game_board::update_game_board,
                 results::update_results,
                 settings::update_settings,
+                settings::handle_setting_buttons,
             ));
     }
 }
