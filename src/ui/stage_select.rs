@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
-use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable, apply_focused_activation, apply_focus_visual};
+use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable};
 
 #[derive(Component)]
 pub struct StageSelectScreen;
@@ -22,7 +22,7 @@ pub fn update_stage_select(
     keyboard: Res<ButtonInput<KeyCode>>,
     asset_server: Res<AssetServer>,
     focus: Option<ResMut<KeyboardFocus>>,
-    nav_query: Query<(&KeyboardNavigable, &mut Interaction), With<Button>>,
+    mut nav_query: Query<(&KeyboardNavigable, &mut BorderColor), With<Button>>,
 ) {
     if *state.get() == GameState::StageSelect {
         if query.is_empty() {
@@ -41,8 +41,28 @@ pub fn update_stage_select(
                 focus.move_down();
             }
 
-            // Activate focused button with Enter
-            apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
+            // Handle Enter key activation (direct state change)
+            if keyboard.just_pressed(KeyCode::Enter) || keyboard.just_pressed(KeyCode::Space) {
+                if let Some(focused_idx) = focus.focused_index {
+                    match focused_idx {
+                        0 => next_state.set(GameState::Stage1Playing),
+                        1 => next_state.set(GameState::Stage2Playing),
+                        2 => next_state.set(GameState::Stage3Playing),
+                        3 => next_state.set(GameState::Stage4Playing),
+                        4 => next_state.set(GameState::Stage5Playing),
+                        _ => {}
+                    }
+                }
+            }
+
+            // Update visual focus (only mutates BorderColor, not Interaction)
+            for (nav, mut border) in nav_query.iter_mut() {
+                if focus.is_focused(nav.index) {
+                    *border = BorderColor(Color::srgb(0.9, 0.9, 1.0));
+                } else {
+                    *border = BorderColor(Color::NONE);
+                }
+            }
         }
 
         // Keyboard shortcuts: ESC or Backspace to return to main menu
