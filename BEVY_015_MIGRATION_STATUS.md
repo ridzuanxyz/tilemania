@@ -373,6 +373,357 @@ No additional X server installation needed!
 
 ---
 
+## 🔧 Troubleshooting: Running the Game on Linux/xrdp
+
+### Common Issues and Solutions
+
+This section documents real-world issues encountered when running TileMania on WSL2 with xrdp, and their solutions. These apply to Chromebook deployment and remote Linux servers.
+
+---
+
+### Issue 1: "Failed to build event loop: XOpenDisplayFailed" ❌
+
+**Error Message:**
+```
+thread 'main' panicked at bevy_winit-0.15.3/src/lib.rs:142:14:
+Failed to build event loop: Os(OsError {
+    error: XNotSupported(XOpenDisplayFailed)
+})
+```
+
+**Cause:** The `DISPLAY` environment variable is not set correctly, or the game is running in the wrong terminal.
+
+**Solutions:**
+
+#### Solution A: DISPLAY Variable Not Set
+
+The xrdp session uses display `:10` but the terminal doesn't inherit this automatically.
+
+**Check current DISPLAY:**
+```bash
+echo $DISPLAY
+```
+
+**Common mistakes:**
+- ❌ `DISPLAY=10` (missing colon)
+- ❌ `DISPLAY=` (empty)
+- ❌ `DISPLAY=:0` (wrong display number)
+- ✅ `DISPLAY=:10` (correct for xrdp)
+
+**Fix - Temporary:**
+```bash
+export DISPLAY=:10
+echo $DISPLAY  # Should show ":10"
+cargo run
+```
+
+**Fix - Permanent:**
+```bash
+echo 'export DISPLAY=:10' >> ~/.bashrc
+source ~/.bashrc
+cargo run
+```
+
+**Critical Detail:** The colon `:` is **mandatory**.
+- `:10` means "local X display number 10"
+- `10` is invalid and will cause XOpenDisplayFailed
+
+#### Solution B: Running from Wrong Terminal
+
+**❌ Wrong:** Running from regular WSL2 terminal (outside RDP)
+- Regular WSL2 terminal has no access to xrdp's X server
+- Will always fail with XOpenDisplayFailed
+
+**✅ Correct:** Running from terminal inside RDP desktop
+1. Connect to xrdp: Remote Desktop → `localhost:3389`
+2. Open Terminal application inside the RDP desktop
+3. Set DISPLAY: `export DISPLAY=:10`
+4. Run game: `cargo run`
+
+**How to verify you're in the right place:**
+```bash
+# Run this inside your terminal
+echo $DISPLAY        # Should show :10 (after export)
+ls /tmp/.X11-unix/   # Should show X10
+ps aux | grep Xorg   # Should show Xorg process on :10
+```
+
+---
+
+### Issue 2: Missing Fonts - Blank Buttons 🔲
+
+**Symptom:** Game runs, but buttons have no text. Exit dialogs show two unlabeled boxes.
+
+**Error in logs:**
+```
+ERROR bevy_asset::server: Path not found: /home/ridzu/tilemania/assets/fonts/FiraSans-Bold.ttf
+ERROR bevy_asset::server: Path not found: /home/ridzu/tilemania/assets/fonts/FiraSans-Medium.ttf
+```
+
+**Cause:** Font files not present in `assets/fonts/` directory.
+
+**Fix:**
+```bash
+# Create fonts directory
+mkdir -p ~/tilemania/assets/fonts
+cd ~/tilemania/assets/fonts
+
+# Download FiraSans fonts (Mozilla's open-source font)
+wget https://github.com/mozilla/Fira/raw/master/ttf/FiraSans-Bold.ttf
+wget https://github.com/mozilla/Fira/raw/master/ttf/FiraSans-Medium.ttf
+wget https://github.com/mozilla/Fira/raw/master/ttf/FiraSans-Regular.ttf
+
+# Verify fonts exist
+ls -la ~/tilemania/assets/fonts/
+
+# Run game - buttons should now have labels
+cargo run
+```
+
+**After fix:** All menu items, buttons, and dialogs will display text properly.
+
+---
+
+### Issue 3: Audio Warnings (Expected, Not Critical) 🔇
+
+**Warnings in logs:**
+```
+ALSA lib pcm.c:2664:(snd_pcm_open_noupdate) Unknown PCM default
+Cannot connect to server socket err = No such file or directory
+jack server is not running or cannot be started
+ALSA lib pulse.c:242:(pulse_connect) PulseAudio: Unable to connect
+WARN bevy_audio::audio_output: No audio device found.
+```
+
+**Cause:** xrdp sessions typically don't have audio forwarding configured by default. WSL2 has no sound card access.
+
+**Impact:** ⚠️ **Non-critical** - Game runs perfectly without audio. These are warnings, not errors.
+
+**Solutions:**
+
+**For Development/Testing:**
+- Ignore these warnings - game functionality is unaffected
+- Audio is not required for testing gameplay logic
+
+**For Chromebook Deployment:**
+- Chromebook has native audio hardware - these warnings won't appear
+- Audio will work automatically on actual Linux hardware
+
+**For xrdp Audio (Optional):**
+If you need audio in xrdp sessions:
+```bash
+# Install PulseAudio for xrdp
+sudo apt-get install pulseaudio pulseaudio-module-xrdp
+sudo systemctl restart xrdp
+
+# Configure PulseAudio
+pulseaudio --start
+```
+
+Note: Audio through RDP adds latency and is generally not recommended for game development.
+
+---
+
+### Issue 4: Software Rendering Warning (Performance) 🐌
+
+**Warning:**
+```
+WARN bevy_render::renderer: The selected adapter is using a driver that only supports
+software rendering. This is likely to be very slow.
+AdapterInfo { name: "llvmpipe (LLVM 15.0.7, 256 bits)", backend: Vulkan }
+```
+
+**Cause:** WSL2 with xrdp uses software rendering (CPU-based graphics) instead of GPU acceleration.
+
+**Impact:**
+- ⚠️ Game will run slower than on native hardware
+- ✅ Acceptable for development and testing
+- ❌ Not representative of Chromebook performance
+
+**Why it happens:**
+- xrdp doesn't support GPU passthrough by default
+- WSL2's graphics virtualization is limited
+- llvmpipe = Mesa software rasterizer (CPU rendering)
+
+**Solutions:**
+
+**For Development:**
+- Accept slower performance - functionality testing is still valid
+- Gameplay logic works regardless of rendering speed
+
+**For Performance Testing:**
+- Test on actual Chromebook hardware with real GPU
+- Chromebook will use hardware acceleration (much faster)
+- Or build natively on Windows for local testing
+
+**WSL2 GPU Acceleration (Advanced):**
+Windows 11 with WSLg supports GPU acceleration, but requires:
+- Windows 11 (not Windows 10)
+- Updated GPU drivers
+- WSLg enabled (built into Windows 11)
+
+---
+
+### Issue 5: XRandR Display Size Warning ⚠️
+
+**Warning:**
+```
+WARN winit::platform_impl::linux::x11::util::randr:
+XRandR reported that the display's 0mm in size, which is certifiably insane
+```
+
+**Cause:** xrdp doesn't report physical display dimensions correctly.
+
+**Impact:** None - Bevy uses logical pixels, not physical dimensions.
+
+**Action:** Ignore this warning - it's cosmetic and doesn't affect functionality.
+
+---
+
+## ✅ Successful Run - What to Expect
+
+When everything is working correctly, you'll see:
+
+```bash
+$ export DISPLAY=:10
+$ cargo run
+
+     Running `target/debug/tilemania`
+INFO bevy_diagnostic: SystemInfo { os: "Linux 22.04 Ubuntu", ... }
+INFO bevy_winit::system: Creating new window "TileMania - Word Tile Strategy Game"
+INFO tilemania::plugins::state: 📺 Entering Splash screen
+INFO tilemania::plugins::assets: 📦 Initializing asset loading system
+INFO tilemania::plugins::core: 🎮 TileMania Core initialized
+INFO tilemania::plugins::core: 📚 Lexicon: CSW24 (280,886 words)
+INFO tilemania::plugins::assets: ✅ Asset loading complete! Progress: 100%
+INFO tilemania::plugins::state: 📋 Entering Main Menu
+```
+
+**Expected behavior:**
+- ✅ Game window opens in xrdp desktop
+- ✅ Splash screen appears briefly
+- ✅ Main menu loads with visible text
+- ✅ All menu items clickable and working
+- ✅ Can navigate: Menu → Settings → Game Board → Results
+- ✅ Exit dialog has labeled "Yes" and "No" buttons
+
+**Current limitations (Sprint 1):**
+- ⚠️ Settings screen shows "Coming in Sprint 1, Week 3"
+- ⚠️ Gameplay shows "Coming in Sprint 2-4"
+- ✅ UI navigation fully functional
+
+---
+
+## 📋 Quick Reference Commands
+
+### Setup (One-time)
+
+```bash
+# Install xrdp and desktop
+sudo apt-get update
+sudo apt-get install -y xfce4 xfce4-goodies xrdp
+
+# Configure xrdp
+sudo systemctl enable xrdp
+sudo systemctl start xrdp
+
+# Download fonts
+mkdir -p ~/tilemania/assets/fonts
+cd ~/tilemania/assets/fonts
+wget https://github.com/mozilla/Fira/raw/master/ttf/FiraSans-Bold.ttf
+wget https://github.com/mozilla/Fira/raw/master/ttf/FiraSans-Medium.ttf
+
+# Make DISPLAY permanent
+echo 'export DISPLAY=:10' >> ~/.bashrc
+```
+
+### Daily Usage
+
+```bash
+# 1. Connect to xrdp from Windows
+#    Remote Desktop Connection → localhost:3389
+
+# 2. Open Terminal in xrdp desktop
+
+# 3. Run the game
+cd ~/tilemania
+cargo run
+
+# Or, if DISPLAY not set:
+export DISPLAY=:10
+cargo run
+```
+
+### Debugging
+
+```bash
+# Check DISPLAY variable
+echo $DISPLAY              # Should show :10
+
+# Check X server
+ls /tmp/.X11-unix/         # Should show X10
+ps aux | grep Xorg         # Should show Xorg :10
+
+# Test X11 connection
+sudo apt-get install x11-apps
+xeyes                      # Should open window
+
+# Check fonts
+ls -la ~/tilemania/assets/fonts/
+
+# Run with full backtrace
+RUST_BACKTRACE=full cargo run
+```
+
+---
+
+## 🎯 Deployment Notes
+
+### For Chromebook Deployment:
+
+When deploying to Chromebook Linux (Crostini):
+
+**Different from WSL2/xrdp:**
+- ✅ DISPLAY will likely be `:0` (not `:10`)
+- ✅ GPU acceleration available (no software rendering warning)
+- ✅ Audio hardware present (no ALSA warnings)
+- ✅ No xrdp needed (native Linux environment)
+
+**Same as WSL2/xrdp:**
+- ✅ Fonts must be in `assets/fonts/`
+- ✅ Compile with `cargo build --release` for production
+- ✅ All Bevy 0.15 migrations apply
+
+**Quick setup on Chromebook:**
+```bash
+# Install dependencies
+sudo apt-get install libasound2-dev libudev-dev pkg-config
+
+# Clone and build
+git clone https://github.com/yourusername/tilemania
+cd tilemania
+cargo build --release
+
+# Run
+./target/release/tilemania
+```
+
+### For Remote Linux Server:
+
+**Differences:**
+- DISPLAY number varies (check with `echo $DISPLAY`)
+- May use `:0`, `:10`, or other number depending on session
+- Always verify: `ls /tmp/.X11-unix/`
+
+**Best practice:**
+```bash
+# Auto-detect display
+export DISPLAY=$(ls /tmp/.X11-unix/ | sed 's/X/:/g' | head -1)
+cargo run
+```
+
+---
+
 ## 📋 Migration Checklist
 
 - [x] Remove incorrect bevy::text::TextStyle imports
@@ -386,10 +737,13 @@ No additional X server installation needed!
 - [x] Fix borrow checker errors (4 instances)
 - [x] Fix system tuple trait bounds (1 instance)
 - [x] Test compilation - **0 ERRORS** ✅
-- [ ] Install runtime dependencies (libxkbcommon-x11)
-- [ ] Setup X server or native Windows build
-- [ ] Verify runtime behavior matches expected
-- [ ] Test all 5 game stages
+- [x] Install runtime dependencies (libxkbcommon-x11)
+- [x] Setup xrdp desktop environment
+- [x] Configure DISPLAY variable (:10)
+- [x] Download FiraSans fonts
+- [x] Verify runtime behavior - **GAME RUNS** ✅
+- [x] Test UI navigation (Menu → Settings → GameBoard → Results) ✅
+- [ ] Test all 5 game stages (Sprint 2-4 implementation pending)
 
 ---
 
