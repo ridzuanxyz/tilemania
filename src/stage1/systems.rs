@@ -55,7 +55,7 @@ pub fn spawn_falling_tiles(
             let y_pos = 400.0; // Top of screen
 
             // Spawn the tile (sprite + text as child for layering)
-            let tile_entity = commands.spawn((
+            commands.spawn((
                 FallingTile {
                     letter,
                     column,
@@ -68,19 +68,19 @@ pub fn spawn_falling_tiles(
                     ..default()
                 },
                 Transform::from_xyz(x_pos, y_pos, 0.0),
-            )).id();
-
-            // Spawn letter text as child (z=1 for layering above sprite)
-            commands.spawn((
-                Text2d::new(letter.to_string()),
-                TextFont {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 48.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.1, 0.1, 0.1)),
-                Transform::from_xyz(x_pos, y_pos, 1.0),
-            ));
+            )).with_children(|parent| {
+                // Spawn letter text as child (z=1 for layering above sprite)
+                parent.spawn((
+                    Text2d::new(letter.to_string()),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 48.0,
+                        ..default()
+                    },
+                    TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                    Transform::from_xyz(0.0, 0.0, 1.0), // Relative to parent
+                ));
+            });
         }
     }
 }
@@ -204,19 +204,19 @@ pub fn validate_word(
         spawn_score_popup(&mut commands, &asset_server, avg_position, points, true);
         spawn_particle_burst(&mut commands, avg_position, TileColors::VALID, 12);
 
-        // Add validation flash to tiles before despawning
+        // Add validation flash and despawn tiles
         for entity in &state.selected_tiles {
             commands.entity(*entity).insert(ValidationFlash {
                 is_valid: true,
                 duration: 0.3,
                 elapsed: 0.0,
             });
-        }
-
-        // Despawn selected tiles (after brief delay for flash)
-        for entity in &state.selected_tiles {
+            // Despawn after adding flash
             commands.entity(*entity).despawn_recursive();
         }
+
+        // Clear selection list (entities already despawned, so don't access them)
+        state.selected_tiles.clear();
 
         info!("Score: {} (+{}), Combo: {}", state.score, points, state.combo_count);
     } else {
@@ -226,17 +226,21 @@ pub fn validate_word(
         // Visual feedback for invalid word
         spawn_score_popup(&mut commands, &asset_server, avg_position, 0, false);
 
-        // Add validation flash to tiles (they stay on screen)
+        // Add validation flash to tiles (they stay on screen) and clear selection
         for entity in &state.selected_tiles {
-            commands.entity(*entity).insert(ValidationFlash {
-                is_valid: false,
-                duration: 0.5,
-                elapsed: 0.0,
-            });
+            if let Some(mut entity_commands) = commands.get_entity(*entity) {
+                entity_commands.insert(ValidationFlash {
+                    is_valid: false,
+                    duration: 0.5,
+                    elapsed: 0.0,
+                });
+                entity_commands.remove::<SelectedTile>();
+            }
         }
-    }
 
-    clear_selection(&mut commands, &mut state);
+        // Clear selection list
+        state.selected_tiles.clear();
+    }
 }
 
 /// Clears current tile selection

@@ -55,10 +55,10 @@ pub fn update_stage_select(
                 }
             }
 
-            // Update visual focus (only mutates BorderColor, not Interaction)
+            // Update visual focus with thick bright border
             for (nav, mut border) in nav_query.iter_mut() {
                 if focus.is_focused(nav.index) {
-                    *border = BorderColor(Color::srgb(0.9, 0.9, 1.0));
+                    *border = BorderColor(Color::srgb(0.3, 0.8, 1.0)); // Bright cyan
                 } else {
                     *border = BorderColor(Color::NONE);
                 }
@@ -272,6 +272,7 @@ fn spawn_stage_card(
                 align_items: AlignItems::Center,
                 padding: UiRect::all(Val::Px(20.0)),
                 column_gap: Val::Px(20.0),
+                border: UiRect::all(Val::Px(4.0)), // Thick border for keyboard focus
                 ..default()
             },
             BackgroundColor(color),
