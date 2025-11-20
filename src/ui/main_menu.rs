@@ -32,7 +32,7 @@ pub fn update_main_menu(
         // Handle Play button click
         for (interaction, _) in interaction_query.iter() {
             if *interaction == Interaction::Pressed {
-                next_state.set(GameState::GameBoard);
+                next_state.set(GameState::StageSelect);
             }
         }
 
@@ -45,7 +45,7 @@ pub fn update_main_menu(
 
         // Keyboard shortcut: SPACE to play
         if keyboard.just_pressed(KeyCode::Space) {
-            next_state.set(GameState::GameBoard);
+            next_state.set(GameState::StageSelect);
         }
 
         // Keyboard shortcut: S for settings
