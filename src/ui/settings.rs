@@ -99,9 +99,10 @@ pub fn handle_setting_buttons(
                 }
                 SettingButton::DictionaryCycle => {
                     settings.gameplay.dictionary = match settings.gameplay.dictionary.as_str() {
-                        "CSW24" => "TWL06".to_string(),
-                        "TWL06" => "SOWPODS".to_string(),
-                        _ => "CSW24".to_string(),
+                        "TML" => "RE-ENABLE".to_string(),
+                        "RE-ENABLE" => "ENABLE".to_string(),
+                        "ENABLE" => "CSW24".to_string(),
+                        _ => "TML".to_string(),
                     };
                     update_labels(&settings, &mut label_query);
                 }

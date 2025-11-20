@@ -35,7 +35,7 @@ impl Default for GameSettings {
                 sfx_volume: 0.7,
             },
             gameplay: GameplaySettings {
-                dictionary: "CSW24".to_string(),
+                dictionary: "TML".to_string(),
                 default_time_limit: 25 * 60, // 25 minutes in seconds
                 default_difficulty: 3, // Medium
             },
