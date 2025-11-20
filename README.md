@@ -90,7 +90,7 @@ cargo build --release --target wasm32-unknown-unknown
 
 | Stage | Document | Lines of Code |
 |-------|----------|---------------|
-| Stage 1 | [STAGE1_COMPLETE_100_PERCENT.md](STAGE1_COMPLETE_100_PERCENT.md) | 2,136 |
+| Stage 1 | [STAGE1_COMPLETE.md](STAGE1_COMPLETE.md) | 2,136 |
 | Stage 2 | [STAGE2_COMPLETE.md](STAGE2_COMPLETE.md) | 2,238 |
 | Stage 3 | [STAGE3_COMPLETE.md](STAGE3_COMPLETE.md) | 2,136 |
 | Stage 4 | [STAGE4_COMPLETE.md](STAGE4_COMPLETE.md) | 950 |
@@ -112,7 +112,7 @@ cargo build --release --target wasm32-unknown-unknown
 
 ### Stage Details
 
-#### Stage 1: Falling Letters ([Full Details](STAGE1_COMPLETE_100_PERCENT.md))
+#### Stage 1: Falling Letters ([Full Details](STAGE1_COMPLETE.md))
 - Catch falling letters to form 2-letter words
 - 5 difficulty levels (90s → 45s time limits)
 - Combo system (1x → 3x multiplier)
@@ -209,7 +209,7 @@ tilemania/
 ├── Cargo.toml                     # Rust dependencies
 ├── EXECUTIVE_SUMMARY.md           # Project overview
 ├── STAGES_2_5_ARCHITECTURE.md     # Implementation architecture
-├── STAGE1_COMPLETE_100_PERCENT.md # Stage 1 completion summary
+├── STAGE1_COMPLETE.md             # Stage 1 completion summary
 ├── STAGE2_COMPLETE.md             # Stage 2 completion summary
 ├── STAGE3_COMPLETE.md             # Stage 3 completion summary
 ├── STAGE4_COMPLETE.md             # Stage 4 completion summary
