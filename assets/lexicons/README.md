@@ -14,11 +14,11 @@ TileMania requires a word list to function. Due to licensing restrictions, some 
 
 **Status:** ✅ **Included** (167,737 words)
 
-**TML (TileMania Lexicon)** is a filtered version of RE-Enable containing only words that also exist in CSW24. This avoids US/UK spelling confusion (color vs colour) while remaining public domain.
+**TML (TileMania Lexicon)** is a filtered version of RE-Enable containing only words that also exist in CSW24. This avoids US/UK spelling confusion (color vs colour).
 
 **Specifications:**
 - **Words:** 167,737 (97.3% of RE-Enable)
-- **License:** Public domain (free for commercial use)
+- **License:** Proprietary (included with TileMania)
 - **Source:** RE-Enable filtered to CSW24 vocabulary
 - **Purpose:** International English words, avoids regional variants
 - **Format:** One word per line, lowercase
@@ -27,8 +27,8 @@ TileMania requires a word list to function. Due to licensing restrictions, some 
 **Why use this:**
 - Avoids confusing kids with US/UK spelling differences
 - International English vocabulary (same as competitive play)
-- Still 100% legal (public domain source)
-- No licensing fees
+- Curated for educational purposes
+- Included with TileMania
 
 ---
 
@@ -143,7 +143,7 @@ The first found lexicon will be loaded.
 
 | Lexicon | Words | License | Cost | Best For |
 |---------|-------|---------|------|----------|
-| **TML** | 167K | Public domain | **FREE** | ✅ **Recommended** - International words, no US/UK confusion |
+| **TML** | 167K | Proprietary | **Included** | ✅ **Recommended** - International words, no US/UK confusion |
 | **RE-ENABLE** | 172K | Public domain | **FREE** | General use with US variants |
 | **ENABLE** | ~173K | Public domain | **FREE** | General use, educational |
 | **CSW24** | ~280K | Licensed | $$$ | Tournament, competitive |

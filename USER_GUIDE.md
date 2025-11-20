@@ -593,7 +593,7 @@ A: Ages 7-12 primarily, but enjoyable for all ages learning vocabulary.
 A: No! TileMania works 100% offline after installation.
 
 **Q: How many words are in the game?**
-A: 167,737 words in the TML (TileMania Lexicon), all public domain.
+A: 167,737 words in the TML (TileMania Lexicon), included with TileMania.
 
 **Q: Can I use my own word list?**
 A: Yes! See `assets/lexicons/README.md` for instructions.

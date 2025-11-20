@@ -19,7 +19,7 @@ TileMania transforms vocabulary learning from rote memorization into a **rewardi
 - ⚙️ **Interactive settings system** with persistent storage
 - 🌐 Offline-first design (no internet required)
 - 🦀 Built with Rust + Bevy 0.15 (fast, cross-platform)
-- 📚 TML (TileMania Lexicon) integration (167,737 words, public domain)
+- 📚 TML (TileMania Lexicon) integration (167,737 words)
 - 🤖 AI opponents with 5 difficulty levels per stage
 - 🏆 Competitive play with bracket system
 - **10,270+ lines** of production Rust code
@@ -153,7 +153,7 @@ cargo build --release --target wasm32-unknown-unknown
 
 - **Language:** Rust 1.70+ 🦀
 - **Engine:** Bevy 0.15 (ECS, 2D rendering, UI)
-- **Lexicon:** TML - TileMania Lexicon (167,737 words, public domain)
+- **Lexicon:** TML - TileMania Lexicon (167,737 words)
 - **Word Engine:** wolges (GADDAG-based word generation)
 - **Dependencies:** rand, bevy_text
 - **Platforms:** Desktop (Windows/Mac/Linux) + Web (WASM)
@@ -268,7 +268,7 @@ tilemania/
 ## 🏆 Key Features Implemented
 
 ### Lexicon System
-- ✅ TML word validation (167,737 words, public domain)
+- ✅ TML word validation (167,737 words)
 - ✅ O(1) lookup performance (HashSet-based)
 - ✅ Length-based filtering (2-15 letters)
 - ✅ Case-insensitive validation
@@ -362,7 +362,7 @@ cargo run --release
 - **Settings Options:** 7 (audio + gameplay)
 - **AI Difficulty Levels:** 25 (5 per stage)
 - **Game States:** 12
-- **Word Count:** 167,737 (TML - public domain)
+- **Word Count:** 167,737 (TML)
 - **Supported Platforms:** Desktop + Web (WASM)
 - **Target Age:** 7-12 years
 - **Development Status:** Core Complete, Assets Pending
@@ -388,7 +388,7 @@ cargo run --release
 ### ✅ Phase 1: Core Implementation (COMPLETE)
 - ✅ All 5 gameplay stages
 - ✅ Interactive settings system with persistence
-- ✅ Lexicon integration (TML - public domain)
+- ✅ Lexicon integration (TML)
 - ✅ AI opponent system
 - ✅ Scoring engine
 - ✅ State management
@@ -483,7 +483,7 @@ Each stage follows the same 8-module pattern:
 Proprietary software. All rights reserved. See [LICENSE](LICENSE) for details.
 
 **Lexicon:**
-- TML (TileMania Lexicon) - Public domain (derived from RE-Enable)
+- TML (TileMania Lexicon) - Curated word list (derived from RE-Enable)
 - RE-ENABLE - Public domain
 - Users may optionally provide their own licensed word lists (CSW24, etc.)
 
