@@ -5,7 +5,7 @@ use super::components::{
     TextComponent, TextStyle, TextColorVariant,
     Stack, StackDirection, Spacing, Alignment, Spacer,
 };
-use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable, apply_focused_activation, apply_focus_visual};
+use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable};
 
 #[derive(Component)]
 pub struct MainMenuScreen;
@@ -25,7 +25,7 @@ pub fn update_main_menu(
     settings_query: Query<(&Interaction, &SettingsButton), Changed<Interaction>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     focus: Option<ResMut<KeyboardFocus>>,
-    nav_query: Query<(&KeyboardNavigable, &mut Interaction), With<Button>>,
+    mut nav_query: Query<(&KeyboardNavigable, &mut BorderColor), With<Button>>,
 ) {
     if *state.get() == GameState::MainMenu {
         if query.is_empty() {
@@ -34,7 +34,7 @@ pub fn update_main_menu(
             commands.insert_resource(KeyboardFocus::new(2));
         }
 
-        // Handle keyboard navigation
+        // Handle keyboard navigation and activation
         if let Some(mut focus) = focus {
             // Arrow key navigation
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
@@ -44,18 +44,35 @@ pub fn update_main_menu(
                 focus.move_down();
             }
 
-            // Activate focused button with Enter
-            apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
+            // Handle Enter key activation (direct state change, no Interaction mutation)
+            if keyboard.just_pressed(KeyCode::Enter) || keyboard.just_pressed(KeyCode::Space) {
+                if let Some(focused_idx) = focus.focused_index {
+                    match focused_idx {
+                        0 => next_state.set(GameState::StageSelect), // Play button
+                        1 => next_state.set(GameState::Settings),    // Settings button
+                        _ => {}
+                    }
+                }
+            }
+
+            // Update visual focus (only mutates BorderColor, not Interaction)
+            for (nav, mut border) in nav_query.iter_mut() {
+                if focus.is_focused(nav.index) {
+                    *border = BorderColor(Color::srgb(0.9, 0.9, 1.0));
+                } else {
+                    *border = BorderColor(Color::NONE);
+                }
+            }
         }
 
-        // Handle Play button click
+        // Handle Play button mouse click
         for (interaction, _) in interaction_query.iter() {
             if *interaction == Interaction::Pressed {
                 next_state.set(GameState::StageSelect);
             }
         }
 
-        // Handle Settings button click
+        // Handle Settings button mouse click
         for (interaction, _) in settings_query.iter() {
             if *interaction == Interaction::Pressed {
                 next_state.set(GameState::Settings);

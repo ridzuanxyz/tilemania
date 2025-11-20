@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
 use crate::plugins::settings::GameSettings;
-use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable, apply_focused_activation};
+use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable};
 
 #[derive(Component)]
 pub struct SettingsScreen;
@@ -46,7 +46,7 @@ pub fn update_settings(
     mut settings: ResMut<GameSettings>,
     asset_server: Res<AssetServer>,
     focus: Option<ResMut<KeyboardFocus>>,
-    nav_query: Query<(&KeyboardNavigable, &mut Interaction), With<Button>>,
+    mut nav_query: Query<(&KeyboardNavigable, &mut BorderColor), With<Button>>,
     mut label_query: Query<(&SettingLabel, &mut Text)>,
 ) {
     if *state.get() == GameState::Settings {
@@ -81,10 +81,24 @@ pub fn update_settings(
                 if changed {
                     update_labels(&settings, &mut label_query);
                 }
+
+                // Handle Enter/Space for activation (settings adjustments or navigation)
+                if keyboard.just_pressed(KeyCode::Enter) || keyboard.just_pressed(KeyCode::Space) {
+                    let changed = handle_enter_activation(focused_idx, &mut settings, &mut next_state);
+                    if changed {
+                        update_labels(&settings, &mut label_query);
+                    }
+                }
             }
 
-            // Activate focused button with Enter/Space
-            apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
+            // Update visual focus (only mutates BorderColor, not Interaction)
+            for (nav, mut border) in nav_query.iter_mut() {
+                if focus.is_focused(nav.index) {
+                    *border = BorderColor(Color::srgb(0.9, 0.9, 1.0));
+                } else {
+                    *border = BorderColor(Color::NONE);
+                }
+            }
         }
 
         // Keyboard shortcuts: ESC or Backspace to return to main menu
@@ -295,6 +309,73 @@ fn handle_right_arrow(focused_idx: usize, settings: &mut GameSettings) -> bool {
             true
         }
         _ => false, // Indices 7-8 (buttons) don't respond to left/right
+    }
+}
+
+fn handle_enter_activation(focused_idx: usize, settings: &mut GameSettings, next_state: &mut ResMut<NextState<GameState>>) -> bool {
+    match focused_idx {
+        0 => {
+            // Music Toggle - same as left/right
+            settings.audio.music_enabled = !settings.audio.music_enabled;
+            true
+        }
+        1 => {
+            // Music Volume - Increase (same as right arrow)
+            settings.audio.music_volume = (settings.audio.music_volume + 0.1).min(1.0);
+            true
+        }
+        2 => {
+            // SFX Toggle - same as left/right
+            settings.audio.sfx_enabled = !settings.audio.sfx_enabled;
+            true
+        }
+        3 => {
+            // SFX Volume - Increase (same as right arrow)
+            settings.audio.sfx_volume = (settings.audio.sfx_volume + 0.1).min(1.0);
+            true
+        }
+        4 => {
+            // Dictionary - Cycle Forward
+            settings.gameplay.dictionary = match settings.gameplay.dictionary.as_str() {
+                "TML" => "RE-ENABLE".to_string(),
+                "RE-ENABLE" => "ENABLE".to_string(),
+                "ENABLE" => "CSW24".to_string(),
+                _ => "TML".to_string(),
+            };
+            true
+        }
+        5 => {
+            // Timer - Cycle Forward
+            settings.gameplay.default_time_limit = match settings.gameplay.default_time_limit {
+                600 => 900,      // 10:00 -> 15:00
+                900 => 1500,     // 15:00 -> 25:00
+                1500 => 1800,    // 25:00 -> 30:00
+                1800 => 0,       // 30:00 -> Unlimited
+                _ => 600,        // Unlimited -> 10:00
+            };
+            true
+        }
+        6 => {
+            // Difficulty - Cycle Forward
+            settings.gameplay.default_difficulty = match settings.gameplay.default_difficulty {
+                1 => 2,
+                2 => 3,
+                3 => 4,
+                4 => 5,
+                _ => 1,
+            };
+            true
+        }
+        7 => {
+            // Save Settings button (auto-saved, so just acknowledge)
+            false
+        }
+        8 => {
+            // Back to Menu button
+            next_state.set(GameState::MainMenu);
+            false
+        }
+        _ => false,
     }
 }
 
