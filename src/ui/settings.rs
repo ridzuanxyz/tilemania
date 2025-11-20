@@ -43,10 +43,11 @@ pub fn update_settings(
     query: Query<Entity, With<SettingsScreen>>,
     mut next_state: ResMut<NextState<GameState>>,
     keyboard: Res<ButtonInput<KeyCode>>,
-    settings: Res<GameSettings>,
+    mut settings: ResMut<GameSettings>,
     asset_server: Res<AssetServer>,
     focus: Option<ResMut<KeyboardFocus>>,
     nav_query: Query<(&KeyboardNavigable, &mut Interaction), With<Button>>,
+    mut label_query: Query<(&SettingLabel, &mut Text)>,
 ) {
     if *state.get() == GameState::Settings {
         if query.is_empty() {
@@ -63,6 +64,23 @@ pub fn update_settings(
             }
             if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
                 focus.move_down();
+            }
+
+            // Left/Right arrows for direct adjustment
+            if let Some(focused_idx) = focus.focused_index {
+                let mut changed = false;
+
+                if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) {
+                    changed = handle_left_arrow(focused_idx, &mut settings);
+                }
+
+                if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) {
+                    changed = handle_right_arrow(focused_idx, &mut settings);
+                }
+
+                if changed {
+                    update_labels(&settings, &mut label_query);
+                }
             }
 
             // Activate focused button with Enter/Space
@@ -158,6 +176,125 @@ pub fn handle_setting_buttons(
                 }
             }
         }
+    }
+}
+
+/// Handle left arrow key for direct setting adjustment
+fn handle_left_arrow(focused_idx: usize, settings: &mut GameSettings) -> bool {
+    match focused_idx {
+        0 => {
+            // Music Toggle
+            settings.audio.music_enabled = !settings.audio.music_enabled;
+            true
+        }
+        1 => {
+            // Music Volume - Decrease
+            settings.audio.music_volume = (settings.audio.music_volume - 0.1).max(0.0);
+            true
+        }
+        2 => {
+            // SFX Toggle
+            settings.audio.sfx_enabled = !settings.audio.sfx_enabled;
+            true
+        }
+        3 => {
+            // SFX Volume - Decrease
+            settings.audio.sfx_volume = (settings.audio.sfx_volume - 0.1).max(0.0);
+            true
+        }
+        4 => {
+            // Dictionary - Cycle Backward
+            settings.gameplay.dictionary = match settings.gameplay.dictionary.as_str() {
+                "TML" => "CSW24".to_string(),
+                "CSW24" => "ENABLE".to_string(),
+                "ENABLE" => "RE-ENABLE".to_string(),
+                _ => "TML".to_string(),
+            };
+            true
+        }
+        5 => {
+            // Timer - Cycle Backward
+            settings.gameplay.default_time_limit = match settings.gameplay.default_time_limit {
+                600 => 0,        // 10:00 -> Unlimited
+                900 => 600,      // 15:00 -> 10:00
+                1500 => 900,     // 25:00 -> 15:00
+                1800 => 1500,    // 30:00 -> 25:00
+                _ => 1800,       // Unlimited -> 30:00
+            };
+            true
+        }
+        6 => {
+            // Difficulty - Cycle Backward
+            settings.gameplay.default_difficulty = match settings.gameplay.default_difficulty {
+                1 => 5,
+                2 => 1,
+                3 => 2,
+                4 => 3,
+                5 => 4,
+                _ => 3,
+            };
+            true
+        }
+        _ => false, // Indices 7-8 (buttons) don't respond to left/right
+    }
+}
+
+/// Handle right arrow key for direct setting adjustment
+fn handle_right_arrow(focused_idx: usize, settings: &mut GameSettings) -> bool {
+    match focused_idx {
+        0 => {
+            // Music Toggle
+            settings.audio.music_enabled = !settings.audio.music_enabled;
+            true
+        }
+        1 => {
+            // Music Volume - Increase
+            settings.audio.music_volume = (settings.audio.music_volume + 0.1).min(1.0);
+            true
+        }
+        2 => {
+            // SFX Toggle
+            settings.audio.sfx_enabled = !settings.audio.sfx_enabled;
+            true
+        }
+        3 => {
+            // SFX Volume - Increase
+            settings.audio.sfx_volume = (settings.audio.sfx_volume + 0.1).min(1.0);
+            true
+        }
+        4 => {
+            // Dictionary - Cycle Forward
+            settings.gameplay.dictionary = match settings.gameplay.dictionary.as_str() {
+                "TML" => "RE-ENABLE".to_string(),
+                "RE-ENABLE" => "ENABLE".to_string(),
+                "ENABLE" => "CSW24".to_string(),
+                _ => "TML".to_string(),
+            };
+            true
+        }
+        5 => {
+            // Timer - Cycle Forward
+            settings.gameplay.default_time_limit = match settings.gameplay.default_time_limit {
+                600 => 900,      // 10:00 -> 15:00
+                900 => 1500,     // 15:00 -> 25:00
+                1500 => 1800,    // 25:00 -> 30:00
+                1800 => 0,       // 30:00 -> Unlimited
+                _ => 600,        // Unlimited -> 10:00
+            };
+            true
+        }
+        6 => {
+            // Difficulty - Cycle Forward
+            settings.gameplay.default_difficulty = match settings.gameplay.default_difficulty {
+                1 => 2,
+                2 => 3,
+                3 => 4,
+                4 => 5,
+                _ => 1,
+            };
+            true
+        }
+        _ => false, // Indices 7-8 (buttons) don't respond to left/right
     }
 }
 
@@ -351,7 +488,7 @@ fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_ser
 
             // Instructions
             parent.spawn((
-                Text::new("↑↓: Navigate | Enter: Select | Backspace: Back"),
+                Text::new("↑↓: Navigate | ←→: Adjust | Enter: Select | Backspace: Back"),
                 TextFont {
                     font: font_medium.clone(),
                     font_size: 18.0,
