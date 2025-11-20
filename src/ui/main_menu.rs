@@ -55,10 +55,10 @@ pub fn update_main_menu(
                 }
             }
 
-            // Update visual focus (only mutates BorderColor, not Interaction)
+            // Update visual focus with thick bright border
             for (nav, mut border) in nav_query.iter_mut() {
                 if focus.is_focused(nav.index) {
-                    *border = BorderColor(Color::srgb(0.9, 0.9, 1.0));
+                    *border = BorderColor(Color::srgb(0.3, 0.8, 1.0)); // Bright cyan
                 } else {
                     *border = BorderColor(Color::NONE);
                 }
@@ -137,10 +137,14 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         ButtonVariant::Primary,
         PlayButton,
     );
-    // Make it keyboard navigable (index 0)
+    // Make it keyboard navigable (index 0) with border support
     commands.entity(play_button).insert((
         KeyboardNavigable { index: 0 },
         BorderColor(Color::NONE),
+        Node {
+            border: UiRect::all(Val::Px(4.0)), // Thick border
+            ..default()
+        },
     ));
     commands.entity(stack_id).add_child(play_button);
 
@@ -152,10 +156,14 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         ButtonVariant::Secondary,
         SettingsButton,
     );
-    // Make it keyboard navigable (index 1)
+    // Make it keyboard navigable (index 1) with border support
     commands.entity(settings_button).insert((
         KeyboardNavigable { index: 1 },
         BorderColor(Color::NONE),
+        Node {
+            border: UiRect::all(Val::Px(4.0)), // Thick border
+            ..default()
+        },
     ));
     commands.entity(stack_id).add_child(settings_button);
 
