@@ -16,12 +16,13 @@ TileMania transforms vocabulary learning from rote memorization into a **rewardi
 
 **✅ Implementation Complete:**
 - 🎮 **5 fully implemented gameplay stages** (Falling Letters → AI Competitions)
+- ⚙️ **Interactive settings system** with persistent storage
 - 🌐 Offline-first design (no internet required)
 - 🦀 Built with Rust + Bevy 0.15 (fast, cross-platform)
 - 📚 TML (TileMania Lexicon) integration (167,737 words, public domain)
 - 🤖 AI opponents with 5 difficulty levels per stage
 - 🏆 Competitive play with bracket system
-- **10,270 lines** of production Rust code
+- **10,270+ lines** of production Rust code
 
 ---
 
@@ -67,6 +68,7 @@ cargo build --release --target wasm32-unknown-unknown
 | Document | Purpose |
 |----------|---------|
 | **[USER_GUIDE.md](USER_GUIDE.md)** | **Complete player manual - How to play all 5 stages** |
+| **[SETTINGS_SYSTEM.md](SETTINGS_SYSTEM.md)** | **Settings guide - Audio, gameplay preferences** |
 | [BUILD_GUIDE.md](BUILD_GUIDE.md) | Installation and setup instructions |
 
 ### For Developers
@@ -78,6 +80,7 @@ cargo build --release --target wasm32-unknown-unknown
 | [CHANGELOG.md](CHANGELOG.md) | Version history and changes |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [ASSET_SPECIFICATIONS.md](ASSET_SPECIFICATIONS.md) | Asset requirements (audio, visual) |
+| [BEVY_015_MIGRATION_STATUS.md](BEVY_015_MIGRATION_STATUS.md) | Bevy 0.15 migration documentation |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
 | [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) | Gameplay mechanics & UX |
 | [STAGES_2_5_ARCHITECTURE.md](STAGES_2_5_ARCHITECTURE.md) | Stage implementation details |
@@ -163,8 +166,10 @@ cargo build --release --target wasm32-unknown-unknown
 tilemania/
 ├── src/
 │   ├── main.rs                    # App entry point (42 lines)
-│   ├── plugins/                   # Core plugins (state, assets, input)
+│   ├── plugins/                   # Core plugins (state, assets, input, settings)
+│   │   ├── settings.rs            # Settings persistence (148 lines)
 │   ├── ui/                        # UI plugin
+│   │   ├── settings.rs            # Settings UI (627 lines)
 │   ├── lexicon/                   # Word validation (155 lines)
 │   ├── scoring/                   # Tile scoring engine (180 lines)
 │   ├── stage1/                    # Falling Letters (2,136 lines)
@@ -211,6 +216,8 @@ tilemania/
 ├── STAGE5_COMPLETE.md             # Stage 5 completion summary
 ├── CHANGELOG.md                   # Version history
 ├── ASSET_SPECIFICATIONS.md        # Asset requirements
+├── SETTINGS_SYSTEM.md             # Settings system documentation
+├── BEVY_015_MIGRATION_STATUS.md   # Bevy 0.15 migration guide
 ├── BUILD_GUIDE.md                 # Build instructions
 └── CONTRIBUTING.md                # Contribution guidelines
 ```
@@ -233,9 +240,10 @@ tilemania/
 - ✅ Tile scoring engine
 - ✅ State management (12 game states)
 - ✅ Plugin architecture
+- ✅ Settings system with persistence
 - ✅ ECS component systems
 
-**Total:** ~10,270 lines of production Rust code
+**Total:** ~11,000 lines of production Rust code
 
 ### 🔄 Phase 2: Polish & Assets (Next)
 
@@ -289,18 +297,20 @@ tilemania/
 
 ### UI Systems
 - ✅ Start screens for each stage
+- ✅ Interactive settings menu (7 configurable options)
 - ✅ In-game HUDs with score/timer/stats
 - ✅ Results screens
 - ✅ Pause menus (ESC key)
 - ✅ Difficulty selection
 - ✅ Competition bracket visualization
 
-### Audio Hooks
+### Audio Hooks & Settings
 - ✅ Event-based audio system (ready for assets)
 - ✅ 60+ audio event types across all stages
 - ✅ Dynamic music switching
 - ✅ Sound effect triggers
-- ✅ Volume controls
+- ✅ Volume controls (music/SFX, 0-100%)
+- ✅ Audio toggle switches (music/SFX ON/OFF)
 
 ---
 
@@ -346,9 +356,10 @@ cargo run --release
 
 ## 📊 Project Metrics
 
-- **Total Lines of Code:** 10,270
-- **Rust Files:** 62
+- **Total Lines of Code:** ~11,000
+- **Rust Files:** 64
 - **Stages Implemented:** 5/5 (100%)
+- **Settings Options:** 7 (audio + gameplay)
 - **AI Difficulty Levels:** 25 (5 per stage)
 - **Game States:** 12
 - **Word Count:** 167,737 (TML - public domain)
@@ -366,8 +377,9 @@ cargo run --release
 | Stage 4 (Speed Challenge) | 950 | 8 |
 | Stage 5 (AI Tournaments) | 790 | 9 |
 | Core Systems (Lexicon, Scoring) | 400 | 2 |
+| Settings System | 775 | 2 |
 | Plugins & Main | ~620 | 16 |
-| **Total** | **~10,270** | **62** |
+| **Total** | **~11,000** | **64** |
 
 ---
 
@@ -375,6 +387,7 @@ cargo run --release
 
 ### ✅ Phase 1: Core Implementation (COMPLETE)
 - ✅ All 5 gameplay stages
+- ✅ Interactive settings system with persistence
 - ✅ Lexicon integration (TML - public domain)
 - ✅ AI opponent system
 - ✅ Scoring engine
@@ -495,9 +508,9 @@ For questions about:
 
 ---
 
-**Status:** 🟢 All 5 Stages Complete
-**Last Updated:** 2025-11-19
-**Next Milestone:** Asset Integration & Platform Testing
+**Status:** 🟢 All 5 Stages Complete + Settings System
+**Last Updated:** 2025-11-20
+**Next Milestone:** Audio Integration & Platform Testing
 
 ---
 
