@@ -1,8 +1,40 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
+use crate::plugins::settings::GameSettings;
 
 #[derive(Component)]
 pub struct SettingsScreen;
+
+#[derive(Component)]
+pub enum SettingButton {
+    MusicToggle,
+    SfxToggle,
+    MusicVolumeUp,
+    MusicVolumeDown,
+    SfxVolumeUp,
+    SfxVolumeDown,
+    DictionaryCycle,
+    TimerCycle,
+    DifficultyCycle,
+    SaveSettings,
+    BackToMenu,
+}
+
+#[derive(Component)]
+pub struct SettingLabel {
+    pub setting_type: SettingType,
+}
+
+#[derive(Clone)]
+pub enum SettingType {
+    MusicEnabled,
+    SfxEnabled,
+    MusicVolume,
+    SfxVolume,
+    Dictionary,
+    Timer,
+    Difficulty,
+}
 
 pub fn update_settings(
     mut commands: Commands,
@@ -10,10 +42,12 @@ pub fn update_settings(
     query: Query<Entity, With<SettingsScreen>>,
     mut next_state: ResMut<NextState<GameState>>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    settings: Res<GameSettings>,
+    asset_server: Res<AssetServer>,
 ) {
     if *state.get() == GameState::Settings {
         if query.is_empty() {
-            spawn_settings_ui(&mut commands);
+            spawn_settings_ui(&mut commands, &settings, &asset_server);
         }
 
         // Keyboard shortcut: ESC to return to main menu
@@ -27,7 +61,131 @@ pub fn update_settings(
     }
 }
 
-fn spawn_settings_ui(commands: &mut Commands) {
+pub fn handle_setting_buttons(
+    mut interaction_query: Query<
+        (&Interaction, &SettingButton),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut settings: ResMut<GameSettings>,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut label_query: Query<(&SettingLabel, &mut Text)>,
+) {
+    for (interaction, button) in interaction_query.iter() {
+        if *interaction == Interaction::Pressed {
+            match button {
+                SettingButton::MusicToggle => {
+                    settings.audio.music_enabled = !settings.audio.music_enabled;
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::SfxToggle => {
+                    settings.audio.sfx_enabled = !settings.audio.sfx_enabled;
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::MusicVolumeUp => {
+                    settings.audio.music_volume = (settings.audio.music_volume + 0.1).min(1.0);
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::MusicVolumeDown => {
+                    settings.audio.music_volume = (settings.audio.music_volume - 0.1).max(0.0);
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::SfxVolumeUp => {
+                    settings.audio.sfx_volume = (settings.audio.sfx_volume + 0.1).min(1.0);
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::SfxVolumeDown => {
+                    settings.audio.sfx_volume = (settings.audio.sfx_volume - 0.1).max(0.0);
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::DictionaryCycle => {
+                    settings.gameplay.dictionary = match settings.gameplay.dictionary.as_str() {
+                        "CSW24" => "TWL06".to_string(),
+                        "TWL06" => "SOWPODS".to_string(),
+                        _ => "CSW24".to_string(),
+                    };
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::TimerCycle => {
+                    settings.gameplay.default_time_limit = match settings.gameplay.default_time_limit {
+                        600 => 900,      // 10:00 -> 15:00
+                        900 => 1500,     // 15:00 -> 25:00
+                        1500 => 1800,    // 25:00 -> 30:00
+                        1800 => 0,       // 30:00 -> Unlimited
+                        _ => 600,        // Unlimited -> 10:00
+                    };
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::DifficultyCycle => {
+                    settings.gameplay.default_difficulty = match settings.gameplay.default_difficulty {
+                        1 => 2,
+                        2 => 3,
+                        3 => 4,
+                        4 => 5,
+                        _ => 1,
+                    };
+                    update_labels(&settings, &mut label_query);
+                }
+                SettingButton::SaveSettings => {
+                    if let Err(e) = settings.save() {
+                        error!("Failed to save settings: {}", e);
+                    } else {
+                        info!("✅ Settings saved successfully");
+                    }
+                }
+                SettingButton::BackToMenu => {
+                    next_state.set(GameState::MainMenu);
+                }
+            }
+        }
+    }
+}
+
+fn update_labels(settings: &GameSettings, label_query: &mut Query<(&SettingLabel, &mut Text)>) {
+    for (label, mut text) in label_query.iter_mut() {
+        **text = match &label.setting_type {
+            SettingType::MusicEnabled => {
+                format!("🎵 Music: {}", if settings.audio.music_enabled { "ON" } else { "OFF" })
+            }
+            SettingType::SfxEnabled => {
+                format!("🔊 Sound Effects: {}", if settings.audio.sfx_enabled { "ON" } else { "OFF" })
+            }
+            SettingType::MusicVolume => {
+                format!("Music Volume: {}%", (settings.audio.music_volume * 100.0) as u8)
+            }
+            SettingType::SfxVolume => {
+                format!("SFX Volume: {}%", (settings.audio.sfx_volume * 100.0) as u8)
+            }
+            SettingType::Dictionary => {
+                format!("📚 Dictionary: {}", settings.gameplay.dictionary)
+            }
+            SettingType::Timer => {
+                if settings.gameplay.default_time_limit == 0 {
+                    "⏱ Timer: Unlimited".to_string()
+                } else {
+                    let minutes = settings.gameplay.default_time_limit / 60;
+                    let seconds = settings.gameplay.default_time_limit % 60;
+                    format!("⏱ Timer: {:02}:{:02}", minutes, seconds)
+                }
+            }
+            SettingType::Difficulty => {
+                let diff_name = match settings.gameplay.default_difficulty {
+                    1 => "Very Easy",
+                    2 => "Easy",
+                    3 => "Medium",
+                    4 => "Hard",
+                    5 => "Very Hard",
+                    _ => "Medium",
+                };
+                format!("🎮 Difficulty: {}", diff_name)
+            }
+        };
+    }
+}
+
+fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_server: &AssetServer) {
+    let font_bold: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium: Handle<Font> = asset_server.load("fonts/FiraSans-Medium.ttf");
+
     commands
         .spawn((
             Node {
@@ -37,6 +195,7 @@ fn spawn_settings_ui(commands: &mut Commands) {
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 row_gap: Val::Px(20.0),
+                padding: UiRect::all(Val::Px(20.0)),
                 ..default()
             },
             BackgroundColor(Color::srgb(0.12, 0.12, 0.18)),
@@ -47,98 +206,422 @@ fn spawn_settings_ui(commands: &mut Commands) {
             parent.spawn((
                 Text::new("⚙ Settings"),
                 TextFont {
-                    font_size: 70.0,
+                    font: font_bold.clone(),
+                    font_size: 60.0,
                     ..default()
                 },
                 TextColor(Color::srgb(0.9, 0.9, 1.0)),
             ));
 
-            // Settings placeholder
+            // Settings container
             parent
-                .spawn((
-                    Node {
-                        flex_direction: FlexDirection::Column,
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Start,
-                        row_gap: Val::Px(15.0),
-                        padding: UiRect::all(Val::Px(40.0)),
-                        ..default()
-                    },
-                    BackgroundColor(Color::srgb(0.18, 0.18, 0.24)),
-                ))
-                .with_children(|settings| {
-                    settings.spawn((
-                        Text::new("🔊 Sound: ON"),
-                        TextFont {
-                            font_size: 30.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
+                .spawn(Node {
+                    flex_direction: FlexDirection::Column,
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    row_gap: Val::Px(20.0),
+                    padding: UiRect::all(Val::Px(30.0)),
+                    ..default()
+                })
+                .with_children(|container| {
+                    // Music Toggle
+                    spawn_toggle_row(
+                        container,
+                        &font_medium,
+                        SettingType::MusicEnabled,
+                        SettingButton::MusicToggle,
+                        settings,
+                    );
 
-                    settings.spawn((
-                        Text::new("🎵 Music: ON"),
-                        TextFont {
-                            font_size: 30.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
+                    // Music Volume
+                    spawn_volume_row(
+                        container,
+                        &font_medium,
+                        SettingType::MusicVolume,
+                        SettingButton::MusicVolumeDown,
+                        SettingButton::MusicVolumeUp,
+                        settings,
+                    );
 
-                    settings.spawn((
-                        Text::new("📚 Dictionary: CSW24"),
-                        TextFont {
-                            font_size: 30.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
+                    // SFX Toggle
+                    spawn_toggle_row(
+                        container,
+                        &font_medium,
+                        SettingType::SfxEnabled,
+                        SettingButton::SfxToggle,
+                        settings,
+                    );
 
-                    settings.spawn((
-                        Text::new("⏱ Timer: 25:00"),
-                        TextFont {
-                            font_size: 30.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
+                    // SFX Volume
+                    spawn_volume_row(
+                        container,
+                        &font_medium,
+                        SettingType::SfxVolume,
+                        SettingButton::SfxVolumeDown,
+                        SettingButton::SfxVolumeUp,
+                        settings,
+                    );
 
-                    settings.spawn((
-                        Text::new("🎮 Difficulty: Medium"),
-                        TextFont {
-                            font_size: 30.0,
-                            ..default()
-                        },
-                        TextColor(Color::WHITE),
-                    ));
+                    // Dictionary Cycle
+                    spawn_cycle_row(
+                        container,
+                        &font_medium,
+                        SettingType::Dictionary,
+                        SettingButton::DictionaryCycle,
+                        settings,
+                    );
+
+                    // Timer Cycle
+                    spawn_cycle_row(
+                        container,
+                        &font_medium,
+                        SettingType::Timer,
+                        SettingButton::TimerCycle,
+                        settings,
+                    );
+
+                    // Difficulty Cycle
+                    spawn_cycle_row(
+                        container,
+                        &font_medium,
+                        SettingType::Difficulty,
+                        SettingButton::DifficultyCycle,
+                        settings,
+                    );
                 });
 
-            // Note
+            // Action buttons
+            parent
+                .spawn(Node {
+                    flex_direction: FlexDirection::Row,
+                    justify_content: JustifyContent::Center,
+                    column_gap: Val::Px(20.0),
+                    margin: UiRect::top(Val::Px(20.0)),
+                    ..default()
+                })
+                .with_children(|buttons| {
+                    // Save button
+                    spawn_action_button(
+                        buttons,
+                        &font_bold,
+                        "💾 Save",
+                        SettingButton::SaveSettings,
+                        Color::srgb(0.2, 0.6, 0.3),
+                    );
+
+                    // Back button
+                    spawn_action_button(
+                        buttons,
+                        &font_bold,
+                        "← Back",
+                        SettingButton::BackToMenu,
+                        Color::srgb(0.3, 0.3, 0.4),
+                    );
+                });
+
+            // Instructions
             parent.spawn((
-                Text::new("Settings functionality will be implemented in Sprint 2"),
+                Text::new("Click buttons to change • Press ESC to go back"),
                 TextFont {
-                    font_size: 20.0,
+                    font: font_medium.clone(),
+                    font_size: 18.0,
                     ..default()
                 },
                 TextColor(Color::srgb(0.6, 0.6, 0.7)),
                 Node {
-                    margin: UiRect::all(Val::Px(20.0)),
+                    margin: UiRect::top(Val::Px(10.0)),
                     ..default()
                 },
             ));
+        });
+}
 
-            // Instructions
-            parent.spawn((
-                Text::new("Press ESC to return to Main Menu"),
+fn spawn_toggle_row(
+    parent: &mut ChildBuilder,
+    font: &Handle<Font>,
+    setting_type: SettingType,
+    button_type: SettingButton,
+    settings: &GameSettings,
+) {
+    parent
+        .spawn(Node {
+            flex_direction: FlexDirection::Row,
+            align_items: AlignItems::Center,
+            column_gap: Val::Px(20.0),
+            width: Val::Px(500.0),
+            justify_content: JustifyContent::SpaceBetween,
+            ..default()
+        })
+        .with_children(|row| {
+            // Label
+            let label_text = match &setting_type {
+                SettingType::MusicEnabled => {
+                    format!("🎵 Music: {}", if settings.audio.music_enabled { "ON" } else { "OFF" })
+                }
+                SettingType::SfxEnabled => {
+                    format!("🔊 Sound Effects: {}", if settings.audio.sfx_enabled { "ON" } else { "OFF" })
+                }
+                _ => String::new(),
+            };
+
+            row.spawn((
+                Text::new(label_text),
                 TextFont {
+                    font: font.clone(),
                     font_size: 24.0,
                     ..default()
                 },
-                TextColor(Color::srgb(0.7, 0.7, 0.8)),
+                TextColor(Color::WHITE),
+                SettingLabel {
+                    setting_type: setting_type.clone(),
+                },
+            ));
+
+            // Toggle button
+            row.spawn((
+                Button,
                 Node {
-                    margin: UiRect::top(Val::Px(20.0)),
+                    width: Val::Px(100.0),
+                    height: Val::Px(40.0),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
                     ..default()
                 },
+                BackgroundColor(Color::srgb(0.25, 0.25, 0.35)),
+                button_type,
+            ))
+            .with_children(|button| {
+                button.spawn((
+                    Text::new("Toggle"),
+                    TextFont {
+                        font: font.clone(),
+                        font_size: 20.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                ));
+            });
+        });
+}
+
+fn spawn_volume_row(
+    parent: &mut ChildBuilder,
+    font: &Handle<Font>,
+    setting_type: SettingType,
+    button_down: SettingButton,
+    button_up: SettingButton,
+    settings: &GameSettings,
+) {
+    parent
+        .spawn(Node {
+            flex_direction: FlexDirection::Row,
+            align_items: AlignItems::Center,
+            column_gap: Val::Px(10.0),
+            width: Val::Px(500.0),
+            justify_content: JustifyContent::SpaceBetween,
+            ..default()
+        })
+        .with_children(|row| {
+            // Label
+            let label_text = match &setting_type {
+                SettingType::MusicVolume => {
+                    format!("Music Volume: {}%", (settings.audio.music_volume * 100.0) as u8)
+                }
+                SettingType::SfxVolume => {
+                    format!("SFX Volume: {}%", (settings.audio.sfx_volume * 100.0) as u8)
+                }
+                _ => String::new(),
+            };
+
+            row.spawn((
+                Text::new(label_text),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+                SettingLabel {
+                    setting_type: setting_type.clone(),
+                },
+            ));
+
+            // Volume controls container
+            row.spawn(Node {
+                flex_direction: FlexDirection::Row,
+                column_gap: Val::Px(10.0),
+                ..default()
+            })
+            .with_children(|controls| {
+                // Decrease button
+                controls
+                    .spawn((
+                        Button,
+                        Node {
+                            width: Val::Px(45.0),
+                            height: Val::Px(40.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        BackgroundColor(Color::srgb(0.4, 0.2, 0.2)),
+                        button_down,
+                    ))
+                    .with_children(|button| {
+                        button.spawn((
+                            Text::new("-"),
+                            TextFont {
+                                font: font.clone(),
+                                font_size: 24.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+                    });
+
+                // Increase button
+                controls
+                    .spawn((
+                        Button,
+                        Node {
+                            width: Val::Px(45.0),
+                            height: Val::Px(40.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        BackgroundColor(Color::srgb(0.2, 0.4, 0.2)),
+                        button_up,
+                    ))
+                    .with_children(|button| {
+                        button.spawn((
+                            Text::new("+"),
+                            TextFont {
+                                font: font.clone(),
+                                font_size: 24.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+                    });
+            });
+        });
+}
+
+fn spawn_cycle_row(
+    parent: &mut ChildBuilder,
+    font: &Handle<Font>,
+    setting_type: SettingType,
+    button_type: SettingButton,
+    settings: &GameSettings,
+) {
+    parent
+        .spawn(Node {
+            flex_direction: FlexDirection::Row,
+            align_items: AlignItems::Center,
+            column_gap: Val::Px(20.0),
+            width: Val::Px(500.0),
+            justify_content: JustifyContent::SpaceBetween,
+            ..default()
+        })
+        .with_children(|row| {
+            // Label
+            let label_text = match &setting_type {
+                SettingType::Dictionary => {
+                    format!("📚 Dictionary: {}", settings.gameplay.dictionary)
+                }
+                SettingType::Timer => {
+                    if settings.gameplay.default_time_limit == 0 {
+                        "⏱ Timer: Unlimited".to_string()
+                    } else {
+                        let minutes = settings.gameplay.default_time_limit / 60;
+                        let seconds = settings.gameplay.default_time_limit % 60;
+                        format!("⏱ Timer: {:02}:{:02}", minutes, seconds)
+                    }
+                }
+                SettingType::Difficulty => {
+                    let diff_name = match settings.gameplay.default_difficulty {
+                        1 => "Very Easy",
+                        2 => "Easy",
+                        3 => "Medium",
+                        4 => "Hard",
+                        5 => "Very Hard",
+                        _ => "Medium",
+                    };
+                    format!("🎮 Difficulty: {}", diff_name)
+                }
+                _ => String::new(),
+            };
+
+            row.spawn((
+                Text::new(label_text),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+                SettingLabel {
+                    setting_type: setting_type.clone(),
+                },
+            ));
+
+            // Cycle button
+            row.spawn((
+                Button,
+                Node {
+                    width: Val::Px(100.0),
+                    height: Val::Px(40.0),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                BackgroundColor(Color::srgb(0.25, 0.25, 0.35)),
+                button_type,
+            ))
+            .with_children(|button| {
+                button.spawn((
+                    Text::new("Change"),
+                    TextFont {
+                        font: font.clone(),
+                        font_size: 20.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                ));
+            });
+        });
+}
+
+fn spawn_action_button(
+    parent: &mut ChildBuilder,
+    font: &Handle<Font>,
+    label: &str,
+    button_type: SettingButton,
+    color: Color,
+) {
+    parent
+        .spawn((
+            Button,
+            Node {
+                width: Val::Px(150.0),
+                height: Val::Px(50.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                ..default()
+            },
+            BackgroundColor(color),
+            button_type,
+        ))
+        .with_children(|button| {
+            button.spawn((
+                Text::new(label),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 24.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
             ));
         });
 }

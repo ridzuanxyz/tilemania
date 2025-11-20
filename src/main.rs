@@ -10,7 +10,7 @@ mod stage3;
 mod stage4;
 mod stage5;
 
-use plugins::{CorePlugin, StatePlugin, AssetPlugin, InputPlugin};
+use plugins::{CorePlugin, StatePlugin, AssetPlugin, InputPlugin, SettingsPlugin};
 use ui::UiPlugin;
 use stage1::Stage1Plugin;
 use stage2::Stage2Plugin;
@@ -33,6 +33,7 @@ fn main() {
             StatePlugin,
             AssetPlugin,
             InputPlugin,
+            SettingsPlugin,
             UiPlugin,
             Stage1Plugin,
             Stage2Plugin,
