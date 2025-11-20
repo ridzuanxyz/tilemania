@@ -5,6 +5,7 @@ pub enum GameState {
     #[default]
     Splash,
     MainMenu,
+    StageSelect,
     GameBoard,
     Stage1Playing,
     Stage1Paused,
@@ -28,6 +29,7 @@ impl Plugin for StatePlugin {
             .init_state::<GameState>()
             .add_systems(OnEnter(GameState::Splash), enter_splash)
             .add_systems(OnEnter(GameState::MainMenu), enter_main_menu)
+            .add_systems(OnEnter(GameState::StageSelect), enter_stage_select)
             .add_systems(OnEnter(GameState::GameBoard), enter_game_board)
             .add_systems(OnEnter(GameState::Results), enter_results)
             .add_systems(OnEnter(GameState::Settings), enter_settings);
@@ -42,6 +44,10 @@ fn enter_splash() {
 
 fn enter_main_menu() {
     info!("📋 Entering Main Menu");
+}
+
+fn enter_stage_select() {
+    info!("🎯 Entering Stage Select");
 }
 
 fn enter_game_board() {
