@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
 use crate::plugins::settings::GameSettings;
+use super::keyboard_nav::{KeyboardFocus, KeyboardNavigable, apply_focused_activation};
 
 #[derive(Component)]
 pub struct SettingsScreen;
@@ -44,10 +45,28 @@ pub fn update_settings(
     keyboard: Res<ButtonInput<KeyCode>>,
     settings: Res<GameSettings>,
     asset_server: Res<AssetServer>,
+    focus: Option<ResMut<KeyboardFocus>>,
+    nav_query: Query<(&KeyboardNavigable, &mut Interaction), With<Button>>,
 ) {
     if *state.get() == GameState::Settings {
         if query.is_empty() {
             spawn_settings_ui(&mut commands, &settings, &asset_server);
+            // Initialize keyboard focus with 9 items (7 settings + 2 buttons)
+            commands.insert_resource(KeyboardFocus::new(9));
+        }
+
+        // Handle keyboard navigation
+        if let Some(mut focus) = focus {
+            // Arrow key navigation
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+                focus.move_up();
+            }
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+                focus.move_down();
+            }
+
+            // Activate focused button with Enter/Space
+            apply_focused_activation(keyboard.as_ref(), focus.as_ref(), nav_query);
         }
 
         // Keyboard shortcut: ESC to return to main menu
@@ -58,6 +77,7 @@ pub fn update_settings(
         for entity in query.iter() {
             commands.entity(entity).despawn_recursive();
         }
+        commands.remove_resource::<KeyboardFocus>();
     }
 }
 
@@ -225,16 +245,17 @@ fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_ser
                     ..default()
                 })
                 .with_children(|container| {
-                    // Music Toggle
+                    // Music Toggle (index 0)
                     spawn_toggle_row(
                         container,
                         &font_medium,
                         SettingType::MusicEnabled,
                         SettingButton::MusicToggle,
                         settings,
+                        0,
                     );
 
-                    // Music Volume
+                    // Music Volume (index 1)
                     spawn_volume_row(
                         container,
                         &font_medium,
@@ -242,18 +263,20 @@ fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_ser
                         SettingButton::MusicVolumeDown,
                         SettingButton::MusicVolumeUp,
                         settings,
+                        1,
                     );
 
-                    // SFX Toggle
+                    // SFX Toggle (index 2)
                     spawn_toggle_row(
                         container,
                         &font_medium,
                         SettingType::SfxEnabled,
                         SettingButton::SfxToggle,
                         settings,
+                        2,
                     );
 
-                    // SFX Volume
+                    // SFX Volume (index 3)
                     spawn_volume_row(
                         container,
                         &font_medium,
@@ -261,33 +284,37 @@ fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_ser
                         SettingButton::SfxVolumeDown,
                         SettingButton::SfxVolumeUp,
                         settings,
+                        3,
                     );
 
-                    // Dictionary Cycle
+                    // Dictionary Cycle (index 4)
                     spawn_cycle_row(
                         container,
                         &font_medium,
                         SettingType::Dictionary,
                         SettingButton::DictionaryCycle,
                         settings,
+                        4,
                     );
 
-                    // Timer Cycle
+                    // Timer Cycle (index 5)
                     spawn_cycle_row(
                         container,
                         &font_medium,
                         SettingType::Timer,
                         SettingButton::TimerCycle,
                         settings,
+                        5,
                     );
 
-                    // Difficulty Cycle
+                    // Difficulty Cycle (index 6)
                     spawn_cycle_row(
                         container,
                         &font_medium,
                         SettingType::Difficulty,
                         SettingButton::DifficultyCycle,
                         settings,
+                        6,
                     );
                 });
 
@@ -301,28 +328,30 @@ fn spawn_settings_ui(commands: &mut Commands, settings: &GameSettings, asset_ser
                     ..default()
                 })
                 .with_children(|buttons| {
-                    // Save button
+                    // Save button (index 7)
                     spawn_action_button(
                         buttons,
                         &font_bold,
                         "💾 Save",
                         SettingButton::SaveSettings,
                         Color::srgb(0.2, 0.6, 0.3),
+                        7,
                     );
 
-                    // Back button
+                    // Back button (index 8)
                     spawn_action_button(
                         buttons,
                         &font_bold,
                         "← Back",
                         SettingButton::BackToMenu,
                         Color::srgb(0.3, 0.3, 0.4),
+                        8,
                     );
                 });
 
             // Instructions
             parent.spawn((
-                Text::new("Click buttons to change • Press ESC to go back"),
+                Text::new("Arrow Keys: Navigate | Enter: Select | ESC: Back"),
                 TextFont {
                     font: font_medium.clone(),
                     font_size: 18.0,
@@ -343,6 +372,7 @@ fn spawn_toggle_row(
     setting_type: SettingType,
     button_type: SettingButton,
     settings: &GameSettings,
+    index: usize,
 ) {
     parent
         .spawn(Node {
@@ -390,6 +420,8 @@ fn spawn_toggle_row(
                 },
                 BackgroundColor(Color::srgb(0.25, 0.25, 0.35)),
                 button_type,
+                KeyboardNavigable { index },
+                BorderColor(Color::NONE),
             ))
             .with_children(|button| {
                 button.spawn((
@@ -412,6 +444,7 @@ fn spawn_volume_row(
     button_down: SettingButton,
     button_up: SettingButton,
     settings: &GameSettings,
+    index: usize,
 ) {
     parent
         .spawn(Node {
@@ -448,11 +481,14 @@ fn spawn_volume_row(
             ));
 
             // Volume controls container
-            row.spawn(Node {
-                flex_direction: FlexDirection::Row,
-                column_gap: Val::Px(10.0),
-                ..default()
-            })
+            row.spawn((
+                Node {
+                    flex_direction: FlexDirection::Row,
+                    column_gap: Val::Px(10.0),
+                    ..default()
+                },
+                KeyboardNavigable { index },
+            ))
             .with_children(|controls| {
                 // Decrease button
                 controls
@@ -463,9 +499,11 @@ fn spawn_volume_row(
                             height: Val::Px(40.0),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
+                            border: UiRect::all(Val::Px(2.0)),
                             ..default()
                         },
                         BackgroundColor(Color::srgb(0.4, 0.2, 0.2)),
+                        BorderColor(Color::NONE),
                         button_down,
                     ))
                     .with_children(|button| {
@@ -489,9 +527,11 @@ fn spawn_volume_row(
                             height: Val::Px(40.0),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
+                            border: UiRect::all(Val::Px(2.0)),
                             ..default()
                         },
                         BackgroundColor(Color::srgb(0.2, 0.4, 0.2)),
+                        BorderColor(Color::NONE),
                         button_up,
                     ))
                     .with_children(|button| {
@@ -515,6 +555,7 @@ fn spawn_cycle_row(
     setting_type: SettingType,
     button_type: SettingButton,
     settings: &GameSettings,
+    index: usize,
 ) {
     parent
         .spawn(Node {
@@ -579,6 +620,8 @@ fn spawn_cycle_row(
                 },
                 BackgroundColor(Color::srgb(0.25, 0.25, 0.35)),
                 button_type,
+                KeyboardNavigable { index },
+                BorderColor(Color::NONE),
             ))
             .with_children(|button| {
                 button.spawn((
@@ -600,6 +643,7 @@ fn spawn_action_button(
     label: &str,
     button_type: SettingButton,
     color: Color,
+    index: usize,
 ) {
     parent
         .spawn((
@@ -613,6 +657,8 @@ fn spawn_action_button(
             },
             BackgroundColor(color),
             button_type,
+            KeyboardNavigable { index },
+            BorderColor(Color::NONE),
         ))
         .with_children(|button| {
             button.spawn((
