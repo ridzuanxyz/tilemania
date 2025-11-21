@@ -49,6 +49,17 @@ pub fn update_main_menu(
         }
 
         // Handle keyboard navigation and activation
+        // Use number keys as workaround for WSL2/X11 arrow key issues
+        if keyboard.just_pressed(KeyCode::Digit1) {
+            info!("1️⃣  Key '1' pressed - navigating to Stage Select");
+            next_state.set(GameState::StageSelect);
+        }
+        if keyboard.just_pressed(KeyCode::Digit2) {
+            info!("2️⃣  Key '2' pressed - navigating to Settings");
+            next_state.set(GameState::Settings);
+        }
+
+        // Original arrow key navigation (keeping for when it works)
         if let Some(mut focus) = focus {
             // Arrow key navigation
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
@@ -182,7 +193,7 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
     // Instructions (using TextComponent)
     let instructions = TextComponent::spawn(
         commands,
-        "↑↓: Navigate | Enter: Select | ESC: Quit",
+        "1: Play | 2: Settings | ESC: Quit",
         TextStyle::Caption,
         TextColorVariant::Muted,
     );
