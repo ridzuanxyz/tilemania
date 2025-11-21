@@ -68,6 +68,10 @@ pub fn spawn_falling_tiles(
                     ..default()
                 },
                 Transform::from_xyz(x_pos, y_pos, 0.0),
+                SpawnAnimation {
+                    elapsed: 0.0,
+                    duration: 0.4, // 400ms bounce-in animation
+                },
             )).with_children(|parent| {
                 // Spawn letter text as child (z=1 for layering above sprite)
                 parent.spawn((

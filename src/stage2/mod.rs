@@ -61,6 +61,7 @@ impl Plugin for Stage2Plugin {
                 check_game_over,
                 // Visual feedback
                 update_tile_visuals,
+                update_spawn_animations,
                 update_match_animations,
                 update_cascade_animations,
                 update_score_popups,

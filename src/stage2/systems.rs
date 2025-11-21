@@ -28,12 +28,16 @@ pub fn spawn_grid(
         SpatialBundle::default(),
     ));
 
-    // Spawn 8x8 grid of tiles
+    // Spawn 8x8 grid of tiles with staggered animation
     for row in 0..grid_size {
         for col in 0..grid_size {
             let letter = get_weighted_random_letter();
             let x = start_x + (col as f32) * (TILE_SIZE + GRID_SPACING);
             let y = start_y + (row as f32) * (TILE_SIZE + GRID_SPACING);
+
+            // Stagger spawn animation based on position (diagonal wave)
+            let tile_index = row + col;
+            let stagger_delay = tile_index as f32 * 0.02; // 20ms delay per diagonal
 
             commands.spawn((
                 GridTile {
@@ -50,6 +54,10 @@ pub fn spawn_grid(
                     },
                     transform: Transform::from_xyz(x, y, 0.0),
                     ..default()
+                },
+                SpawnAnimation {
+                    elapsed: -stagger_delay, // Negative elapsed = delayed start
+                    duration: 0.3, // 300ms bounce-in
                 },
             ));
 
@@ -454,6 +462,10 @@ pub fn spawn_new_tiles(
                     CascadingTile {
                         target_pos: grid_pos,
                         speed: 500.0,
+                    },
+                    SpawnAnimation {
+                        elapsed: 0.0,
+                        duration: 0.3,
                     },
                 ));
 

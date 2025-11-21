@@ -76,7 +76,11 @@ pub fn update_tile_visuals(
         &mut Transform,
         Option<&HoveredTile>,
     ), Without<MatchAnimation>>,
+    time: Res<Time>,
 ) {
+    // Calculate pulse scale for selected tiles (gentle breathing effect)
+    let pulse = (time.elapsed_secs() * 2.0).sin() * 0.025 + 1.0; // Oscillates between 0.975 and 1.025
+
     for (tile, mut sprite, mut transform, hovered) in tile_query.iter_mut() {
         // Priority: matched > selected > hovered > normal
         if tile.is_matched {
@@ -84,7 +88,7 @@ pub fn update_tile_visuals(
             transform.scale = Vec3::splat(1.0);
         } else if tile.is_selected {
             sprite.color = TileColors::SELECTED;
-            transform.scale = Vec3::splat(1.0);
+            transform.scale = Vec3::splat(pulse); // Gentle breathing animation
         } else if hovered.is_some() {
             sprite.color = TileColors::HOVER;
             transform.scale = Vec3::splat(1.1); // Scale up 10% on hover
@@ -260,6 +264,42 @@ pub fn update_particles(
         // Remove when finished
         if particle.lifetime.finished() {
             commands.entity(entity).despawn();
+        }
+    }
+}
+
+/// Updates spawn animation (bounce-in effect)
+pub fn update_spawn_animations(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut SpawnAnimation, &mut Transform), Without<SelectedTile>>,
+    time: Res<Time>,
+) {
+    for (entity, mut anim, mut transform) in query.iter_mut() {
+        // Skip if animation hasn't started yet (negative elapsed for stagger)
+        if anim.elapsed < 0.0 {
+            anim.elapsed += time.delta_secs();
+            transform.scale = Vec3::splat(0.0); // Keep invisible until ready
+            continue;
+        }
+
+        anim.elapsed += time.delta_secs();
+
+        if anim.elapsed >= anim.duration {
+            // Animation complete - remove component and set final scale
+            transform.scale = Vec3::splat(1.0);
+            commands.entity(entity).remove::<SpawnAnimation>();
+        } else {
+            // Calculate bounce-in scale (elastic ease-out)
+            let t = anim.elapsed / anim.duration;
+            let scale = if t < 0.5 {
+                // First half: rapid scale up to 1.2 (overshoot)
+                2.0 * t * t * 1.2
+            } else {
+                // Second half: settle back to 1.0
+                let t2 = (t - 0.5) * 2.0; // Remap to 0-1
+                1.2 - (t2 * t2 * 0.2) // Smooth from 1.2 to 1.0
+            };
+            transform.scale = Vec3::splat(scale);
         }
     }
 }

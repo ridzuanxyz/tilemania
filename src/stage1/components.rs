@@ -83,3 +83,10 @@ pub struct ValidationAnimation {
     pub is_valid: bool,
     pub progress: f32,
 }
+
+/// Animation component for tile spawn effect
+#[derive(Component)]
+pub struct SpawnAnimation {
+    pub elapsed: f32,
+    pub duration: f32,
+}

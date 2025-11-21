@@ -65,6 +65,7 @@ impl Plugin for Stage1Plugin {
             // Visual feedback systems
             .add_systems(Update, (
                 update_tile_visuals,
+                update_spawn_animations,
                 update_score_popups,
                 update_validation_flash,
                 update_combo_glow,

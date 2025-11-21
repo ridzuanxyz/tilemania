@@ -48,13 +48,17 @@ pub fn update_tile_visuals(
         Option<&HighlightedTile>,
         Option<&HoveredTile>,
     )>,
+    time: Res<Time>,
 ) {
+    // Calculate pulse scale for selected tiles (gentle breathing effect)
+    let pulse = (time.elapsed_secs() * 2.0).sin() * 0.025 + 1.0; // Oscillates between 0.975 and 1.025
+
     for (_tile, mut sprite, mut transform, selected, highlighted, hovered) in tile_query.iter_mut() {
         // Determine color based on priority: selected > highlighted > hovered > normal
         if selected.is_some() {
-            // Selected state (yellow)
+            // Selected state (yellow with gentle pulse)
             sprite.color = TileColors::SELECTED;
-            transform.scale = Vec3::splat(1.0); // Reset scale when selected
+            transform.scale = Vec3::splat(pulse); // Gentle breathing animation
         } else if highlighted.is_some() {
             // Highlighted state for keyboard focus (bright cyan)
             sprite.color = TileColors::HIGHLIGHTED;
@@ -251,6 +255,35 @@ pub fn update_particles(
         // Despawn when expired
         if particle.elapsed >= particle.lifetime {
             commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
+/// Updates spawn animation (bounce-in effect)
+pub fn update_spawn_animations(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut SpawnAnimation, &mut Transform), Without<SelectedTile>>,
+    time: Res<Time>,
+) {
+    for (entity, mut anim, mut transform) in query.iter_mut() {
+        anim.elapsed += time.delta_secs();
+
+        if anim.elapsed >= anim.duration {
+            // Animation complete - remove component and set final scale
+            transform.scale = Vec3::splat(1.0);
+            commands.entity(entity).remove::<SpawnAnimation>();
+        } else {
+            // Calculate bounce-in scale (elastic ease-out)
+            let t = anim.elapsed / anim.duration;
+            let scale = if t < 0.5 {
+                // First half: rapid scale up to 1.2 (overshoot)
+                2.0 * t * t * 1.2
+            } else {
+                // Second half: settle back to 1.0
+                let t2 = (t - 0.5) * 2.0; // Remap to 0-1
+                1.2 - (t2 * t2 * 0.2) // Smooth from 1.2 to 1.0
+            };
+            transform.scale = Vec3::splat(scale);
         }
     }
 }
