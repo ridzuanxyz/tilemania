@@ -28,9 +28,24 @@ pub fn update_main_menu(
 ) {
     if *state.get() == GameState::MainMenu {
         if query.is_empty() {
+            info!("🎮 Main Menu: Spawning UI and initializing keyboard focus");
             spawn_main_menu_ui(&mut commands);
             // Initialize keyboard focus with 2 items (Play, Settings)
             commands.insert_resource(KeyboardFocus::new(2));
+        }
+
+        // Debug: Check if ANY arrow keys are being pressed
+        if keyboard.just_pressed(KeyCode::ArrowUp) {
+            info!("🔍 DEBUG: ArrowUp detected in Main Menu");
+        }
+        if keyboard.just_pressed(KeyCode::ArrowDown) {
+            info!("🔍 DEBUG: ArrowDown detected in Main Menu");
+        }
+        if keyboard.just_pressed(KeyCode::KeyW) {
+            info!("🔍 DEBUG: W key detected in Main Menu");
+        }
+        if keyboard.just_pressed(KeyCode::KeyS) {
+            info!("🔍 DEBUG: S key detected in Main Menu");
         }
 
         // Handle keyboard navigation and activation
@@ -63,6 +78,12 @@ pub fn update_main_menu(
                         _ => {}
                     }
                 }
+            }
+        } else {
+            // KeyboardFocus resource doesn't exist yet
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::ArrowDown) ||
+               keyboard.just_pressed(KeyCode::KeyW) || keyboard.just_pressed(KeyCode::KeyS) {
+                warn!("❌ KeyboardFocus resource not found! Arrows keys pressed but navigation unavailable.");
             }
         }
 
