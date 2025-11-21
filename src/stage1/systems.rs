@@ -145,7 +145,7 @@ pub fn handle_tile_selection(
     }
 }
 
-/// Validates the word when player submits (spacebar or Enter)
+/// Validates the word when player submits (Enter or Space)
 pub fn validate_word(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
@@ -155,7 +155,7 @@ pub fn validate_word(
     asset_server: Res<AssetServer>,
     lexicon: Option<Res<crate::lexicon::Lexicon>>,
 ) {
-    if !keyboard.just_pressed(KeyCode::Space) && !keyboard.just_pressed(KeyCode::Enter) {
+    if !keyboard.just_pressed(KeyCode::Enter) && !keyboard.just_pressed(KeyCode::Space) {
         return;
     }
 
