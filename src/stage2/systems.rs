@@ -377,6 +377,22 @@ pub fn clear_matched_words(
     }
 }
 
+/// Despawn tiles after their match animation completes
+pub fn despawn_matched_tiles(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut matched_query: Query<(Entity, &mut MatchedTile)>,
+) {
+    for (entity, mut matched) in matched_query.iter_mut() {
+        matched.elapsed += time.delta_secs();
+
+        if matched.elapsed >= matched.duration {
+            // Animation complete - despawn the tile
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 /// Handles cascade logic (tiles fall down to fill gaps)
 pub fn cascade_tiles(
     mut commands: Commands,
@@ -569,6 +585,29 @@ pub fn update_moves_display(
         } else {
             **text = format!("Moves: {}", state.moves_made);
         }
+    }
+}
+
+/// Cleanup system to despawn all grid entities when leaving Stage2Playing
+pub fn cleanup_stage2_gameplay(
+    mut commands: Commands,
+    grid_query: Query<Entity, With<GameGrid>>,
+    tile_query: Query<Entity, With<GridTile>>,
+    hud_query: Query<Entity, With<crate::stage2::ui::Stage2HUD>>,
+) {
+    // Despawn grid container
+    for entity in grid_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    // Despawn all tiles
+    for entity in tile_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    // Despawn HUD
+    for entity in hud_query.iter() {
+        commands.entity(entity).despawn_recursive();
     }
 }
 

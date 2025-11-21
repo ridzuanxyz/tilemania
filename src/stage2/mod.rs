@@ -46,7 +46,7 @@ impl Plugin for Stage2Plugin {
             .add_systems(Update, handle_difficulty_selection.run_if(in_state(GameState::Stage2Start)))
 
             // Gameplay (Stage2Playing state to be added)
-            .add_systems(OnEnter(GameState::Stage2Playing), spawn_stage2_hud)
+            .add_systems(OnEnter(GameState::Stage2Playing), (spawn_grid, spawn_stage2_hud))
             .add_systems(Update, (
                 // Pause handling
                 handle_pause_input,
@@ -56,6 +56,7 @@ impl Plugin for Stage2Plugin {
                 handle_tile_swap,
                 find_word_matches,
                 clear_matched_words,
+                despawn_matched_tiles,
                 cascade_tiles,
                 spawn_new_tiles,
                 check_game_over,
@@ -73,6 +74,7 @@ impl Plugin for Stage2Plugin {
                 // Audio
                 play_audio_events,
             ).run_if(in_state(GameState::Stage2Playing)))
+            .add_systems(OnExit(GameState::Stage2Playing), cleanup_stage2_gameplay)
 
             // Pause menu
             .add_systems(OnEnter(GameState::Stage2Paused), spawn_pause_menu)
