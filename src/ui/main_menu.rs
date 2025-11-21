@@ -27,15 +27,15 @@ pub fn update_main_menu(
     focus: Option<ResMut<KeyboardFocus>>,
 ) {
     if *state.get() == GameState::MainMenu {
-        let is_first_frame = query.is_empty();
-
-        if is_first_frame {
-            info!("🎮 Main Menu: Spawning UI and initializing keyboard focus");
+        // Spawn UI if it doesn't exist
+        if query.is_empty() {
             spawn_main_menu_ui(&mut commands);
-            // Initialize keyboard focus with 2 items (Play, Settings)
+        }
+
+        // Always ensure KeyboardFocus resource exists (it gets removed when leaving this state)
+        if focus.is_none() {
             commands.insert_resource(KeyboardFocus::new(2));
-            // Skip keyboard navigation this frame - resource won't be available until next frame
-            return;
+            return; // Skip navigation this frame - resource won't be available until next frame
         }
 
         // Debug: Log ALL keyboard inputs to diagnose arrow key issue
