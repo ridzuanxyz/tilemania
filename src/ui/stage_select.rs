@@ -24,22 +24,26 @@ pub fn update_stage_select(
     focus: Option<ResMut<KeyboardFocus>>,
 ) {
     if *state.get() == GameState::StageSelect {
-        if query.is_empty() {
+        let is_first_frame = query.is_empty();
+
+        if is_first_frame {
             spawn_stage_select_ui(&mut commands, &asset_server);
             // Initialize keyboard focus with 5 stage cards
             commands.insert_resource(KeyboardFocus::new(5));
+            // Skip keyboard navigation this frame - resource won't be available until next frame
+            return;
         }
 
         // Handle keyboard navigation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            // WSL2/X11 bug workaround: Arrow Up → NumpadEnter, Arrow Down → Lang3
+            // WSL2/X11 bug workaround: Arrow DOWN → NumpadEnter, Arrow UP → Lang3
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
-               keyboard.just_pressed(KeyCode::NumpadEnter) {
+               keyboard.just_pressed(KeyCode::Lang3) {
                 focus.move_up();
             }
             if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
-               keyboard.just_pressed(KeyCode::Lang3) {
+               keyboard.just_pressed(KeyCode::NumpadEnter) {
                 focus.move_down();
             }
 

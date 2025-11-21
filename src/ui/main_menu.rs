@@ -27,11 +27,15 @@ pub fn update_main_menu(
     focus: Option<ResMut<KeyboardFocus>>,
 ) {
     if *state.get() == GameState::MainMenu {
-        if query.is_empty() {
+        let is_first_frame = query.is_empty();
+
+        if is_first_frame {
             info!("🎮 Main Menu: Spawning UI and initializing keyboard focus");
             spawn_main_menu_ui(&mut commands);
             // Initialize keyboard focus with 2 items (Play, Settings)
             commands.insert_resource(KeyboardFocus::new(2));
+            // Skip keyboard navigation this frame - resource won't be available until next frame
+            return;
         }
 
         // Debug: Log ALL keyboard inputs to diagnose arrow key issue
@@ -43,15 +47,15 @@ pub fn update_main_menu(
         if let Some(mut focus) = focus {
             // Arrow key navigation
             // WSL2/X11 bug workaround: Arrow keys map to wrong keycodes
-            // Arrow Up → NumpadEnter, Arrow Down → Lang3
+            // Arrow DOWN → NumpadEnter, Arrow UP → Lang3
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
-               keyboard.just_pressed(KeyCode::NumpadEnter) {  // WSL2 bug: Arrow Up maps here
+               keyboard.just_pressed(KeyCode::Lang3) {  // WSL2 bug: Arrow UP maps here
                 info!("⬆️  Arrow Up pressed - moving focus up");
                 focus.move_up();
                 info!("   Current focus: {:?}", focus.focused_index);
             }
             if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
-               keyboard.just_pressed(KeyCode::Lang3) {  // WSL2 bug: Arrow Down maps here
+               keyboard.just_pressed(KeyCode::NumpadEnter) {  // WSL2 bug: Arrow DOWN maps here
                 info!("⬇️  Arrow Down pressed - moving focus down");
                 focus.move_down();
                 info!("   Current focus: {:?}", focus.focused_index);
@@ -75,11 +79,11 @@ pub fn update_main_menu(
                 }
             }
         } else {
-            // KeyboardFocus resource doesn't exist yet
+            // KeyboardFocus resource doesn't exist - this shouldn't happen after first frame
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::ArrowDown) ||
                keyboard.just_pressed(KeyCode::KeyW) || keyboard.just_pressed(KeyCode::KeyS) ||
                keyboard.just_pressed(KeyCode::NumpadEnter) || keyboard.just_pressed(KeyCode::Lang3) {
-                warn!("❌ KeyboardFocus resource not found! Arrow keys pressed but navigation unavailable.");
+                error!("❌ CRITICAL: KeyboardFocus resource missing after UI spawn! This is a bug.");
             }
         }
 

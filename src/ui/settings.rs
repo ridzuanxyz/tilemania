@@ -49,10 +49,14 @@ pub fn update_settings(
     mut label_query: Query<(&SettingLabel, &mut Text)>,
 ) {
     if *state.get() == GameState::Settings {
-        if query.is_empty() {
+        let is_first_frame = query.is_empty();
+
+        if is_first_frame {
             spawn_settings_ui(&mut commands, &settings, &asset_server);
             // Initialize keyboard focus with 9 items (7 settings + 2 buttons)
             commands.insert_resource(KeyboardFocus::new(9));
+            // Skip keyboard navigation this frame - resource won't be available until next frame
+            return;
         }
 
         // Debug: Log ALL keyboard inputs to diagnose arrow key issue
@@ -63,28 +67,28 @@ pub fn update_settings(
         // Handle keyboard navigation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            // WSL2/X11 bug workaround: Arrow Up → NumpadEnter, Arrow Down → Lang3
+            // WSL2/X11 bug workaround: Arrow DOWN → NumpadEnter, Arrow UP → Lang3
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
-               keyboard.just_pressed(KeyCode::NumpadEnter) {
+               keyboard.just_pressed(KeyCode::Lang3) {
                 focus.move_up();
             }
             if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
-               keyboard.just_pressed(KeyCode::Lang3) {
+               keyboard.just_pressed(KeyCode::NumpadEnter) {
                 focus.move_down();
             }
 
             // Left/Right arrows for direct adjustment
-            // WSL2/X11 bug: Arrow Left/Right map to Convert/NonConvert
+            // WSL2/X11 bug: Arrow LEFT → Convert, Arrow RIGHT → NonConvert
             if let Some(focused_idx) = focus.focused_index {
                 let mut changed = false;
 
                 if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) ||
-                   keyboard.just_pressed(KeyCode::Convert) || keyboard.just_pressed(KeyCode::NonConvert) {
+                   keyboard.just_pressed(KeyCode::Convert) {
                     changed = handle_left_arrow(focused_idx, &mut settings);
                 }
 
                 if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) ||
-                   keyboard.just_pressed(KeyCode::Convert) || keyboard.just_pressed(KeyCode::NonConvert) {
+                   keyboard.just_pressed(KeyCode::NonConvert) {
                     changed = handle_right_arrow(focused_idx, &mut settings);
                 }
 
