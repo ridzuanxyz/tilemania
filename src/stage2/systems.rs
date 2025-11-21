@@ -39,6 +39,7 @@ pub fn spawn_grid(
             let tile_index = row + col;
             let stagger_delay = tile_index as f32 * 0.02; // 20ms delay per diagonal
 
+            // Spawn tile with letter text as child
             commands.spawn((
                 GridTile {
                     letter,
@@ -59,19 +60,19 @@ pub fn spawn_grid(
                     elapsed: -stagger_delay, // Negative elapsed = delayed start
                     duration: 0.3, // 300ms bounce-in
                 },
-            ));
-
-            // Spawn letter text at higher z-level
-            commands.spawn((
-                Text2d::new(letter.to_string()),
-                TextFont {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 42.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.1, 0.1, 0.1)),
-                Transform::from_xyz(x, y, 1.0),
-            ));
+            )).with_children(|parent| {
+                // Spawn letter text as child so it inherits transformations
+                parent.spawn((
+                    Text2d::new(letter.to_string()),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 42.0,
+                        ..default()
+                    },
+                    TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                    Transform::from_xyz(0.0, 0.0, 1.0), // Relative to parent
+                ));
+            });
         }
     }
 
@@ -443,6 +444,7 @@ pub fn spawn_new_tiles(
                 let x = start_x + (col as f32) * (TILE_SIZE + GRID_SPACING);
                 let y = start_y + (row as f32) * (TILE_SIZE + GRID_SPACING);
 
+                // Spawn tile with letter text as child
                 commands.spawn((
                     GridTile {
                         letter,
@@ -467,7 +469,19 @@ pub fn spawn_new_tiles(
                         elapsed: 0.0,
                         duration: 0.3,
                     },
-                ));
+                )).with_children(|parent| {
+                    // Spawn letter text as child so it inherits transformations
+                    parent.spawn((
+                        Text2d::new(letter.to_string()),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 42.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                        Transform::from_xyz(0.0, 0.0, 1.0), // Relative to parent
+                    ));
+                });
 
                 info!("Spawned new tile at ({},{}) with letter {}", row, col, letter);
             }
