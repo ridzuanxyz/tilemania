@@ -103,7 +103,7 @@ pub fn spawn_stage1_hud(
 
                     // Instruction text (always visible during gameplay)
                     bottom.spawn((
-                        Text::new("← → arrows to navigate • SPACE to select • ENTER to submit"),
+                        Text::new("Type letters to select tiles • ENTER to submit word"),
                         TextFont {
                             font: font.clone(),
                             font_size: 22.0,
@@ -302,7 +302,7 @@ pub fn spawn_start_screen(
 
             // Instructions
             parent.spawn((
-                Text::new("← → arrows to navigate • SPACE to select • ENTER to submit"),
+                Text::new("Click a difficulty to begin"),
                 TextFont {
                     font: font.clone(),
                     font_size: 20.0,

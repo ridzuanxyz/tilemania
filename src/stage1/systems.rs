@@ -145,76 +145,43 @@ pub fn handle_tile_selection(
     }
 }
 
-/// Handles tile selection via keyboard (arrow keys + Space)
+/// Handles tile selection via keyboard (direct letter key input)
 pub fn handle_keyboard_tile_selection(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
-    mut tile_query: Query<(Entity, &mut FallingTile, &Transform), Without<HighlightedTile>>,
-    highlighted_query: Query<Entity, With<HighlightedTile>>,
+    mut tile_query: Query<(Entity, &mut FallingTile, &Transform)>,
     mut state: ResMut<Stage1State>,
 ) {
-    // Get all visible tiles sorted by X position (left to right)
-    let mut tiles: Vec<(Entity, char, f32)> = tile_query
-        .iter()
-        .map(|(entity, tile, transform)| (entity, tile.letter, transform.translation.x))
-        .collect();
+    // Map letter keys to characters
+    let letter_keys = [
+        (KeyCode::KeyA, 'A'), (KeyCode::KeyB, 'B'), (KeyCode::KeyC, 'C'),
+        (KeyCode::KeyD, 'D'), (KeyCode::KeyE, 'E'), (KeyCode::KeyF, 'F'),
+        (KeyCode::KeyG, 'G'), (KeyCode::KeyH, 'H'), (KeyCode::KeyI, 'I'),
+        (KeyCode::KeyJ, 'J'), (KeyCode::KeyK, 'K'), (KeyCode::KeyL, 'L'),
+        (KeyCode::KeyM, 'M'), (KeyCode::KeyN, 'N'), (KeyCode::KeyO, 'O'),
+        (KeyCode::KeyP, 'P'), (KeyCode::KeyQ, 'Q'), (KeyCode::KeyR, 'R'),
+        (KeyCode::KeyS, 'S'), (KeyCode::KeyT, 'T'), (KeyCode::KeyU, 'U'),
+        (KeyCode::KeyV, 'V'), (KeyCode::KeyW, 'W'), (KeyCode::KeyX, 'X'),
+        (KeyCode::KeyY, 'Y'), (KeyCode::KeyZ, 'Z'),
+    ];
 
-    if tiles.is_empty() {
-        return;
-    }
-
-    tiles.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
-
-    // Find currently highlighted tile index
-    let highlighted_entity = highlighted_query.iter().next();
-    let current_index = if let Some(highlighted) = highlighted_entity {
-        tiles.iter().position(|(e, _, _)| *e == highlighted).unwrap_or(0)
-    } else {
-        0
-    };
-
-    // Navigate with arrow keys
-    let mut new_index = current_index;
-
-    if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) {
-        new_index = if current_index > 0 { current_index - 1 } else { tiles.len() - 1 };
-        info!("⬅️  Keyboard navigation: moved left");
-    } else if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) {
-        new_index = if current_index < tiles.len() - 1 { current_index + 1 } else { 0 };
-        info!("➡️  Keyboard navigation: moved right");
-    }
-
-    // Update highlight if navigation occurred
-    if new_index != current_index || highlighted_entity.is_none() {
-        // Remove old highlight
-        if let Some(old_highlighted) = highlighted_entity {
-            commands.entity(old_highlighted).remove::<HighlightedTile>();
-        }
-
-        // Add new highlight
-        let (new_entity, letter, _) = tiles[new_index];
-        commands.entity(new_entity).insert(HighlightedTile);
-        info!("🎯 Highlighted tile: {}", letter);
-    }
-
-    // Toggle selection with Space
-    if keyboard.just_pressed(KeyCode::Space) {
-        if let Some(highlighted) = highlighted_entity {
-            if let Ok((entity, mut tile, _)) = tile_query.get_mut(highlighted) {
-                if tile.is_selected {
-                    // Deselect
-                    tile.is_selected = false;
-                    state.selected_tiles.retain(|&e| e != entity);
-                    commands.entity(entity).remove::<SelectedTile>();
-                    info!("❌ Deselected tile: {}", tile.letter);
-                } else {
-                    // Select
+    // Check if any letter key was pressed
+    for (key_code, letter) in &letter_keys {
+        if keyboard.just_pressed(*key_code) {
+            // Find first unselected falling tile with this letter
+            for (entity, mut tile, _) in tile_query.iter_mut() {
+                if tile.letter == *letter && !tile.is_selected {
+                    // Select this tile
                     tile.is_selected = true;
                     state.selected_tiles.push(entity);
                     commands.entity(entity).insert(SelectedTile);
-                    info!("✅ Keyboard selected tile: {}", tile.letter);
+                    info!("⌨️  Pressed '{}' - selected tile: {}", letter, tile.letter);
+                    return; // Only select one tile per keypress
                 }
             }
+            // If no matching tile found, log it
+            info!("⌨️  Pressed '{}' but no matching tile found on screen", letter);
+            return;
         }
     }
 }
