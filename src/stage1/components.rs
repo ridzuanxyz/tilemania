@@ -25,6 +25,10 @@ pub struct FallingTile {
 #[derive(Component)]
 pub struct SelectedTile;
 
+/// Component marking a tile as highlighted (for keyboard navigation)
+#[derive(Component)]
+pub struct HighlightedTile;
+
 /// Component for displaying the current word being formed
 #[derive(Component)]
 pub struct WordDisplay;

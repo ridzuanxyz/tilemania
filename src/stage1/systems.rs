@@ -137,7 +137,7 @@ pub fn handle_tile_selection(
                     // Add visual feedback
                     commands.entity(entity).insert(SelectedTile);
 
-                    info!("Selected tile: {}", tile.letter);
+                    info!("🖱️  Mouse selected tile: {}", tile.letter);
                     break;
                 }
             }
@@ -145,7 +145,48 @@ pub fn handle_tile_selection(
     }
 }
 
-/// Validates the word when player submits (spacebar or Enter)
+/// Handles tile selection via keyboard (direct letter key input)
+pub fn handle_keyboard_tile_selection(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut tile_query: Query<(Entity, &mut FallingTile, &Transform)>,
+    mut state: ResMut<Stage1State>,
+) {
+    // Map letter keys to characters
+    let letter_keys = [
+        (KeyCode::KeyA, 'A'), (KeyCode::KeyB, 'B'), (KeyCode::KeyC, 'C'),
+        (KeyCode::KeyD, 'D'), (KeyCode::KeyE, 'E'), (KeyCode::KeyF, 'F'),
+        (KeyCode::KeyG, 'G'), (KeyCode::KeyH, 'H'), (KeyCode::KeyI, 'I'),
+        (KeyCode::KeyJ, 'J'), (KeyCode::KeyK, 'K'), (KeyCode::KeyL, 'L'),
+        (KeyCode::KeyM, 'M'), (KeyCode::KeyN, 'N'), (KeyCode::KeyO, 'O'),
+        (KeyCode::KeyP, 'P'), (KeyCode::KeyQ, 'Q'), (KeyCode::KeyR, 'R'),
+        (KeyCode::KeyS, 'S'), (KeyCode::KeyT, 'T'), (KeyCode::KeyU, 'U'),
+        (KeyCode::KeyV, 'V'), (KeyCode::KeyW, 'W'), (KeyCode::KeyX, 'X'),
+        (KeyCode::KeyY, 'Y'), (KeyCode::KeyZ, 'Z'),
+    ];
+
+    // Check if any letter key was pressed
+    for (key_code, letter) in &letter_keys {
+        if keyboard.just_pressed(*key_code) {
+            // Find first unselected falling tile with this letter
+            for (entity, mut tile, _) in tile_query.iter_mut() {
+                if tile.letter == *letter && !tile.is_selected {
+                    // Select this tile
+                    tile.is_selected = true;
+                    state.selected_tiles.push(entity);
+                    commands.entity(entity).insert(SelectedTile);
+                    info!("⌨️  Pressed '{}' - selected tile: {}", letter, tile.letter);
+                    return; // Only select one tile per keypress
+                }
+            }
+            // If no matching tile found, log it
+            info!("⌨️  Pressed '{}' but no matching tile found on screen", letter);
+            return;
+        }
+    }
+}
+
+/// Validates the word when player submits (Enter or Space)
 pub fn validate_word(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
@@ -153,8 +194,9 @@ pub fn validate_word(
     config: Res<Stage1Config>,
     tile_query: Query<(&FallingTile, &Transform)>,
     asset_server: Res<AssetServer>,
+    lexicon: Option<Res<crate::lexicon::Lexicon>>,
 ) {
-    if !keyboard.just_pressed(KeyCode::Space) && !keyboard.just_pressed(KeyCode::Enter) {
+    if !keyboard.just_pressed(KeyCode::Enter) && !keyboard.just_pressed(KeyCode::Space) {
         return;
     }
 
@@ -181,8 +223,14 @@ pub fn validate_word(
         avg_position /= tile_count as f32;
     }
 
-    // Validate word
-    let is_valid = config.two_letter_words.contains(&word.to_uppercase());
+    // Validate word using Lexicon resource (O(1) HashSet lookup)
+    let is_valid = lexicon
+        .as_ref()
+        .map(|lex| lex.is_valid(&word))
+        .unwrap_or_else(|| {
+            // Fallback to config if lexicon not available
+            config.two_letter_words.contains(&word.to_uppercase())
+        });
 
     if is_valid {
         info!("✓ Valid word: {}", word);
@@ -266,23 +314,47 @@ pub fn update_score_display(
 
 /// Updates timer display and counts down
 pub fn update_timer(
-    mut query: Query<&mut Text, With<TimerDisplay>>,
+    mut query: Query<(&mut Text, &mut TextColor), With<TimerDisplay>>,
     mut state: ResMut<Stage1State>,
     time: Res<Time>,
     config: Res<Stage1Config>,
 ) {
     if !state.is_active {
+        warn!("⏸️  Timer paused - is_active = false");
         return;
     }
 
     // Countdown timer
     let delta_ms = (time.delta_secs() * 1000.0) as u32;
+    let old_time = state.time_remaining_ms;
     state.time_remaining_ms = state.time_remaining_ms.saturating_sub(delta_ms);
 
-    // Update display
-    for mut text in query.iter_mut() {
+    // Log every second for debugging
+    if old_time / 1000 != state.time_remaining_ms / 1000 {
+        info!("⏱️  Timer: {}s remaining (delta: {}ms, is_active: {})",
+              state.time_remaining_ms / 1000, delta_ms, state.is_active);
+    }
+
+    // Update display with color feedback
+    for (mut text, mut text_color) in query.iter_mut() {
         let seconds = state.time_remaining_ms / 1000;
         **text = format!("Time: {}s", seconds);
+
+        // Color feedback based on remaining time
+        let time_ratio = state.time_remaining_ms as f32 / config.total_time_ms as f32;
+        text_color.0 = if time_ratio < 0.15 {
+            // Critical: < 15% - Red, pulsing effect
+            Color::srgb(1.0, 0.2, 0.2)
+        } else if time_ratio < 0.30 {
+            // Warning: < 30% - Orange
+            Color::srgb(1.0, 0.6, 0.0)
+        } else if time_ratio < 0.50 {
+            // Caution: < 50% - Yellow
+            Color::srgb(1.0, 1.0, 0.4)
+        } else {
+            // Normal: White
+            Color::WHITE
+        };
     }
 }
 
