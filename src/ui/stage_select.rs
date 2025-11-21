@@ -41,11 +41,11 @@ pub fn update_stage_select(
                 focus.move_down();
             }
 
-            // Handle Enter key activation (direct state change)
+            // Handle Enter key activation (navigate to stage start screen with difficulty selection)
             if keyboard.just_pressed(KeyCode::Enter) || keyboard.just_pressed(KeyCode::Space) {
                 if let Some(focused_idx) = focus.focused_index {
                     match focused_idx {
-                        0 => next_state.set(GameState::Stage1Playing),
+                        0 => next_state.set(GameState::GameBoard),  // Stage 1 start screen
                         1 => next_state.set(GameState::Stage2Playing),
                         2 => next_state.set(GameState::Stage3Playing),
                         3 => next_state.set(GameState::Stage4Playing),
@@ -70,9 +70,9 @@ pub fn update_stage_select(
             next_state.set(GameState::MainMenu);
         }
 
-        // Keyboard shortcuts for stages (1-5)
+        // Keyboard shortcuts for stages (1-5) - go to start screen first
         if keyboard.just_pressed(KeyCode::Digit1) {
-            next_state.set(GameState::Stage1Playing);
+            next_state.set(GameState::GameBoard);  // Stage 1 with difficulty selection
         }
         if keyboard.just_pressed(KeyCode::Digit2) {
             next_state.set(GameState::Stage2Playing);
@@ -104,7 +104,7 @@ pub fn handle_stage_buttons(
     for (interaction, button) in interaction_query.iter() {
         if *interaction == Interaction::Pressed {
             match button {
-                StageButton::Stage1 => next_state.set(GameState::Stage1Playing),
+                StageButton::Stage1 => next_state.set(GameState::GameBoard),  // Go to difficulty screen first
                 StageButton::Stage2 => next_state.set(GameState::Stage2Playing),
                 StageButton::Stage3 => next_state.set(GameState::Stage3Playing),
                 StageButton::Stage4 => next_state.set(GameState::Stage4Playing),
