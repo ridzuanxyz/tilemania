@@ -246,7 +246,10 @@ pub fn validate_word(
 /// Clears current tile selection
 fn clear_selection(commands: &mut Commands, state: &mut ResMut<Stage1State>) {
     for entity in &state.selected_tiles {
-        commands.entity(*entity).remove::<SelectedTile>();
+        // Use get_entity() to safely handle entities that may have been despawned
+        if let Some(mut entity_commands) = commands.get_entity(*entity) {
+            entity_commands.remove::<SelectedTile>();
+        }
     }
     state.selected_tiles.clear();
 }

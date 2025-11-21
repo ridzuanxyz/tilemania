@@ -698,13 +698,18 @@ fn spawn_volume_row(
                 },
             ));
 
-            // Volume controls container
+            // Volume controls container (must be a Button for keyboard navigation)
             row.spawn((
+                Button,
                 Node {
                     flex_direction: FlexDirection::Row,
                     column_gap: Val::Px(10.0),
+                    border: UiRect::all(Val::Px(3.0)),
+                    padding: UiRect::all(Val::Px(2.0)),
                     ..default()
                 },
+                BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.0)), // Transparent background
+                BorderColor(Color::NONE), // Will be updated by focus system
                 KeyboardNavigable { index },
             ))
             .with_children(|controls| {
