@@ -37,18 +37,29 @@ pub fn update_main_menu(
         if let Some(mut focus) = focus {
             // Arrow key navigation
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+                info!("⬆️  Arrow Up pressed - moving focus up");
                 focus.move_up();
+                info!("   Current focus: {:?}", focus.focused_index);
             }
             if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+                info!("⬇️  Arrow Down pressed - moving focus down");
                 focus.move_down();
+                info!("   Current focus: {:?}", focus.focused_index);
             }
 
             // Handle Enter key activation (direct state change, no Interaction mutation)
             if keyboard.just_pressed(KeyCode::Enter) || keyboard.just_pressed(KeyCode::Space) {
+                info!("⏎ Enter/Space pressed with focus: {:?}", focus.focused_index);
                 if let Some(focused_idx) = focus.focused_index {
                     match focused_idx {
-                        0 => next_state.set(GameState::StageSelect), // Play button
-                        1 => next_state.set(GameState::Settings),    // Settings button
+                        0 => {
+                            info!("   Navigating to Stage Select (Play button)");
+                            next_state.set(GameState::StageSelect);
+                        }
+                        1 => {
+                            info!("   Navigating to Settings");
+                            next_state.set(GameState::Settings);
+                        }
                         _ => {}
                     }
                 }
