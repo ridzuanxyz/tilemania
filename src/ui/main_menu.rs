@@ -42,12 +42,16 @@ pub fn update_main_menu(
         // Handle keyboard navigation and activation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+            // WSL2/X11 bug workaround: Arrow keys map to wrong keycodes
+            // Arrow Up → NumpadEnter, Arrow Down → Lang3
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) {  // WSL2 bug: Arrow Up maps here
                 info!("⬆️  Arrow Up pressed - moving focus up");
                 focus.move_up();
                 info!("   Current focus: {:?}", focus.focused_index);
             }
-            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::Lang3) {  // WSL2 bug: Arrow Down maps here
                 info!("⬇️  Arrow Down pressed - moving focus down");
                 focus.move_down();
                 info!("   Current focus: {:?}", focus.focused_index);
@@ -73,8 +77,9 @@ pub fn update_main_menu(
         } else {
             // KeyboardFocus resource doesn't exist yet
             if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::ArrowDown) ||
-               keyboard.just_pressed(KeyCode::KeyW) || keyboard.just_pressed(KeyCode::KeyS) {
-                warn!("❌ KeyboardFocus resource not found! Arrows keys pressed but navigation unavailable.");
+               keyboard.just_pressed(KeyCode::KeyW) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) || keyboard.just_pressed(KeyCode::Lang3) {
+                warn!("❌ KeyboardFocus resource not found! Arrow keys pressed but navigation unavailable.");
             }
         }
 

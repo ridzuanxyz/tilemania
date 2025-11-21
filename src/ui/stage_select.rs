@@ -33,10 +33,13 @@ pub fn update_stage_select(
         // Handle keyboard navigation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+            // WSL2/X11 bug workaround: Arrow Up → NumpadEnter, Arrow Down → Lang3
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) {
                 focus.move_up();
             }
-            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::Lang3) {
                 focus.move_down();
             }
 

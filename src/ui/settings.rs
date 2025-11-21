@@ -63,22 +63,28 @@ pub fn update_settings(
         // Handle keyboard navigation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+            // WSL2/X11 bug workaround: Arrow Up → NumpadEnter, Arrow Down → Lang3
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) {
                 focus.move_up();
             }
-            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::Lang3) {
                 focus.move_down();
             }
 
             // Left/Right arrows for direct adjustment
+            // WSL2/X11 bug: Arrow Left/Right map to Convert/NonConvert
             if let Some(focused_idx) = focus.focused_index {
                 let mut changed = false;
 
-                if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) {
+                if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) ||
+                   keyboard.just_pressed(KeyCode::Convert) || keyboard.just_pressed(KeyCode::NonConvert) {
                     changed = handle_left_arrow(focused_idx, &mut settings);
                 }
 
-                if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) {
+                if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) ||
+                   keyboard.just_pressed(KeyCode::Convert) || keyboard.just_pressed(KeyCode::NonConvert) {
                     changed = handle_right_arrow(focused_idx, &mut settings);
                 }
 
