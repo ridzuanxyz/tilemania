@@ -10,6 +10,9 @@ impl TileColors {
     /// Default tile color (unselected)
     pub const NORMAL: Color = Color::srgb(0.85, 0.85, 0.95);
 
+    /// Highlighted tile color (keyboard focus - bright cyan border)
+    pub const HIGHLIGHTED: Color = Color::srgb(0.3, 0.9, 1.0);
+
     /// Selected tile color (yellow glow)
     pub const SELECTED: Color = Color::srgb(1.0, 0.95, 0.4);
 
@@ -32,14 +35,24 @@ impl TileColors {
     }
 }
 
-/// System to update tile visual states based on selection
+/// System to update tile visual states based on selection and highlight
 pub fn update_tile_visuals(
-    mut tile_query: Query<(&FallingTile, &mut Sprite), Changed<FallingTile>>,
+    mut tile_query: Query<(
+        &FallingTile,
+        &mut Sprite,
+        Option<&SelectedTile>,
+        Option<&HighlightedTile>,
+    )>,
 ) {
-    for (tile, mut sprite) in tile_query.iter_mut() {
-        if tile.is_selected {
+    for (tile, mut sprite, selected, highlighted) in tile_query.iter_mut() {
+        if selected.is_some() {
+            // Selected state (yellow)
             sprite.color = TileColors::SELECTED;
+        } else if highlighted.is_some() {
+            // Highlighted state for keyboard focus (bright cyan)
+            sprite.color = TileColors::HIGHLIGHTED;
         } else {
+            // Normal state
             sprite.color = TileColors::NORMAL;
         }
     }

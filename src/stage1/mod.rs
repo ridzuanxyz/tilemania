@@ -55,6 +55,7 @@ impl Plugin for Stage1Plugin {
                 spawn_falling_tiles,
                 update_falling_tiles,
                 handle_tile_selection,
+                handle_keyboard_tile_selection,
                 validate_word,
                 update_score_display,
                 update_timer,

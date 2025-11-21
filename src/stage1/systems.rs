@@ -137,8 +137,82 @@ pub fn handle_tile_selection(
                     // Add visual feedback
                     commands.entity(entity).insert(SelectedTile);
 
-                    info!("Selected tile: {}", tile.letter);
+                    info!("🖱️  Mouse selected tile: {}", tile.letter);
                     break;
+                }
+            }
+        }
+    }
+}
+
+/// Handles tile selection via keyboard (arrow keys + Space)
+pub fn handle_keyboard_tile_selection(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut tile_query: Query<(Entity, &mut FallingTile, &Transform), Without<HighlightedTile>>,
+    highlighted_query: Query<Entity, With<HighlightedTile>>,
+    mut state: ResMut<Stage1State>,
+) {
+    // Get all visible tiles sorted by X position (left to right)
+    let mut tiles: Vec<(Entity, char, f32)> = tile_query
+        .iter()
+        .map(|(entity, tile, transform)| (entity, tile.letter, transform.translation.x))
+        .collect();
+
+    if tiles.is_empty() {
+        return;
+    }
+
+    tiles.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
+
+    // Find currently highlighted tile index
+    let highlighted_entity = highlighted_query.iter().next();
+    let current_index = if let Some(highlighted) = highlighted_entity {
+        tiles.iter().position(|(e, _, _)| *e == highlighted).unwrap_or(0)
+    } else {
+        0
+    };
+
+    // Navigate with arrow keys
+    let mut new_index = current_index;
+
+    if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) {
+        new_index = if current_index > 0 { current_index - 1 } else { tiles.len() - 1 };
+        info!("⬅️  Keyboard navigation: moved left");
+    } else if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) {
+        new_index = if current_index < tiles.len() - 1 { current_index + 1 } else { 0 };
+        info!("➡️  Keyboard navigation: moved right");
+    }
+
+    // Update highlight if navigation occurred
+    if new_index != current_index || highlighted_entity.is_none() {
+        // Remove old highlight
+        if let Some(old_highlighted) = highlighted_entity {
+            commands.entity(old_highlighted).remove::<HighlightedTile>();
+        }
+
+        // Add new highlight
+        let (new_entity, letter, _) = tiles[new_index];
+        commands.entity(new_entity).insert(HighlightedTile);
+        info!("🎯 Highlighted tile: {}", letter);
+    }
+
+    // Toggle selection with Space
+    if keyboard.just_pressed(KeyCode::Space) {
+        if let Some(highlighted) = highlighted_entity {
+            if let Ok((entity, mut tile, _)) = tile_query.get_mut(highlighted) {
+                if tile.is_selected {
+                    // Deselect
+                    tile.is_selected = false;
+                    state.selected_tiles.retain(|&e| e != entity);
+                    commands.entity(entity).remove::<SelectedTile>();
+                    info!("❌ Deselected tile: {}", tile.letter);
+                } else {
+                    // Select
+                    tile.is_selected = true;
+                    state.selected_tiles.push(entity);
+                    commands.entity(entity).insert(SelectedTile);
+                    info!("✅ Keyboard selected tile: {}", tile.letter);
                 }
             }
         }
@@ -279,12 +353,20 @@ pub fn update_timer(
     config: Res<Stage1Config>,
 ) {
     if !state.is_active {
+        warn!("⏸️  Timer paused - is_active = false");
         return;
     }
 
     // Countdown timer
     let delta_ms = (time.delta_secs() * 1000.0) as u32;
+    let old_time = state.time_remaining_ms;
     state.time_remaining_ms = state.time_remaining_ms.saturating_sub(delta_ms);
+
+    // Log every second for debugging
+    if old_time / 1000 != state.time_remaining_ms / 1000 {
+        info!("⏱️  Timer: {}s remaining (delta: {}ms, is_active: {})",
+              state.time_remaining_ms / 1000, delta_ms, state.is_active);
+    }
 
     // Update display with color feedback
     for (mut text, mut text_color) in query.iter_mut() {
