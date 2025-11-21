@@ -46,7 +46,6 @@ pub fn update_settings(
     mut settings: ResMut<GameSettings>,
     asset_server: Res<AssetServer>,
     focus: Option<ResMut<KeyboardFocus>>,
-    mut nav_query: Query<(&KeyboardNavigable, &mut BorderColor), With<Button>>,
     mut label_query: Query<(&SettingLabel, &mut Text)>,
 ) {
     if *state.get() == GameState::Settings {
@@ -88,15 +87,6 @@ pub fn update_settings(
                     if changed {
                         update_labels(&settings, &mut label_query);
                     }
-                }
-            }
-
-            // Update visual focus with thick bright border
-            for (nav, mut border) in nav_query.iter_mut() {
-                if focus.is_focused(nav.index) {
-                    *border = BorderColor(Color::srgb(0.3, 0.8, 1.0)); // Bright cyan
-                } else {
-                    *border = BorderColor(Color::NONE);
                 }
             }
         }
