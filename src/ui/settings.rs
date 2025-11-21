@@ -55,21 +55,9 @@ pub fn update_settings(
             commands.insert_resource(KeyboardFocus::new(9));
         }
 
-        // Number key shortcuts as workaround for WSL2/X11 arrow key issues
-        // 1-2: Toggle music/sfx, 9: Back to menu
-        if keyboard.just_pressed(KeyCode::Digit1) {
-            settings.audio.music_enabled = !settings.audio.music_enabled;
-            update_labels(&settings, &mut label_query);
-            info!("1️⃣  Toggled music: {}", settings.audio.music_enabled);
-        }
-        if keyboard.just_pressed(KeyCode::Digit2) {
-            settings.audio.sfx_enabled = !settings.audio.sfx_enabled;
-            update_labels(&settings, &mut label_query);
-            info!("2️⃣  Toggled SFX: {}", settings.audio.sfx_enabled);
-        }
-        if keyboard.just_pressed(KeyCode::Digit9) {
-            info!("9️⃣  Returning to Main Menu");
-            next_state.set(GameState::MainMenu);
+        // Debug: Log ALL keyboard inputs to diagnose arrow key issue
+        for key in keyboard.get_just_pressed() {
+            info!("🔍 SETTINGS KEY PRESSED: {:?}", key);
         }
 
         // Handle keyboard navigation
