@@ -46,7 +46,7 @@ pub fn update_stage_select(
                 if let Some(focused_idx) = focus.focused_index {
                     match focused_idx {
                         0 => next_state.set(GameState::GameBoard),  // Stage 1 start screen
-                        1 => next_state.set(GameState::Stage2Playing),
+                        1 => next_state.set(GameState::Stage2Start),  // Stage 2 start screen
                         2 => next_state.set(GameState::Stage3Playing),
                         3 => next_state.set(GameState::Stage4Playing),
                         4 => next_state.set(GameState::Stage5Playing),
@@ -75,7 +75,7 @@ pub fn update_stage_select(
             next_state.set(GameState::GameBoard);  // Stage 1 with difficulty selection
         }
         if keyboard.just_pressed(KeyCode::Digit2) {
-            next_state.set(GameState::Stage2Playing);
+            next_state.set(GameState::Stage2Start);  // Stage 2 with difficulty selection
         }
         if keyboard.just_pressed(KeyCode::Digit3) {
             next_state.set(GameState::Stage3Playing);
@@ -105,7 +105,7 @@ pub fn handle_stage_buttons(
         if *interaction == Interaction::Pressed {
             match button {
                 StageButton::Stage1 => next_state.set(GameState::GameBoard),  // Go to difficulty screen first
-                StageButton::Stage2 => next_state.set(GameState::Stage2Playing),
+                StageButton::Stage2 => next_state.set(GameState::Stage2Start),  // Go to difficulty screen first
                 StageButton::Stage3 => next_state.set(GameState::Stage3Playing),
                 StageButton::Stage4 => next_state.set(GameState::Stage4Playing),
                 StageButton::Stage5 => next_state.set(GameState::Stage5Playing),

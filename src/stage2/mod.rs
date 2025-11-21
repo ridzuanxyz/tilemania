@@ -42,8 +42,8 @@ impl Plugin for Stage2Plugin {
             .add_systems(Startup, setup_stage2)
 
             // Start screen
-            .add_systems(OnEnter(GameState::GameBoard), spawn_start_screen)
-            .add_systems(Update, handle_difficulty_selection.run_if(in_state(GameState::GameBoard)))
+            .add_systems(OnEnter(GameState::Stage2Start), spawn_start_screen)
+            .add_systems(Update, handle_difficulty_selection.run_if(in_state(GameState::Stage2Start)))
 
             // Gameplay (Stage2Playing state to be added)
             .add_systems(OnEnter(GameState::Stage2Playing), spawn_stage2_hud)

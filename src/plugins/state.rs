@@ -9,6 +9,7 @@ pub enum GameState {
     GameBoard,
     Stage1Playing,
     Stage1Paused,
+    Stage2Start,
     Stage2Playing,
     Stage2Paused,
     Stage3Playing,
@@ -31,6 +32,7 @@ impl Plugin for StatePlugin {
             .add_systems(OnEnter(GameState::MainMenu), enter_main_menu)
             .add_systems(OnEnter(GameState::StageSelect), enter_stage_select)
             .add_systems(OnEnter(GameState::GameBoard), enter_game_board)
+            .add_systems(OnEnter(GameState::Stage2Start), enter_stage2_start)
             .add_systems(OnEnter(GameState::Results), enter_results)
             .add_systems(OnEnter(GameState::Settings), enter_settings);
     }
@@ -56,6 +58,10 @@ fn enter_game_board() {
 
 fn enter_results() {
     info!("🏆 Entering Results");
+}
+
+fn enter_stage2_start() {
+    info!("🎮 Entering Stage 2 Start");
 }
 
 fn enter_settings() {
