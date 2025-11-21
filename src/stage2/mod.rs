@@ -33,6 +33,7 @@ impl Plugin for Stage2Plugin {
             .init_resource::<Stage2Config>()
             .init_resource::<Stage2State>()
             .init_resource::<BackgroundMusic>()
+            .init_resource::<SoundEffects>()
 
             // Events
             .add_event::<AudioEvent>()
