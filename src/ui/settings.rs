@@ -49,14 +49,15 @@ pub fn update_settings(
     mut label_query: Query<(&SettingLabel, &mut Text)>,
 ) {
     if *state.get() == GameState::Settings {
-        let is_first_frame = query.is_empty();
-
-        if is_first_frame {
+        // Spawn UI if it doesn't exist
+        if query.is_empty() {
             spawn_settings_ui(&mut commands, &settings, &asset_server);
-            // Initialize keyboard focus with 9 items (7 settings + 2 buttons)
+        }
+
+        // Always ensure KeyboardFocus resource exists (it gets removed when leaving this state)
+        if focus.is_none() {
             commands.insert_resource(KeyboardFocus::new(9));
-            // Skip keyboard navigation this frame - resource won't be available until next frame
-            return;
+            return; // Skip navigation this frame - resource won't be available until next frame
         }
 
         // Debug: Log ALL keyboard inputs to diagnose arrow key issue

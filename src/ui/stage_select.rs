@@ -24,14 +24,15 @@ pub fn update_stage_select(
     focus: Option<ResMut<KeyboardFocus>>,
 ) {
     if *state.get() == GameState::StageSelect {
-        let is_first_frame = query.is_empty();
-
-        if is_first_frame {
+        // Spawn UI if it doesn't exist
+        if query.is_empty() {
             spawn_stage_select_ui(&mut commands, &asset_server);
-            // Initialize keyboard focus with 5 stage cards
+        }
+
+        // Always ensure KeyboardFocus resource exists (it gets removed when leaving this state)
+        if focus.is_none() {
             commands.insert_resource(KeyboardFocus::new(5));
-            // Skip keyboard navigation this frame - resource won't be available until next frame
-            return;
+            return; // Skip navigation this frame - resource won't be available until next frame
         }
 
         // Handle keyboard navigation
