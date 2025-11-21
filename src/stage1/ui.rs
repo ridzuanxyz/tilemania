@@ -74,32 +74,42 @@ pub fn spawn_stage1_hud(
                     ));
                 });
 
-            // Current word display (bottom-center)
+            // Current word display and instructions (bottom-center)
             parent
                 .spawn(NodeBundle {
                     node: Node {
                         position_type: PositionType::Absolute,
-                        bottom: Val::Px(100.0),
-                        left: Val::Percent(50.0),
+                        bottom: Val::Px(60.0),
+                        width: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
+                        row_gap: Val::Px(15.0),
                         ..default()
                     },
                     ..default()
                 })
                 .with_children(|bottom| {
+                    // Current word display
                     bottom.spawn((
                         Text::new(""),
                         TextFont {
                             font: font.clone(),
-                            font_size: 48.0,
+                            font_size: 52.0,
                             ..default()
                         },
                         TextColor(Color::srgb(1.0, 1.0, 0.5)),
-                        Node {
-                            position_type: PositionType::Relative,
-                            left: Val::Px(-100.0), // Center adjustment
+                        WordDisplay,
+                    ));
+
+                    // Instruction text (always visible during gameplay)
+                    bottom.spawn((
+                        Text::new("Click tiles to select • Press SPACE to submit word"),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 22.0,
                             ..default()
                         },
-                        WordDisplay,
+                        TextColor(Color::srgb(0.7, 0.9, 1.0)),
                     ));
                 });
         });
@@ -141,15 +151,16 @@ pub fn update_combo_display(
 
 /// Updates current word display based on selected tiles
 pub fn update_word_display(
-    mut word_query: Query<&mut Text, With<WordDisplay>>,
+    mut word_query: Query<(&mut Text, &mut TextColor), With<WordDisplay>>,
     state: Res<Stage1State>,
     tile_query: Query<&FallingTile>,
+    lexicon: Option<Res<crate::lexicon::Lexicon>>,
 ) {
     if !state.is_changed() {
         return;
     }
 
-    for mut text in word_query.iter_mut() {
+    for (mut text, mut text_color) in word_query.iter_mut() {
         let mut word = String::new();
         for entity in &state.selected_tiles {
             if let Ok(tile) = tile_query.get(*entity) {
@@ -157,11 +168,37 @@ pub fn update_word_display(
             }
         }
 
-        **text = if word.is_empty() {
-            "Select 2 tiles...".to_string()
+        if word.is_empty() {
+            **text = "Select 2 tiles...".to_string();
+            text_color.0 = Color::srgb(0.7, 0.7, 0.7);
         } else {
-            word
-        };
+            **text = word.clone();
+
+            // Show real-time validation feedback
+            if word.len() == 2 {
+                let is_valid = lexicon
+                    .as_ref()
+                    .map(|lex| lex.is_valid(&word))
+                    .unwrap_or(false);
+
+                if is_valid {
+                    // Valid word - Green with glow
+                    text_color.0 = Color::srgb(0.3, 1.0, 0.3);
+                    **text = format!("{} ✓", word);
+                } else {
+                    // Invalid word - Orange/Yellow (not red, to be encouraging)
+                    text_color.0 = Color::srgb(1.0, 0.7, 0.3);
+                    **text = format!("{} ?", word);
+                }
+            } else if word.len() < 2 {
+                // Need more letters - Yellow
+                text_color.0 = Color::srgb(1.0, 1.0, 0.5);
+            } else {
+                // Too many letters - Orange
+                text_color.0 = Color::srgb(1.0, 0.6, 0.3);
+                **text = format!("{} (need 2 tiles!)", word);
+            }
+        }
     }
 }
 

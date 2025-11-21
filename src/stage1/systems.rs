@@ -153,6 +153,7 @@ pub fn validate_word(
     config: Res<Stage1Config>,
     tile_query: Query<(&FallingTile, &Transform)>,
     asset_server: Res<AssetServer>,
+    lexicon: Option<Res<crate::lexicon::Lexicon>>,
 ) {
     if !keyboard.just_pressed(KeyCode::Space) && !keyboard.just_pressed(KeyCode::Enter) {
         return;
@@ -181,8 +182,14 @@ pub fn validate_word(
         avg_position /= tile_count as f32;
     }
 
-    // Validate word
-    let is_valid = config.two_letter_words.contains(&word.to_uppercase());
+    // Validate word using Lexicon resource (O(1) HashSet lookup)
+    let is_valid = lexicon
+        .as_ref()
+        .map(|lex| lex.is_valid(&word))
+        .unwrap_or_else(|| {
+            // Fallback to config if lexicon not available
+            config.two_letter_words.contains(&word.to_uppercase())
+        });
 
     if is_valid {
         info!("✓ Valid word: {}", word);
@@ -266,7 +273,7 @@ pub fn update_score_display(
 
 /// Updates timer display and counts down
 pub fn update_timer(
-    mut query: Query<&mut Text, With<TimerDisplay>>,
+    mut query: Query<(&mut Text, &mut TextColor), With<TimerDisplay>>,
     mut state: ResMut<Stage1State>,
     time: Res<Time>,
     config: Res<Stage1Config>,
@@ -279,10 +286,26 @@ pub fn update_timer(
     let delta_ms = (time.delta_secs() * 1000.0) as u32;
     state.time_remaining_ms = state.time_remaining_ms.saturating_sub(delta_ms);
 
-    // Update display
-    for mut text in query.iter_mut() {
+    // Update display with color feedback
+    for (mut text, mut text_color) in query.iter_mut() {
         let seconds = state.time_remaining_ms / 1000;
         **text = format!("Time: {}s", seconds);
+
+        // Color feedback based on remaining time
+        let time_ratio = state.time_remaining_ms as f32 / config.total_time_ms as f32;
+        text_color.0 = if time_ratio < 0.15 {
+            // Critical: < 15% - Red, pulsing effect
+            Color::srgb(1.0, 0.2, 0.2)
+        } else if time_ratio < 0.30 {
+            // Warning: < 30% - Orange
+            Color::srgb(1.0, 0.6, 0.0)
+        } else if time_ratio < 0.50 {
+            // Caution: < 50% - Yellow
+            Color::srgb(1.0, 1.0, 0.4)
+        } else {
+            // Normal: White
+            Color::WHITE
+        };
     }
 }
 

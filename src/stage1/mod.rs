@@ -142,14 +142,19 @@ fn setup_stage1(
     mut commands: Commands,
     mut config: ResMut<Stage1Config>,
 ) {
-    // Load lexicon and get 2-letter words
-    match Lexicon::load_from_file("CSW24.txt") {
+    // Load lexicon and get 2-letter words (try multiple sources)
+    match Lexicon::load_default() {
         Ok(lexicon) => {
             config.two_letter_words = lexicon.get_two_letter_words();
-            info!("Loaded {} two-letter words for Stage 1", config.two_letter_words.len());
+            info!("Loaded {} two-letter words for Stage 1 from {} lexicon",
+                  config.two_letter_words.len(), lexicon.lexicon_name);
+
+            // Store lexicon as resource for word validation
+            commands.insert_resource(lexicon);
         }
         Err(e) => {
             error!("Failed to load lexicon: {}", e);
+            error!("Stage 1 will not function correctly without a word list!");
         }
     }
 
