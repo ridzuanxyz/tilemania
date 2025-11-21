@@ -186,6 +186,67 @@ pub fn handle_keyboard_tile_selection(
     }
 }
 
+/// Detects which tile the mouse is hovering over
+pub fn detect_tile_hover(
+    mut commands: Commands,
+    windows: Query<&Window>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    tile_query: Query<(Entity, &Transform), With<FallingTile>>,
+    hovered_query: Query<Entity, With<HoveredTile>>,
+) {
+    // Get mouse position in world coordinates
+    let Ok(window) = windows.get_single() else { return; };
+    let Ok((camera, camera_transform)) = camera_query.get_single() else { return; };
+
+    let Some(cursor_pos) = window.cursor_position() else {
+        // No cursor position - remove all hover markers
+        for entity in hovered_query.iter() {
+            commands.entity(entity).remove::<HoveredTile>();
+        }
+        return;
+    };
+
+    let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else { return; };
+
+    // Find closest tile under cursor
+    let mut closest_tile: Option<(Entity, f32)> = None;
+
+    for (entity, transform) in tile_query.iter() {
+        let tile_pos = transform.translation.truncate();
+        let distance = tile_pos.distance(world_pos);
+
+        if distance < TILE_SIZE / 2.0 {
+            match closest_tile {
+                None => closest_tile = Some((entity, distance)),
+                Some((_, prev_distance)) if distance < prev_distance => {
+                    closest_tile = Some((entity, distance));
+                }
+                _ => {}
+            }
+        }
+    }
+
+    // Update hover markers
+    match closest_tile {
+        Some((hovered_entity, _)) => {
+            // Remove hover from all other tiles
+            for entity in hovered_query.iter() {
+                if entity != hovered_entity {
+                    commands.entity(entity).remove::<HoveredTile>();
+                }
+            }
+            // Add hover to the closest tile
+            commands.entity(hovered_entity).insert(HoveredTile);
+        }
+        None => {
+            // No tile under cursor - remove all hover markers
+            for entity in hovered_query.iter() {
+                commands.entity(entity).remove::<HoveredTile>();
+            }
+        }
+    }
+}
+
 /// Validates the word when player submits (Enter or Space)
 pub fn validate_word(
     mut commands: Commands,

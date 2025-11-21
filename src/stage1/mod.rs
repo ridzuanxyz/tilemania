@@ -54,6 +54,7 @@ impl Plugin for Stage1Plugin {
                 handle_pause_input,
                 spawn_falling_tiles,
                 update_falling_tiles,
+                detect_tile_hover,
                 handle_tile_selection,
                 handle_keyboard_tile_selection,
                 validate_word,

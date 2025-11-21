@@ -68,17 +68,29 @@ impl Default for Particle {
     }
 }
 
-/// Update tile visual states based on selection/matching
+/// Update tile visual states based on selection, matching, and hover
 pub fn update_tile_visuals(
-    mut tile_query: Query<(&GridTile, &mut Sprite), Without<MatchAnimation>>,
+    mut tile_query: Query<(
+        &GridTile,
+        &mut Sprite,
+        &mut Transform,
+        Option<&HoveredTile>,
+    ), Without<MatchAnimation>>,
 ) {
-    for (tile, mut sprite) in tile_query.iter_mut() {
+    for (tile, mut sprite, mut transform, hovered) in tile_query.iter_mut() {
+        // Priority: matched > selected > hovered > normal
         if tile.is_matched {
             sprite.color = TileColors::MATCHED;
+            transform.scale = Vec3::splat(1.0);
         } else if tile.is_selected {
             sprite.color = TileColors::SELECTED;
+            transform.scale = Vec3::splat(1.0);
+        } else if hovered.is_some() {
+            sprite.color = TileColors::HOVER;
+            transform.scale = Vec3::splat(1.1); // Scale up 10% on hover
         } else {
             sprite.color = TileColors::NORMAL;
+            transform.scale = Vec3::splat(1.0);
         }
     }
 }

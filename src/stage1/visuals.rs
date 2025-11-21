@@ -22,6 +22,9 @@ impl TileColors {
     /// Invalid word flash (red)
     pub const INVALID: Color = Color::srgb(0.95, 0.3, 0.3);
 
+    /// Hover color (slightly brighter with warm tone)
+    pub const HOVER: Color = Color::srgb(0.95, 0.95, 1.0);
+
     /// Combo glow colors (by combo level)
     pub fn combo_color(combo: u32) -> Color {
         match combo {
@@ -35,25 +38,35 @@ impl TileColors {
     }
 }
 
-/// System to update tile visual states based on selection and highlight
+/// System to update tile visual states based on selection, highlight, and hover
 pub fn update_tile_visuals(
     mut tile_query: Query<(
         &FallingTile,
         &mut Sprite,
+        &mut Transform,
         Option<&SelectedTile>,
         Option<&HighlightedTile>,
+        Option<&HoveredTile>,
     )>,
 ) {
-    for (tile, mut sprite, selected, highlighted) in tile_query.iter_mut() {
+    for (_tile, mut sprite, mut transform, selected, highlighted, hovered) in tile_query.iter_mut() {
+        // Determine color based on priority: selected > highlighted > hovered > normal
         if selected.is_some() {
             // Selected state (yellow)
             sprite.color = TileColors::SELECTED;
+            transform.scale = Vec3::splat(1.0); // Reset scale when selected
         } else if highlighted.is_some() {
             // Highlighted state for keyboard focus (bright cyan)
             sprite.color = TileColors::HIGHLIGHTED;
+            transform.scale = Vec3::splat(1.0); // Reset scale when highlighted
+        } else if hovered.is_some() {
+            // Hovered state (brighter with scale-up)
+            sprite.color = TileColors::HOVER;
+            transform.scale = Vec3::splat(1.1); // Scale up 10% on hover
         } else {
             // Normal state
             sprite.color = TileColors::NORMAL;
+            transform.scale = Vec3::splat(1.0); // Normal scale
         }
     }
 }

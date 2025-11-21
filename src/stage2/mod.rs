@@ -51,6 +51,7 @@ impl Plugin for Stage2Plugin {
                 // Pause handling
                 handle_pause_input,
                 // Core gameplay
+                detect_tile_hover,
                 handle_tile_selection,
                 handle_tile_swap,
                 find_word_matches,

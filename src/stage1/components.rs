@@ -29,6 +29,10 @@ pub struct SelectedTile;
 #[derive(Component)]
 pub struct HighlightedTile;
 
+/// Component marking a tile as hovered by mouse cursor
+#[derive(Component)]
+pub struct HoveredTile;
+
 /// Component for displaying the current word being formed
 #[derive(Component)]
 pub struct WordDisplay;
