@@ -32,6 +32,7 @@ pub enum GameState {
     Stage5Paused,
     Results,
     Settings,
+    DebugMenu,
 }
 
 pub struct StatePlugin;
@@ -47,7 +48,8 @@ impl Plugin for StatePlugin {
             .add_systems(OnEnter(GameState::GameBoard), enter_game_board)
             .add_systems(OnEnter(GameState::Stage2Start), enter_stage2_start)
             .add_systems(OnEnter(GameState::Results), enter_results)
-            .add_systems(OnEnter(GameState::Settings), enter_settings);
+            .add_systems(OnEnter(GameState::Settings), enter_settings)
+            .add_systems(OnEnter(GameState::DebugMenu), enter_debug_menu);
     }
 }
 
@@ -79,4 +81,8 @@ fn enter_stage2_start() {
 
 fn enter_settings() {
     info!("⚙️  Entering Settings");
+}
+
+fn enter_debug_menu() {
+    info!("🐛 Entering Debug Menu");
 }

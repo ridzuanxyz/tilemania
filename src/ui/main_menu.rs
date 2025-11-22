@@ -16,6 +16,9 @@ pub struct PlayButton;
 #[derive(Component)]
 pub struct SettingsButton;
 
+#[derive(Component)]
+pub struct DebugButton;
+
 pub fn update_main_menu(
     mut commands: Commands,
     state: Res<State<GameState>>,
@@ -23,6 +26,7 @@ pub fn update_main_menu(
     mut next_state: ResMut<NextState<GameState>>,
     interaction_query: Query<(&Interaction, &PlayButton), Changed<Interaction>>,
     settings_query: Query<(&Interaction, &SettingsButton), Changed<Interaction>>,
+    debug_query: Query<(&Interaction, &DebugButton), Changed<Interaction>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     focus: Option<ResMut<KeyboardFocus>>,
 ) {
@@ -34,7 +38,7 @@ pub fn update_main_menu(
 
         // Always ensure KeyboardFocus resource exists (it gets removed when leaving this state)
         if focus.is_none() {
-            commands.insert_resource(KeyboardFocus::new(2));
+            commands.insert_resource(KeyboardFocus::new(3));  // Now have 3 buttons
             return; // Skip navigation this frame - resource won't be available until next frame
         }
 
@@ -74,6 +78,10 @@ pub fn update_main_menu(
                             info!("   Navigating to Settings");
                             next_state.set(GameState::Settings);
                         }
+                        2 => {
+                            info!("   Navigating to Debug Menu");
+                            next_state.set(GameState::DebugMenu);
+                        }
                         _ => {}
                     }
                 }
@@ -98,6 +106,13 @@ pub fn update_main_menu(
         for (interaction, _) in settings_query.iter() {
             if *interaction == Interaction::Pressed {
                 next_state.set(GameState::Settings);
+            }
+        }
+
+        // Handle Debug button mouse click
+        for (interaction, _) in debug_query.iter() {
+            if *interaction == Interaction::Pressed {
+                next_state.set(GameState::DebugMenu);
             }
         }
     } else {
@@ -174,6 +189,18 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
     // Make it keyboard navigable (index 1)
     commands.entity(settings_button).insert(KeyboardNavigable { index: 1 });
     commands.entity(stack_id).add_child(settings_button);
+
+    // Debug button (using ButtonComponent)
+    let debug_button = ButtonComponent::spawn(
+        commands,
+        "🐛 Debug",
+        ButtonSize::Large,
+        ButtonVariant::Secondary,
+        DebugButton,
+    );
+    // Make it keyboard navigable (index 2)
+    commands.entity(debug_button).insert(KeyboardNavigable { index: 2 });
+    commands.entity(stack_id).add_child(debug_button);
 
     // Spacer between buttons and instructions
     let spacer2 = Spacer::spawn_vertical(commands, Spacing::LG);

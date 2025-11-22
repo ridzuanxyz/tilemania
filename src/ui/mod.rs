@@ -6,6 +6,7 @@ pub mod game_board;
 pub mod results;
 pub mod settings;
 pub mod keyboard_nav;
+pub mod debug_menu;
 
 use bevy::prelude::*;
 use components::button;
@@ -27,6 +28,7 @@ impl Plugin for UiPlugin {
                 // results::update_results, // Disabled - using stage-specific results screens
                 settings::update_settings,
                 settings::handle_setting_buttons,
+                debug_menu::update_debug_menu,
                 update_keyboard_focus_visual,
             ));
     }
