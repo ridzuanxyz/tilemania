@@ -785,6 +785,11 @@ pub fn handle_results_buttons(
     mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
     results_screen_query: Query<Entity, With<ResultsScreen>>,
 ) {
+    // Only handle buttons if Stage 1 was the last completed stage
+    if *last_stage != crate::plugins::state::LastStageCompleted::Stage1 {
+        return;
+    }
+
     for (interaction, button, mut bg_color) in interaction_query.iter_mut() {
         match *interaction {
             Interaction::Pressed => {
