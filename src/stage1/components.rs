@@ -90,3 +90,10 @@ pub struct SpawnAnimation {
     pub elapsed: f32,
     pub duration: f32,
 }
+
+/// Velocity component for entities that move
+#[derive(Component)]
+pub struct Velocity {
+    pub x: f32,
+    pub y: f32,
+}

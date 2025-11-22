@@ -261,7 +261,7 @@ pub fn validate_word(
     asset_server: Res<AssetServer>,
     lexicon: Option<Res<crate::lexicon::Lexicon>>,
 ) {
-    if !keyboard.just_pressed(KeyCode::Enter) && !keyboard.just_pressed(KeyCode::Space) {
+    if !keyboard.just_pressed(KeyCode::Enter) {
         return;
     }
 
