@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use crate::plugins::state::GameState;
+use crate::plugins::assets::GameAssets;
 
 #[derive(Component)]
 pub struct ResultsScreen;
@@ -10,10 +11,11 @@ pub fn update_results(
     query: Query<Entity, With<ResultsScreen>>,
     mut next_state: ResMut<NextState<GameState>>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    game_assets: Res<GameAssets>,
 ) {
     if *state.get() == GameState::Results {
         if query.is_empty() {
-            spawn_results_ui(&mut commands);
+            spawn_results_ui(&mut commands, &game_assets);
         }
 
         // Keyboard shortcut: SPACE or ENTER to return to main menu
@@ -27,7 +29,10 @@ pub fn update_results(
     }
 }
 
-fn spawn_results_ui(commands: &mut Commands) {
+fn spawn_results_ui(commands: &mut Commands, game_assets: &GameAssets) {
+    // Get emoji font handle
+    let emoji_font = game_assets.fonts.get("emoji").cloned();
+
     commands
         .spawn((
             Node {
@@ -43,8 +48,8 @@ fn spawn_results_ui(commands: &mut Commands) {
             ResultsScreen,
         ))
         .with_children(|parent| {
-            // Title
-            parent.spawn((
+            // Title with emoji font
+            let mut title = parent.spawn((
                 Text::new("🏆 Game Results"),
                 TextFont {
                     font_size: 70.0,
@@ -52,6 +57,15 @@ fn spawn_results_ui(commands: &mut Commands) {
                 },
                 TextColor(Color::srgb(1.0, 0.9, 0.4)),
             ));
+
+            // Add emoji font if available
+            if let Some(font) = emoji_font.clone() {
+                title.insert(TextFont {
+                    font,
+                    font_size: 70.0,
+                    ..default()
+                });
+            }
 
             // Stats placeholder
             parent
@@ -67,41 +81,73 @@ fn spawn_results_ui(commands: &mut Commands) {
                     BackgroundColor(Color::srgb(0.2, 0.15, 0.25)),
                 ))
                 .with_children(|stats| {
-                    stats.spawn((
-                        Text::new("Score: 1,234"),
+                    // Score with emoji
+                    let mut score_text = stats.spawn((
+                        Text::new("⭐ Score: 1,234"),
                         TextFont {
                             font_size: 40.0,
                             ..default()
                         },
                         TextColor(Color::WHITE),
                     ));
+                    if let Some(font) = emoji_font.clone() {
+                        score_text.insert(TextFont {
+                            font,
+                            font_size: 40.0,
+                            ..default()
+                        });
+                    }
 
-                    stats.spawn((
-                        Text::new("Words Played: 23"),
+                    // Words played with emoji
+                    let mut words_text = stats.spawn((
+                        Text::new("📝 Words Played: 23"),
                         TextFont {
                             font_size: 30.0,
                             ..default()
                         },
                         TextColor(Color::srgb(0.9, 0.9, 0.9)),
                     ));
+                    if let Some(font) = emoji_font.clone() {
+                        words_text.insert(TextFont {
+                            font,
+                            font_size: 30.0,
+                            ..default()
+                        });
+                    }
 
-                    stats.spawn((
-                        Text::new("Best Word: QUIZZIFY (128 pts)"),
+                    // Best word with emoji
+                    let mut best_word_text = stats.spawn((
+                        Text::new("🎯 Best Word: QUIZZIFY (128 pts)"),
                         TextFont {
                             font_size: 30.0,
                             ..default()
                         },
                         TextColor(Color::srgb(0.9, 0.9, 0.9)),
                     ));
+                    if let Some(font) = emoji_font.clone() {
+                        best_word_text.insert(TextFont {
+                            font,
+                            font_size: 30.0,
+                            ..default()
+                        });
+                    }
 
-                    stats.spawn((
-                        Text::new("Time: 12:34"),
+                    // Time with emoji
+                    let mut time_text = stats.spawn((
+                        Text::new("⏱️ Time: 12:34"),
                         TextFont {
                             font_size: 30.0,
                             ..default()
                         },
                         TextColor(Color::srgb(0.9, 0.9, 0.9)),
                     ));
+                    if let Some(font) = emoji_font {
+                        time_text.insert(TextFont {
+                            font,
+                            font_size: 30.0,
+                            ..default()
+                        });
+                    }
                 });
 
             // Instructions

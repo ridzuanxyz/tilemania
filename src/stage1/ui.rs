@@ -5,6 +5,7 @@ use super::components::*;
 use super::{Stage1Config, Stage1State};
 use super::difficulty::{get_difficulty, DIFFICULTY_LEVELS};
 use crate::plugins::state::GameState;
+use crate::plugins::assets::GameAssets;
 
 /// Spawns the in-game HUD (score, timer, combo)
 pub fn spawn_stage1_hud(
@@ -389,10 +390,12 @@ pub struct HelpState {
 pub fn spawn_help_overlay(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    game_assets: &GameAssets,
     help_state: &HelpState,
 ) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
+    let font_emoji = game_assets.fonts.get("emoji").cloned();
 
     commands
         .spawn((
@@ -450,8 +453,8 @@ pub fn spawn_help_overlay(
                         ..default()
                     })
                     .with_children(|instructions| {
-                        // Goal
-                        instructions.spawn((
+                        // Goal (with emoji font)
+                        let mut goal_text = instructions.spawn((
                             Text::new("🎯  Goal: Form valid 2-letter words"),
                             TextFont {
                                 font: font_medium.clone(),
@@ -460,9 +463,16 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
+                        if let Some(font) = font_emoji.clone() {
+                            goal_text.insert(TextFont {
+                                font,
+                                font_size: 28.0,
+                                ..default()
+                            });
+                        }
 
-                        // Type letters
-                        instructions.spawn((
+                        // Type letters (with emoji font)
+                        let mut keyboard_text = instructions.spawn((
                             Text::new("⌨️  Type letters (A-Z) to select tiles"),
                             TextFont {
                                 font: font_medium.clone(),
@@ -471,9 +481,16 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
+                        if let Some(font) = font_emoji.clone() {
+                            keyboard_text.insert(TextFont {
+                                font,
+                                font_size: 28.0,
+                                ..default()
+                            });
+                        }
 
-                        // Submit word
-                        instructions.spawn((
+                        // Submit word (with emoji font)
+                        let mut submit_text = instructions.spawn((
                             Text::new("✅  Press ENTER to submit your word"),
                             TextFont {
                                 font: font_medium.clone(),
@@ -482,9 +499,16 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
+                        if let Some(font) = font_emoji.clone() {
+                            submit_text.insert(TextFont {
+                                font,
+                                font_size: 28.0,
+                                ..default()
+                            });
+                        }
 
-                        // Time pressure
-                        instructions.spawn((
+                        // Time pressure (with emoji font)
+                        let mut time_text = instructions.spawn((
                             Text::new("⏱️  Make as many words as you can before time runs out!"),
                             TextFont {
                                 font: font_medium.clone(),
@@ -493,6 +517,13 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
+                        if let Some(font) = font_emoji {
+                            time_text.insert(TextFont {
+                                font,
+                                font_size: 28.0,
+                                ..default()
+                            });
+                        }
                     });
 
                     // Bottom instruction
@@ -543,11 +574,12 @@ pub fn despawn_help_overlay(
 pub fn show_pregame_help(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    game_assets: Res<GameAssets>,
     mut help_state: ResMut<HelpState>,
 ) {
     help_state.is_visible = true;
     help_state.is_pregame = true;
-    spawn_help_overlay(commands, asset_server, &help_state);
+    spawn_help_overlay(commands, asset_server, &game_assets, &help_state);
 }
 
 /// Handles pre-game help dismissal (SPACE key)
@@ -580,6 +612,7 @@ pub fn handle_f1_help_toggle(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     asset_server: Res<AssetServer>,
+    game_assets: Res<GameAssets>,
     mut help_state: ResMut<HelpState>,
     mut state: ResMut<Stage1State>,
     help_query: Query<Entity, With<HelpOverlay>>,
@@ -599,7 +632,7 @@ pub fn handle_f1_help_toggle(
             // Show help and pause game
             help_state.is_visible = true;
             state.is_active = false; // Pause timer
-            spawn_help_overlay(commands, asset_server, &help_state);
+            spawn_help_overlay(commands, asset_server, &game_assets, &help_state);
         }
     }
 }
