@@ -103,9 +103,13 @@ fn simulate_asset_loading(
     if assets.state == AssetLoadingState::Loading {
         // Check how many fonts are loaded
         let mut loaded_count = 0;
-        for handle in assets.fonts.values() {
+        for (name, handle) in assets.fonts.iter() {
             if asset_server.is_loaded_with_dependencies(handle.id()) {
                 loaded_count += 1;
+                info!("✅ Font loaded: {}", name);
+            } else {
+                let load_state = asset_server.load_state(handle.id());
+                info!("⏳ Font loading: {} - state: {:?}", name, load_state);
             }
         }
 
@@ -116,6 +120,11 @@ fn simulate_asset_loading(
         if assets.loaded_assets >= assets.total_assets {
             assets.state = AssetLoadingState::Loaded;
             info!("✅ Asset loading complete! All {} fonts loaded", assets.total_assets);
+
+            // Log emoji font specifically
+            if let Some(emoji_handle) = assets.fonts.get("emoji") {
+                info!("🎨 Emoji font handle: {:?}", emoji_handle);
+            }
         }
     }
 }
