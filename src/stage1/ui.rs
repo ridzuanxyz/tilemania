@@ -398,7 +398,7 @@ pub fn spawn_help_overlay(
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 0.85).into(),
-                z_index: ZIndex::Global(1000),
+                z_index: ZIndex(1000),
                 ..default()
             },
             HelpOverlay,
