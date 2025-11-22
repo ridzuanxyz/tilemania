@@ -390,12 +390,11 @@ pub struct HelpState {
 pub fn spawn_help_overlay(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    game_assets: &GameAssets,
+    _game_assets: &GameAssets,
     help_state: &HelpState,
 ) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
-    let font_emoji = game_assets.fonts.get("emoji").cloned();
 
     commands
         .spawn((
@@ -453,9 +452,9 @@ pub fn spawn_help_overlay(
                         ..default()
                     })
                     .with_children(|instructions| {
-                        // Goal (with emoji font)
-                        let mut goal_text = instructions.spawn((
-                            Text::new("🎯  Goal: Form valid 2-letter words"),
+                        // Goal (with mixed emoji and text using separate fonts)
+                        instructions.spawn((
+                            Text::new("Goal: Form valid 2-letter words"),
                             TextFont {
                                 font: font_medium.clone(),
                                 font_size: 28.0,
@@ -463,17 +462,10 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
-                        if let Some(font) = font_emoji.clone() {
-                            goal_text.insert(TextFont {
-                                font,
-                                font_size: 28.0,
-                                ..default()
-                            });
-                        }
 
-                        // Type letters (with emoji font)
-                        let mut keyboard_text = instructions.spawn((
-                            Text::new("⌨️  Type letters (A-Z) to select tiles"),
+                        // Type letters
+                        instructions.spawn((
+                            Text::new("Type letters (A-Z) to select tiles"),
                             TextFont {
                                 font: font_medium.clone(),
                                 font_size: 28.0,
@@ -481,17 +473,10 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
-                        if let Some(font) = font_emoji.clone() {
-                            keyboard_text.insert(TextFont {
-                                font,
-                                font_size: 28.0,
-                                ..default()
-                            });
-                        }
 
-                        // Submit word (with emoji font)
-                        let mut submit_text = instructions.spawn((
-                            Text::new("✅  Press ENTER to submit your word"),
+                        // Submit word
+                        instructions.spawn((
+                            Text::new("Press ENTER to submit your word"),
                             TextFont {
                                 font: font_medium.clone(),
                                 font_size: 28.0,
@@ -499,17 +484,10 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
-                        if let Some(font) = font_emoji.clone() {
-                            submit_text.insert(TextFont {
-                                font,
-                                font_size: 28.0,
-                                ..default()
-                            });
-                        }
 
-                        // Time pressure (with emoji font)
-                        let mut time_text = instructions.spawn((
-                            Text::new("⏱️  Make as many words as you can before time runs out!"),
+                        // Time pressure
+                        instructions.spawn((
+                            Text::new("Make as many words as you can before time runs out!"),
                             TextFont {
                                 font: font_medium.clone(),
                                 font_size: 28.0,
@@ -517,13 +495,6 @@ pub fn spawn_help_overlay(
                             },
                             TextColor(Color::WHITE),
                         ));
-                        if let Some(font) = font_emoji {
-                            time_text.insert(TextFont {
-                                font,
-                                font_size: 28.0,
-                                ..default()
-                            });
-                        }
                     });
 
                     // Bottom instruction
