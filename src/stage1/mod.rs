@@ -97,7 +97,8 @@ impl Plugin for Stage1Plugin {
             .add_systems(OnExit(GameState::Stage1Paused), despawn_pause_menu)
 
             // Results screen
-            .add_systems(OnEnter(GameState::Results), spawn_results_screen);
+            .add_systems(OnEnter(GameState::Results), spawn_results_screen)
+            .add_systems(Update, handle_results_buttons.run_if(in_state(GameState::Results)));
     }
 }
 

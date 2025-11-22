@@ -367,6 +367,13 @@ pub fn handle_difficulty_selection(
 #[derive(Component)]
 pub struct ResultsScreen;
 
+/// Marker component for results screen buttons
+#[derive(Component)]
+pub enum ResultsButton {
+    PlayAgain,
+    MainMenu,
+}
+
 /// Marker component for help overlay
 #[derive(Component)]
 pub struct HelpOverlay;
@@ -423,7 +430,7 @@ pub fn spawn_help_overlay(
                 .with_children(|card| {
                     // Title
                     card.spawn((
-                        Text::new("How to Play - Stage 1"),
+                        Text::new("How to Play"),
                         TextFont {
                             font: font_bold.clone(),
                             font_size: 48.0,
@@ -485,29 +492,6 @@ pub fn spawn_help_overlay(
                                 ..default()
                             },
                             TextColor(Color::WHITE),
-                        ));
-                    });
-
-                    // Visual keyboard hint
-                    card.spawn(NodeBundle {
-                        node: Node {
-                            margin: UiRect::top(Val::Px(10.0)),
-                            padding: UiRect::all(Val::Px(15.0)),
-                            ..default()
-                        },
-                        background_color: Color::srgba(0.3, 0.3, 0.4, 0.5).into(),
-                        border_radius: BorderRadius::all(Val::Px(10.0)),
-                        ..default()
-                    })
-                    .with_children(|keyboard| {
-                        keyboard.spawn((
-                            Text::new("Press [ENTER ⏎] to submit"),
-                            TextFont {
-                                font: font_bold.clone(),
-                                font_size: 24.0,
-                                ..default()
-                            },
-                            TextColor(Color::srgb(0.5, 0.9, 0.5)),
                         ));
                     });
 
@@ -733,18 +717,21 @@ pub fn spawn_results_screen(
 
             // Play again button
             parent
-                .spawn(ButtonBundle {
-                    node: Node {
-                        width: Val::Px(200.0),
-                        height: Val::Px(60.0),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        margin: UiRect::top(Val::Px(40.0)),
+                .spawn((
+                    ButtonBundle {
+                        node: Node {
+                            width: Val::Px(200.0),
+                            height: Val::Px(60.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            margin: UiRect::top(Val::Px(40.0)),
+                            ..default()
+                        },
+                        background_color: Color::srgb(0.3, 0.6, 0.3).into(),
                         ..default()
                     },
-                    background_color: Color::srgb(0.3, 0.6, 0.3).into(),
-                    ..default()
-                })
+                    ResultsButton::PlayAgain,
+                ))
                 .with_children(|button| {
                     button.spawn((
                         Text::new("Play Again"),
@@ -759,17 +746,20 @@ pub fn spawn_results_screen(
 
             // Back to menu button
             parent
-                .spawn(ButtonBundle {
-                    node: Node {
-                        width: Val::Px(200.0),
-                        height: Val::Px(60.0),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
+                .spawn((
+                    ButtonBundle {
+                        node: Node {
+                            width: Val::Px(200.0),
+                            height: Val::Px(60.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        background_color: Color::srgb(0.4, 0.4, 0.5).into(),
                         ..default()
                     },
-                    background_color: Color::srgb(0.4, 0.4, 0.5).into(),
-                    ..default()
-                })
+                    ResultsButton::MainMenu,
+                ))
                 .with_children(|button| {
                     button.spawn((
                         Text::new("Main Menu"),
@@ -782,4 +772,64 @@ pub fn spawn_results_screen(
                     ));
                 });
         });
+}
+
+/// Handles results screen button clicks
+pub fn handle_results_buttons(
+    mut commands: Commands,
+    mut interaction_query: Query<
+        (&Interaction, &ResultsButton, &mut BackgroundColor),
+        Changed<Interaction>,
+    >,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
+    results_screen_query: Query<Entity, With<ResultsScreen>>,
+) {
+    for (interaction, button, mut bg_color) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Pressed => {
+                // Cleanup results screen
+                for entity in results_screen_query.iter() {
+                    commands.entity(entity).despawn_recursive();
+                }
+
+                // Reset last stage tracker
+                *last_stage = crate::plugins::state::LastStageCompleted::None;
+
+                match button {
+                    ResultsButton::PlayAgain => {
+                        // Return to Stage 1 start screen (difficulty selection)
+                        next_state.set(GameState::GameBoard);
+                    }
+                    ResultsButton::MainMenu => {
+                        next_state.set(GameState::MainMenu);
+                    }
+                }
+            }
+            Interaction::Hovered => {
+                let base_color = match button {
+                    ResultsButton::PlayAgain => Color::srgb(0.3, 0.6, 0.3),
+                    ResultsButton::MainMenu => Color::srgb(0.4, 0.4, 0.5),
+                };
+                *bg_color = lighten_color(base_color).into();
+            }
+            Interaction::None => {
+                *bg_color = match button {
+                    ResultsButton::PlayAgain => Color::srgb(0.3, 0.6, 0.3),
+                    ResultsButton::MainMenu => Color::srgb(0.4, 0.4, 0.5),
+                }
+                .into();
+            }
+        }
+    }
+}
+
+/// Helper function to lighten a color for hover effect
+fn lighten_color(color: Color) -> Color {
+    let rgb = color.to_srgba();
+    Color::srgb(
+        (rgb.red + 0.1).min(1.0),
+        (rgb.green + 0.1).min(1.0),
+        (rgb.blue + 0.1).min(1.0),
+    )
 }
