@@ -137,6 +137,8 @@ pub struct Stage1State {
     pub time_remaining_ms: u32,
     /// Current combo count
     pub combo_count: u32,
+    /// Maximum combo achieved
+    pub max_combo: u32,
     /// Selected tiles
     pub selected_tiles: Vec<Entity>,
     /// Words found this session

@@ -510,6 +510,7 @@ pub fn check_game_over(
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
 ) {
     if !state.is_active {
         return;
@@ -522,12 +523,14 @@ pub fn check_game_over(
         } else {
             info!("❌ Time's up! Score: {} / {}", state.score, config.target_score);
         }
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage2;
         next_state.set(GameState::Results);
     }
 
     // Check target score reached
     if state.score >= config.target_score {
         info!("🎯 Target score reached! Final score: {}", state.score);
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage2;
         next_state.set(GameState::Results);
     }
 
@@ -538,6 +541,7 @@ pub fn check_game_over(
         } else {
             info!("❌ Out of moves!");
         }
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage2;
         next_state.set(GameState::Results);
     }
 }

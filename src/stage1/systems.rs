@@ -311,6 +311,7 @@ pub fn validate_word(
 
         state.score += points;
         state.combo_count += 1;
+        state.max_combo = state.max_combo.max(state.combo_count); // Track highest combo
         state.words_found.push(word.to_uppercase());
 
         // Visual feedback for valid word
@@ -427,9 +428,11 @@ pub fn update_timer(
 pub fn check_game_over(
     state: Res<Stage1State>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
 ) {
     if state.time_remaining_ms == 0 && state.is_active {
         info!("Game Over! Final Score: {}", state.score);
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage1;
         next_state.set(GameState::Results);
     }
 }

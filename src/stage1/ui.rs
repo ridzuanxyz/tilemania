@@ -169,7 +169,7 @@ pub fn update_word_display(
         }
 
         if word.is_empty() {
-            **text = "Select 2 tiles...".to_string();
+            **text = "".to_string(); // Empty when no tiles selected
             text_color.0 = Color::srgb(0.7, 0.7, 0.7);
         } else {
             **text = word.clone();
@@ -340,6 +340,7 @@ pub fn handle_difficulty_selection(
                 state.score = 0;
                 state.time_remaining_ms = config.total_time_ms;
                 state.combo_count = 0;
+                state.max_combo = 0;
                 state.selected_tiles.clear();
                 state.words_found.clear();
                 state.is_active = false; // Will be activated after help dismissal
@@ -638,7 +639,13 @@ pub fn spawn_results_screen(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     state: Res<Stage1State>,
+    last_stage: Res<crate::plugins::state::LastStageCompleted>,
 ) {
+    // Only spawn if this stage just completed
+    if *last_stage != crate::plugins::state::LastStageCompleted::Stage1 {
+        return;
+    }
+
     let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     commands
@@ -690,6 +697,17 @@ pub fn spawn_results_screen(
                     ..default()
                 },
                 TextColor(Color::WHITE),
+            ));
+
+            // Max combo
+            parent.spawn((
+                Text::new(format!("Max Combo: {}x", state.max_combo)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 32.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 0.9, 0.4)),
             ));
 
             // Word list (first 10)

@@ -406,7 +406,13 @@ pub fn spawn_results_screen(
     asset_server: Res<AssetServer>,
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
+    last_stage: Res<crate::plugins::state::LastStageCompleted>,
 ) {
+    // Only spawn if this stage just completed
+    if *last_stage != crate::plugins::state::LastStageCompleted::Stage2 {
+        return;
+    }
+
     let font_bold: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium: Handle<Font> = asset_server.load("fonts/FiraSans-Medium.ttf");
 
