@@ -700,14 +700,27 @@ pub fn spawn_results_screen(
                 TextColor(Color::srgb(1.0, 0.6, 0.2)),  // Vibrant orange
             ));
 
-            // Word list (first 10)
-            let word_list = state
-                .words_found
-                .iter()
-                .take(10)
-                .cloned()
-                .collect::<Vec<_>>()
-                .join(", ");
+            // Word list with smart truncation
+            let word_list = if state.words_found.len() > 10 {
+                // Show first 10 words + indicator for remaining
+                let shown_words = state
+                    .words_found
+                    .iter()
+                    .take(10)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                let remaining = state.words_found.len() - 10;
+                format!("{}, ... (+{} more)", shown_words, remaining)
+            } else {
+                // Show all words if 10 or fewer
+                state
+                    .words_found
+                    .iter()
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            };
 
             if !word_list.is_empty() {
                 parent.spawn((
