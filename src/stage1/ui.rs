@@ -673,8 +673,14 @@ pub fn spawn_results_screen(
             ));
 
             // Words found - CYAN/BLUE (information, learning metric)
+            // Shows unique count with total in parentheses if different
+            let words_text = if state.total_words_formed > state.words_found.len() as u32 {
+                format!("Words Found: {} unique ({} total)", state.words_found.len(), state.total_words_formed)
+            } else {
+                format!("Words Found: {}", state.words_found.len())
+            };
             parent.spawn((
-                Text::new(format!("Words Found: {}", state.words_found.len())),
+                Text::new(words_text),
                 TextFont {
                     font: font.clone(),
                     font_size: 32.0,

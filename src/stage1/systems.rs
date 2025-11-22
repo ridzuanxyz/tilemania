@@ -320,7 +320,15 @@ pub fn validate_word(
         state.score += points;
         state.combo_count += 1;
         state.max_combo = state.max_combo.max(state.combo_count); // Track highest combo
-        state.words_found.push(word.to_uppercase());
+
+        // Track total words formed (including duplicates)
+        state.total_words_formed += 1;
+
+        // Track unique words (add only if not already found)
+        let word_upper = word.to_uppercase();
+        if !state.words_found.contains(&word_upper) {
+            state.words_found.push(word_upper);
+        }
 
         // Visual feedback for valid word
         spawn_score_popup(&mut commands, &asset_server, avg_position, points, true);

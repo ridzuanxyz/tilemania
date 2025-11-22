@@ -144,8 +144,10 @@ pub struct Stage1State {
     pub max_combo: u32,
     /// Selected tiles
     pub selected_tiles: Vec<Entity>,
-    /// Words found this session
+    /// Unique words found this session (no duplicates)
     pub words_found: Vec<String>,
+    /// Total words formed (including duplicates)
+    pub total_words_formed: u32,
     /// Is game active
     pub is_active: bool,
 }
