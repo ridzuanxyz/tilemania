@@ -205,7 +205,9 @@ pub fn detect_tile_hover(
     let Some(cursor_pos) = window.cursor_position() else {
         // No cursor position - remove all hover markers
         for entity in hovered_query.iter() {
-            commands.entity(entity).remove::<HoveredTile>();
+            if let Some(mut entity_commands) = commands.get_entity(entity) {
+                entity_commands.remove::<HoveredTile>();
+            }
         }
         return;
     };
@@ -236,16 +238,22 @@ pub fn detect_tile_hover(
             // Remove hover from all other tiles
             for entity in hovered_query.iter() {
                 if entity != hovered_entity {
-                    commands.entity(entity).remove::<HoveredTile>();
+                    if let Some(mut entity_commands) = commands.get_entity(entity) {
+                        entity_commands.remove::<HoveredTile>();
+                    }
                 }
             }
-            // Add hover to the closest tile
-            commands.entity(hovered_entity).insert(HoveredTile);
+            // Add hover to the closest tile (only if it still exists)
+            if let Some(mut entity_commands) = commands.get_entity(hovered_entity) {
+                entity_commands.insert(HoveredTile);
+            }
         }
         None => {
             // No tile under cursor - remove all hover markers
             for entity in hovered_query.iter() {
-                commands.entity(entity).remove::<HoveredTile>();
+                if let Some(mut entity_commands) = commands.get_entity(entity) {
+                    entity_commands.remove::<HoveredTile>();
+                }
             }
         }
     }
