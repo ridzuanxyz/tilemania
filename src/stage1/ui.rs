@@ -390,11 +390,12 @@ pub struct HelpState {
 pub fn spawn_help_overlay(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    _game_assets: &GameAssets,
+    game_assets: &GameAssets,
     help_state: &HelpState,
 ) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
+    let font_emoji = game_assets.fonts.get("emoji").cloned();
 
     commands
         .spawn((
@@ -452,49 +453,130 @@ pub fn spawn_help_overlay(
                         ..default()
                     })
                     .with_children(|instructions| {
-                        // Goal (with mixed emoji and text using separate fonts)
-                        instructions.spawn((
-                            Text::new("Goal: Form valid 2-letter words"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::WHITE),
-                        ));
+                        // Goal (with emoji using TextSpan)
+                        if let Some(emoji_font) = font_emoji.clone() {
+                            instructions.spawn((
+                                Text::new("🎯"),
+                                TextFont {
+                                    font: emoji_font.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ))
+                            .with_child((
+                                TextSpan::new("  Goal: Form valid 2-letter words"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                            ));
+                        } else {
+                            // Fallback without emoji
+                            instructions.spawn((
+                                Text::new("Goal: Form valid 2-letter words"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ));
+                        }
 
-                        // Type letters
-                        instructions.spawn((
-                            Text::new("Type letters (A-Z) to select tiles"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::WHITE),
-                        ));
+                        // Type letters (with emoji using TextSpan)
+                        if let Some(emoji_font) = font_emoji.clone() {
+                            instructions.spawn((
+                                Text::new("⌨️"),
+                                TextFont {
+                                    font: emoji_font.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ))
+                            .with_child((
+                                TextSpan::new("  Type letters (A-Z) to select tiles"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                            ));
+                        } else {
+                            instructions.spawn((
+                                Text::new("Type letters (A-Z) to select tiles"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ));
+                        }
 
-                        // Submit word
-                        instructions.spawn((
-                            Text::new("Press ENTER to submit your word"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::WHITE),
-                        ));
+                        // Submit word (with emoji using TextSpan)
+                        if let Some(emoji_font) = font_emoji.clone() {
+                            instructions.spawn((
+                                Text::new("✅"),
+                                TextFont {
+                                    font: emoji_font.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ))
+                            .with_child((
+                                TextSpan::new("  Press ENTER to submit your word"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                            ));
+                        } else {
+                            instructions.spawn((
+                                Text::new("Press ENTER to submit your word"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ));
+                        }
 
-                        // Time pressure
-                        instructions.spawn((
-                            Text::new("Make as many words as you can before time runs out!"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::WHITE),
-                        ));
+                        // Time pressure (with emoji using TextSpan)
+                        if let Some(emoji_font) = font_emoji.clone() {
+                            instructions.spawn((
+                                Text::new("⏱️"),
+                                TextFont {
+                                    font: emoji_font,
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ))
+                            .with_child((
+                                TextSpan::new("  Make as many words as you can before time runs out!"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                            ));
+                        } else {
+                            instructions.spawn((
+                                Text::new("Make as many words as you can before time runs out!"),
+                                TextFont {
+                                    font: font_medium.clone(),
+                                    font_size: 28.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ));
+                        }
                     });
 
                     // Bottom instruction
