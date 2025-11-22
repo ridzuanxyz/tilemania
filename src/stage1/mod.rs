@@ -24,6 +24,7 @@ use ui::*;
 use pause::*;
 use powerups::*;
 use audio::{AudioEvent, BackgroundMusic, play_audio_events};
+pub use ui::HelpState;
 
 /// Plugin for Stage 1 gameplay
 pub struct Stage1Plugin;
@@ -36,6 +37,7 @@ impl Plugin for Stage1Plugin {
             .init_resource::<Stage1State>()
             .init_resource::<ActivePowerUps>()
             .init_resource::<BackgroundMusic>()
+            .init_resource::<HelpState>()
 
             // Events
             .add_event::<AudioEvent>()
@@ -48,10 +50,12 @@ impl Plugin for Stage1Plugin {
             .add_systems(Update, handle_difficulty_selection.run_if(in_state(GameState::GameBoard)))
 
             // Gameplay
-            .add_systems(OnEnter(GameState::Stage1Playing), (spawn_stage1_hud, spawn_powerup_ui))
+            .add_systems(OnEnter(GameState::Stage1Playing), (spawn_stage1_hud, spawn_powerup_ui, show_pregame_help))
             // Core gameplay systems
             .add_systems(Update, (
                 handle_pause_input,
+                handle_pregame_help_input,
+                handle_f1_help_toggle,
                 spawn_falling_tiles,
                 update_falling_tiles,
                 detect_tile_hover,
@@ -82,6 +86,7 @@ impl Plugin for Stage1Plugin {
                 update_powerup_display,
                 play_audio_events,
             ).run_if(in_state(GameState::Stage1Playing)))
+            .add_systems(OnExit(GameState::Stage1Playing), cleanup_help_state)
 
             // Pause menu
             .add_systems(OnEnter(GameState::Stage1Paused), spawn_pause_menu)
