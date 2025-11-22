@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use std::collections::HashMap;
 
 /// Asset loading state tracking
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -18,8 +19,9 @@ pub struct GameAssets {
     pub progress: f32,  // 0.0 to 1.0
     pub total_assets: usize,
     pub loaded_assets: usize,
+    // Font assets
+    pub fonts: HashMap<String, Handle<Font>>,
     // Future fields (Sprint 2-4):
-    // pub fonts: HashMap<String, Handle<Font>>,
     // pub textures: HashMap<String, Handle<Image>>,
     // pub sounds: HashMap<String, Handle<AudioSource>>,
     // pub lexicon: Option<Handle<Lexicon>>,
@@ -32,6 +34,7 @@ impl Default for GameAssets {
             progress: 0.0,
             total_assets: 0,
             loaded_assets: 0,
+            fonts: HashMap::new(),
         }
     }
 }
@@ -64,12 +67,27 @@ impl Plugin for AssetPlugin {
     }
 }
 
-fn start_loading_assets(mut assets: ResMut<GameAssets>) {
+fn start_loading_assets(
+    mut assets: ResMut<GameAssets>,
+    asset_server: Res<AssetServer>,
+) {
     info!("📦 Initializing asset loading system");
 
-    // Simulate asset count for demonstration
-    // In Sprint 2-4, this will be actual asset counts
-    assets.total_assets = 10;  // Mock: fonts, textures, sounds, etc.
+    // Load fonts
+    let font_paths = vec![
+        ("regular", "fonts/FiraSans-Regular.ttf"),
+        ("medium", "fonts/FiraSans-Medium.ttf"),
+        ("bold", "fonts/FiraSans-Bold.ttf"),
+        ("emoji", "fonts/NotoColorEmoji-Regular.ttf"),
+    ];
+
+    for (name, path) in font_paths {
+        let handle: Handle<Font> = asset_server.load(path);
+        assets.fonts.insert(name.to_string(), handle);
+        info!("📝 Loading font: {} from {}", name, path);
+    }
+
+    assets.total_assets = assets.fonts.len();
     assets.loaded_assets = 0;
     assets.state = AssetLoadingState::Loading;
     assets.progress = 0.0;
@@ -77,26 +95,27 @@ fn start_loading_assets(mut assets: ResMut<GameAssets>) {
     info!("📊 Total assets to load: {}", assets.total_assets);
 }
 
-/// Simulates progressive asset loading
-/// In Sprint 2-4, this will be replaced with actual asset loading logic
+/// Checks asset loading progress
 fn simulate_asset_loading(
-    time: Res<Time>,
     mut assets: ResMut<GameAssets>,
+    asset_server: Res<AssetServer>,
 ) {
     if assets.state == AssetLoadingState::Loading {
-        // Simulate loading progress over 2 seconds
-        let load_speed = 5.0; // assets per second
-        let delta = time.delta_secs() * load_speed;
+        // Check how many fonts are loaded
+        let mut loaded_count = 0;
+        for handle in assets.fonts.values() {
+            if asset_server.is_loaded_with_dependencies(handle.id()) {
+                loaded_count += 1;
+            }
+        }
 
-        assets.loaded_assets = (assets.loaded_assets as f32 + delta)
-            .min(assets.total_assets as f32) as usize;
-
+        assets.loaded_assets = loaded_count;
         assets.update_progress();
 
         // Check if all assets loaded
         if assets.loaded_assets >= assets.total_assets {
             assets.state = AssetLoadingState::Loaded;
-            info!("✅ Asset loading complete! Progress: {:.0}%", assets.progress * 100.0);
+            info!("✅ Asset loading complete! All {} fonts loaded", assets.total_assets);
         }
     }
 }

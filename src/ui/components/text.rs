@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::plugins::assets::GameAssets;
 
 /// Reusable text component with consistent typography and colors
 #[derive(Component, Debug, Clone)]
@@ -6,6 +7,34 @@ pub struct TextComponent {
     pub content: String,
     pub style: TextStyle,
     pub color_variant: TextColorVariant,
+    pub font_type: FontType,
+}
+
+/// Font type selection
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FontType {
+    Regular,  // FiraSans-Regular
+    Medium,   // FiraSans-Medium
+    Bold,     // FiraSans-Bold
+    Emoji,    // NotoColorEmoji-Regular
+}
+
+impl FontType {
+    /// Get the font handle key name
+    pub fn key(&self) -> &str {
+        match self {
+            FontType::Regular => "regular",
+            FontType::Medium => "medium",
+            FontType::Bold => "bold",
+            FontType::Emoji => "emoji",
+        }
+    }
+}
+
+impl Default for FontType {
+    fn default() -> Self {
+        FontType::Regular
+    }
 }
 
 /// Typography scale for consistent text sizing
@@ -71,6 +100,22 @@ impl TextComponent {
             content: content.into(),
             style,
             color_variant,
+            font_type: FontType::default(),
+        }
+    }
+
+    /// Create a new text component with custom font
+    pub fn new_with_font(
+        content: impl Into<String>,
+        style: TextStyle,
+        color_variant: TextColorVariant,
+        font_type: FontType,
+    ) -> Self {
+        Self {
+            content: content.into(),
+            style,
+            color_variant,
+            font_type,
         }
     }
 
@@ -81,19 +126,44 @@ impl TextComponent {
         style: TextStyle,
         color_variant: TextColorVariant,
     ) -> Entity {
-        let text_component = Self::new(content, style, color_variant);
+        Self::spawn_with_font(commands, content, style, color_variant, FontType::default(), None)
+    }
 
-        commands
-            .spawn((
-                Text::new(&text_component.content),
-                TextFont {
-                    font_size: text_component.style.font_size(),
-                    ..default()
-                },
-                TextColor(text_component.color_variant.color()),
-                text_component,
-            ))
-            .id()
+    /// Spawn a text entity with custom font
+    pub fn spawn_with_font(
+        commands: &mut Commands,
+        content: impl Into<String>,
+        style: TextStyle,
+        color_variant: TextColorVariant,
+        font_type: FontType,
+        game_assets: Option<&GameAssets>,
+    ) -> Entity {
+        let text_component = Self::new_with_font(content, style, color_variant, font_type);
+
+        let font_handle = game_assets
+            .and_then(|assets| assets.fonts.get(font_type.key()))
+            .cloned();
+
+        let mut entity = commands.spawn((
+            Text::new(&text_component.content),
+            TextFont {
+                font_size: text_component.style.font_size(),
+                ..default()
+            },
+            TextColor(text_component.color_variant.color()),
+            text_component,
+        ));
+
+        // Add font handle if available
+        if let Some(font) = font_handle {
+            entity.insert(TextFont {
+                font,
+                font_size: style.font_size(),
+                ..default()
+            });
+        }
+
+        entity.id()
     }
 
     /// Spawn text with optional custom node styling (margins, etc.)
@@ -104,19 +174,45 @@ impl TextComponent {
         color_variant: TextColorVariant,
         node: Node,
     ) -> Entity {
-        let text_component = Self::new(content, style, color_variant);
+        Self::spawn_with_node_and_font(commands, content, style, color_variant, node, FontType::default(), None)
+    }
 
-        commands
-            .spawn((
-                Text::new(&text_component.content),
-                TextFont {
-                    font_size: text_component.style.font_size(),
-                    ..default()
-                },
-                TextColor(text_component.color_variant.color()),
-                node,
-                text_component,
-            ))
-            .id()
+    /// Spawn text with optional custom node styling and font
+    pub fn spawn_with_node_and_font(
+        commands: &mut Commands,
+        content: impl Into<String>,
+        style: TextStyle,
+        color_variant: TextColorVariant,
+        node: Node,
+        font_type: FontType,
+        game_assets: Option<&GameAssets>,
+    ) -> Entity {
+        let text_component = Self::new_with_font(content, style, color_variant, font_type);
+
+        let font_handle = game_assets
+            .and_then(|assets| assets.fonts.get(font_type.key()))
+            .cloned();
+
+        let mut entity = commands.spawn((
+            Text::new(&text_component.content),
+            TextFont {
+                font_size: text_component.style.font_size(),
+                ..default()
+            },
+            TextColor(text_component.color_variant.color()),
+            node,
+            text_component,
+        ));
+
+        // Add font handle if available
+        if let Some(font) = font_handle {
+            entity.insert(TextFont {
+                font,
+                font_size: style.font_size(),
+                ..default()
+            });
+        }
+
+        entity.id()
     }
 }
