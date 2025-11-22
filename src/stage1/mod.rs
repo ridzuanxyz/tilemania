@@ -24,6 +24,7 @@ use ui::*;
 use pause::*;
 use powerups::*;
 use audio::{AudioEvent, BackgroundMusic, play_audio_events};
+pub use ui::HelpState;
 
 /// Plugin for Stage 1 gameplay
 pub struct Stage1Plugin;
@@ -36,6 +37,7 @@ impl Plugin for Stage1Plugin {
             .init_resource::<Stage1State>()
             .init_resource::<ActivePowerUps>()
             .init_resource::<BackgroundMusic>()
+            .init_resource::<HelpState>()
 
             // Events
             .add_event::<AudioEvent>()
@@ -48,12 +50,15 @@ impl Plugin for Stage1Plugin {
             .add_systems(Update, handle_difficulty_selection.run_if(in_state(GameState::GameBoard)))
 
             // Gameplay
-            .add_systems(OnEnter(GameState::Stage1Playing), (spawn_stage1_hud, spawn_powerup_ui))
+            .add_systems(OnEnter(GameState::Stage1Playing), (spawn_stage1_hud, spawn_powerup_ui, show_pregame_help))
             // Core gameplay systems
             .add_systems(Update, (
                 handle_pause_input,
+                handle_pregame_help_input,
+                handle_f1_help_toggle,
                 spawn_falling_tiles,
                 update_falling_tiles,
+                detect_tile_hover,
                 handle_tile_selection,
                 handle_keyboard_tile_selection,
                 validate_word,
@@ -64,6 +69,7 @@ impl Plugin for Stage1Plugin {
             // Visual feedback systems
             .add_systems(Update, (
                 update_tile_visuals,
+                update_spawn_animations,
                 update_score_popups,
                 update_validation_flash,
                 update_combo_glow,
@@ -74,12 +80,15 @@ impl Plugin for Stage1Plugin {
                 update_combo_display,
                 update_word_display,
                 spawn_powerup_pickups,
+                move_powerup_pickups,
+                despawn_offscreen_powerups,
                 collect_powerups,
-                activate_powerups,
+                renumber_powerups,
                 update_powerup_timers,
                 update_powerup_display,
                 play_audio_events,
             ).run_if(in_state(GameState::Stage1Playing)))
+            .add_systems(OnExit(GameState::Stage1Playing), cleanup_help_state)
 
             // Pause menu
             .add_systems(OnEnter(GameState::Stage1Paused), spawn_pause_menu)
@@ -90,7 +99,8 @@ impl Plugin for Stage1Plugin {
             .add_systems(OnExit(GameState::Stage1Paused), despawn_pause_menu)
 
             // Results screen
-            .add_systems(OnEnter(GameState::Results), spawn_results_screen);
+            .add_systems(OnEnter(GameState::Results), spawn_results_screen)
+            .add_systems(Update, handle_results_buttons.run_if(in_state(GameState::Results)));
     }
 }
 
@@ -130,10 +140,14 @@ pub struct Stage1State {
     pub time_remaining_ms: u32,
     /// Current combo count
     pub combo_count: u32,
+    /// Maximum combo achieved
+    pub max_combo: u32,
     /// Selected tiles
     pub selected_tiles: Vec<Entity>,
-    /// Words found this session
+    /// Unique words found this session (no duplicates)
     pub words_found: Vec<String>,
+    /// Total words formed (including duplicates)
+    pub total_words_formed: u32,
     /// Is game active
     pub is_active: bool,
 }

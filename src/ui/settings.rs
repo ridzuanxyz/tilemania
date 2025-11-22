@@ -46,35 +46,50 @@ pub fn update_settings(
     mut settings: ResMut<GameSettings>,
     asset_server: Res<AssetServer>,
     focus: Option<ResMut<KeyboardFocus>>,
-    mut nav_query: Query<(&KeyboardNavigable, &mut BorderColor), With<Button>>,
     mut label_query: Query<(&SettingLabel, &mut Text)>,
 ) {
     if *state.get() == GameState::Settings {
+        // Spawn UI if it doesn't exist
         if query.is_empty() {
             spawn_settings_ui(&mut commands, &settings, &asset_server);
-            // Initialize keyboard focus with 9 items (7 settings + 2 buttons)
+        }
+
+        // Always ensure KeyboardFocus resource exists (it gets removed when leaving this state)
+        if focus.is_none() {
             commands.insert_resource(KeyboardFocus::new(9));
+            return; // Skip navigation this frame - resource won't be available until next frame
+        }
+
+        // Debug: Log ALL keyboard inputs to diagnose arrow key issue
+        for key in keyboard.get_just_pressed() {
+            info!("🔍 SETTINGS KEY PRESSED: {:?}", key);
         }
 
         // Handle keyboard navigation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+            // WSL2/X11 bug workaround: Arrow DOWN → NumpadEnter, Arrow UP → Lang3
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
+               keyboard.just_pressed(KeyCode::Lang3) {
                 focus.move_up();
             }
-            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) {
                 focus.move_down();
             }
 
             // Left/Right arrows for direct adjustment
+            // WSL2/X11 bug: Arrow LEFT → Convert, Arrow RIGHT → NonConvert
             if let Some(focused_idx) = focus.focused_index {
                 let mut changed = false;
 
-                if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) {
+                if keyboard.just_pressed(KeyCode::ArrowLeft) || keyboard.just_pressed(KeyCode::KeyA) ||
+                   keyboard.just_pressed(KeyCode::Convert) {
                     changed = handle_left_arrow(focused_idx, &mut settings);
                 }
 
-                if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) {
+                if keyboard.just_pressed(KeyCode::ArrowRight) || keyboard.just_pressed(KeyCode::KeyD) ||
+                   keyboard.just_pressed(KeyCode::NonConvert) {
                     changed = handle_right_arrow(focused_idx, &mut settings);
                 }
 
@@ -88,15 +103,6 @@ pub fn update_settings(
                     if changed {
                         update_labels(&settings, &mut label_query);
                     }
-                }
-            }
-
-            // Update visual focus with thick bright border
-            for (nav, mut border) in nav_query.iter_mut() {
-                if focus.is_focused(nav.index) {
-                    *border = BorderColor(Color::srgb(0.3, 0.8, 1.0)); // Bright cyan
-                } else {
-                    *border = BorderColor(Color::NONE);
                 }
             }
         }

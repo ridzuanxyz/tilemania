@@ -29,6 +29,10 @@ pub struct SelectedTile;
 #[derive(Component)]
 pub struct HighlightedTile;
 
+/// Component marking a tile as hovered by mouse cursor
+#[derive(Component)]
+pub struct HoveredTile;
+
 /// Component for displaying the current word being formed
 #[derive(Component)]
 pub struct WordDisplay;
@@ -78,4 +82,18 @@ pub struct ParticleEffect {
 pub struct ValidationAnimation {
     pub is_valid: bool,
     pub progress: f32,
+}
+
+/// Animation component for tile spawn effect
+#[derive(Component)]
+pub struct SpawnAnimation {
+    pub elapsed: f32,
+    pub duration: f32,
+}
+
+/// Velocity component for entities that move
+#[derive(Component)]
+pub struct Velocity {
+    pub x: f32,
+    pub y: f32,
 }

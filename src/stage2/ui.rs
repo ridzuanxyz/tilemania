@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 use super::{Stage2Config, Stage2State};
 use super::difficulty::*;
+use super::components::{ScoreDisplay, TimerDisplay, MovesDisplay};
 use crate::plugins::state::GameState;
 
 /// Marker for Stage 2 start screen
@@ -278,7 +279,7 @@ pub fn spawn_stage2_hud(
                             ..default()
                         },
                         TextColor(Color::WHITE),
-                        HUDElement::Score,
+                        ScoreDisplay,
                     ));
                 });
 
@@ -301,7 +302,7 @@ pub fn spawn_stage2_hud(
                             ..default()
                         },
                         TextColor(Color::WHITE),
-                        HUDElement::Timer,
+                        TimerDisplay,
                     ));
                 });
 
@@ -330,7 +331,7 @@ pub fn spawn_stage2_hud(
                             ..default()
                         },
                         TextColor(Color::WHITE),
-                        HUDElement::Moves,
+                        MovesDisplay,
                     ));
 
                     section.spawn((
@@ -405,7 +406,13 @@ pub fn spawn_results_screen(
     asset_server: Res<AssetServer>,
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
+    last_stage: Res<crate::plugins::state::LastStageCompleted>,
 ) {
+    // Only spawn if this stage just completed
+    if *last_stage != crate::plugins::state::LastStageCompleted::Stage2 {
+        return;
+    }
+
     let font_bold: Handle<Font> = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium: Handle<Font> = asset_server.load("fonts/FiraSans-Medium.ttf");
 

@@ -25,43 +25,65 @@ pub fn update_main_menu(
     settings_query: Query<(&Interaction, &SettingsButton), Changed<Interaction>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     focus: Option<ResMut<KeyboardFocus>>,
-    mut nav_query: Query<(&KeyboardNavigable, &mut BorderColor), With<Button>>,
 ) {
     if *state.get() == GameState::MainMenu {
+        // Spawn UI if it doesn't exist
         if query.is_empty() {
             spawn_main_menu_ui(&mut commands);
-            // Initialize keyboard focus with 2 items (Play, Settings)
+        }
+
+        // Always ensure KeyboardFocus resource exists (it gets removed when leaving this state)
+        if focus.is_none() {
             commands.insert_resource(KeyboardFocus::new(2));
+            return; // Skip navigation this frame - resource won't be available until next frame
+        }
+
+        // Debug: Log ALL keyboard inputs to diagnose arrow key issue
+        for key in keyboard.get_just_pressed() {
+            info!("🔍 KEY PRESSED: {:?}", key);
         }
 
         // Handle keyboard navigation and activation
         if let Some(mut focus) = focus {
             // Arrow key navigation
-            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) {
+            // WSL2/X11 bug workaround: Arrow keys map to wrong keycodes
+            // Arrow DOWN → NumpadEnter, Arrow UP → Lang3
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::KeyW) ||
+               keyboard.just_pressed(KeyCode::Lang3) {  // WSL2 bug: Arrow UP maps here
+                info!("⬆️  Arrow Up pressed - moving focus up");
                 focus.move_up();
+                info!("   Current focus: {:?}", focus.focused_index);
             }
-            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) {
+            if keyboard.just_pressed(KeyCode::ArrowDown) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) {  // WSL2 bug: Arrow DOWN maps here
+                info!("⬇️  Arrow Down pressed - moving focus down");
                 focus.move_down();
+                info!("   Current focus: {:?}", focus.focused_index);
             }
 
             // Handle Enter key activation (direct state change, no Interaction mutation)
             if keyboard.just_pressed(KeyCode::Enter) || keyboard.just_pressed(KeyCode::Space) {
+                info!("⏎ Enter/Space pressed with focus: {:?}", focus.focused_index);
                 if let Some(focused_idx) = focus.focused_index {
                     match focused_idx {
-                        0 => next_state.set(GameState::StageSelect), // Play button
-                        1 => next_state.set(GameState::Settings),    // Settings button
+                        0 => {
+                            info!("   Navigating to Stage Select (Play button)");
+                            next_state.set(GameState::StageSelect);
+                        }
+                        1 => {
+                            info!("   Navigating to Settings");
+                            next_state.set(GameState::Settings);
+                        }
                         _ => {}
                     }
                 }
             }
-
-            // Update visual focus with thick bright border
-            for (nav, mut border) in nav_query.iter_mut() {
-                if focus.is_focused(nav.index) {
-                    *border = BorderColor(Color::srgb(0.3, 0.8, 1.0)); // Bright cyan
-                } else {
-                    *border = BorderColor(Color::NONE);
-                }
+        } else {
+            // KeyboardFocus resource doesn't exist - this shouldn't happen after first frame
+            if keyboard.just_pressed(KeyCode::ArrowUp) || keyboard.just_pressed(KeyCode::ArrowDown) ||
+               keyboard.just_pressed(KeyCode::KeyW) || keyboard.just_pressed(KeyCode::KeyS) ||
+               keyboard.just_pressed(KeyCode::NumpadEnter) || keyboard.just_pressed(KeyCode::Lang3) {
+                error!("❌ CRITICAL: KeyboardFocus resource missing after UI spawn! This is a bug.");
             }
         }
 
@@ -137,15 +159,8 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         ButtonVariant::Primary,
         PlayButton,
     );
-    // Make it keyboard navigable (index 0) with border support
-    commands.entity(play_button).insert((
-        KeyboardNavigable { index: 0 },
-        BorderColor(Color::NONE),
-        Node {
-            border: UiRect::all(Val::Px(4.0)), // Thick border
-            ..default()
-        },
-    ));
+    // Make it keyboard navigable (index 0)
+    commands.entity(play_button).insert(KeyboardNavigable { index: 0 });
     commands.entity(stack_id).add_child(play_button);
 
     // Settings button (using ButtonComponent)
@@ -156,15 +171,8 @@ fn spawn_main_menu_ui(commands: &mut Commands) {
         ButtonVariant::Secondary,
         SettingsButton,
     );
-    // Make it keyboard navigable (index 1) with border support
-    commands.entity(settings_button).insert((
-        KeyboardNavigable { index: 1 },
-        BorderColor(Color::NONE),
-        Node {
-            border: UiRect::all(Val::Px(4.0)), // Thick border
-            ..default()
-        },
-    ));
+    // Make it keyboard navigable (index 1)
+    commands.entity(settings_button).insert(KeyboardNavigable { index: 1 });
     commands.entity(stack_id).add_child(settings_button);
 
     // Spacer between buttons and instructions

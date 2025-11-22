@@ -24,7 +24,7 @@ impl Plugin for UiPlugin {
                 stage_select::update_stage_select,
                 stage_select::handle_stage_buttons,
                 // game_board::update_game_board, // Disabled - Stage2Plugin handles GameBoard state
-                results::update_results,
+                // results::update_results, // Disabled - using stage-specific results screens
                 settings::update_settings,
                 settings::handle_setting_buttons,
                 update_keyboard_focus_visual,

@@ -74,7 +74,7 @@ pub fn spawn_stage1_hud(
                     ));
                 });
 
-            // Current word display and instructions (bottom-center)
+            // Current word display (bottom-center)
             parent
                 .spawn(NodeBundle {
                     node: Node {
@@ -101,15 +101,15 @@ pub fn spawn_stage1_hud(
                         WordDisplay,
                     ));
 
-                    // Instruction text (always visible during gameplay)
+                    // Help hint (press F1)
                     bottom.spawn((
-                        Text::new("Type letters to select tiles • ENTER to submit word"),
+                        Text::new("Press F1 for Help"),
                         TextFont {
                             font: font.clone(),
-                            font_size: 22.0,
+                            font_size: 18.0,
                             ..default()
                         },
-                        TextColor(Color::srgb(0.7, 0.9, 1.0)),
+                        TextColor(Color::srgb(0.5, 0.5, 0.6)),
                     ));
                 });
         });
@@ -169,7 +169,7 @@ pub fn update_word_display(
         }
 
         if word.is_empty() {
-            **text = "Select 2 tiles...".to_string();
+            **text = "".to_string(); // Empty when no tiles selected
             text_color.0 = Color::srgb(0.7, 0.7, 0.7);
         } else {
             **text = word.clone();
@@ -340,9 +340,10 @@ pub fn handle_difficulty_selection(
                 state.score = 0;
                 state.time_remaining_ms = config.total_time_ms;
                 state.combo_count = 0;
+                state.max_combo = 0;
                 state.selected_tiles.clear();
                 state.words_found.clear();
-                state.is_active = true;
+                state.is_active = false; // Will be activated after help dismissal
 
                 // Despawn start screen
                 for entity in start_screen_query.iter() {
@@ -366,12 +367,269 @@ pub fn handle_difficulty_selection(
 #[derive(Component)]
 pub struct ResultsScreen;
 
+/// Marker component for results screen buttons
+#[derive(Component)]
+pub enum ResultsButton {
+    PlayAgain,
+    MainMenu,
+}
+
+/// Marker component for help overlay
+#[derive(Component)]
+pub struct HelpOverlay;
+
+/// Resource to track help overlay visibility
+#[derive(Resource, Default)]
+pub struct HelpState {
+    pub is_visible: bool,
+    pub is_pregame: bool, // True if this is the pre-game help, false if toggled with F1
+}
+
+/// Spawns the help overlay (pre-game or F1 toggle)
+pub fn spawn_help_overlay(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    help_state: &HelpState,
+) {
+    let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
+
+    commands
+        .spawn((
+            NodeBundle {
+                node: Node {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    position_type: PositionType::Absolute,
+                    ..default()
+                },
+                background_color: Color::srgba(0.0, 0.0, 0.0, 0.85).into(),
+                z_index: ZIndex(1000),
+                ..default()
+            },
+            HelpOverlay,
+        ))
+        .with_children(|parent| {
+            // Help card/panel
+            parent
+                .spawn(NodeBundle {
+                    node: Node {
+                        width: Val::Px(700.0),
+                        padding: UiRect::all(Val::Px(40.0)),
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
+                        row_gap: Val::Px(25.0),
+                        ..default()
+                    },
+                    background_color: Color::srgb(0.15, 0.15, 0.2).into(),
+                    border_radius: BorderRadius::all(Val::Px(20.0)),
+                    ..default()
+                })
+                .with_children(|card| {
+                    // Title
+                    card.spawn((
+                        Text::new("How to Play"),
+                        TextFont {
+                            font: font_bold.clone(),
+                            font_size: 48.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(1.0, 0.95, 0.5)),
+                    ));
+
+                    // Instructions container
+                    card.spawn(NodeBundle {
+                        node: Node {
+                            flex_direction: FlexDirection::Column,
+                            row_gap: Val::Px(18.0),
+                            align_items: AlignItems::Start,
+                            ..default()
+                        },
+                        ..default()
+                    })
+                    .with_children(|instructions| {
+                        // Goal
+                        instructions.spawn((
+                            Text::new("🎯  Goal: Form valid 2-letter words"),
+                            TextFont {
+                                font: font_medium.clone(),
+                                font_size: 28.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+
+                        // Type letters
+                        instructions.spawn((
+                            Text::new("⌨️  Type letters (A-Z) to select tiles"),
+                            TextFont {
+                                font: font_medium.clone(),
+                                font_size: 28.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+
+                        // Submit word
+                        instructions.spawn((
+                            Text::new("✅  Press ENTER to submit your word"),
+                            TextFont {
+                                font: font_medium.clone(),
+                                font_size: 28.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+
+                        // Time pressure
+                        instructions.spawn((
+                            Text::new("⏱️  Make as many words as you can before time runs out!"),
+                            TextFont {
+                                font: font_medium.clone(),
+                                font_size: 28.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+                    });
+
+                    // Bottom instruction
+                    if help_state.is_pregame {
+                        card.spawn((
+                            Text::new("Press SPACE to Start"),
+                            TextFont {
+                                font: font_bold.clone(),
+                                font_size: 32.0,
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.3, 0.9, 0.3)),
+                            Node {
+                                margin: UiRect::top(Val::Px(20.0)),
+                                ..default()
+                            },
+                        ));
+                    } else {
+                        card.spawn((
+                            Text::new("Press F1 to close and resume"),
+                            TextFont {
+                                font: font_bold.clone(),
+                                font_size: 28.0,
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.7, 0.7, 0.8)),
+                            Node {
+                                margin: UiRect::top(Val::Px(20.0)),
+                                ..default()
+                            },
+                        ));
+                    }
+                });
+        });
+}
+
+/// Despawns help overlay
+pub fn despawn_help_overlay(
+    mut commands: Commands,
+    help_query: Query<Entity, With<HelpOverlay>>,
+) {
+    for entity in help_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+/// Shows help overlay on entering Stage1Playing
+pub fn show_pregame_help(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut help_state: ResMut<HelpState>,
+) {
+    help_state.is_visible = true;
+    help_state.is_pregame = true;
+    spawn_help_overlay(commands, asset_server, &help_state);
+}
+
+/// Handles pre-game help dismissal (SPACE key)
+pub fn handle_pregame_help_input(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut help_state: ResMut<HelpState>,
+    mut state: ResMut<Stage1State>,
+    help_query: Query<Entity, With<HelpOverlay>>,
+) {
+    if !help_state.is_pregame || !help_state.is_visible {
+        return;
+    }
+
+    if keyboard.just_pressed(KeyCode::Space) {
+        // Dismiss help
+        help_state.is_visible = false;
+        help_state.is_pregame = false;
+
+        // Despawn overlay
+        despawn_help_overlay(commands, help_query);
+
+        // Activate game (start timer)
+        state.is_active = true;
+    }
+}
+
+/// Handles F1 help toggle during gameplay
+pub fn handle_f1_help_toggle(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    asset_server: Res<AssetServer>,
+    mut help_state: ResMut<HelpState>,
+    mut state: ResMut<Stage1State>,
+    help_query: Query<Entity, With<HelpOverlay>>,
+) {
+    // Don't handle F1 during pre-game help
+    if help_state.is_pregame {
+        return;
+    }
+
+    if keyboard.just_pressed(KeyCode::F1) {
+        if help_state.is_visible {
+            // Hide help and resume game
+            help_state.is_visible = false;
+            state.is_active = true; // Resume timer
+            despawn_help_overlay(commands, help_query);
+        } else {
+            // Show help and pause game
+            help_state.is_visible = true;
+            state.is_active = false; // Pause timer
+            spawn_help_overlay(commands, asset_server, &help_state);
+        }
+    }
+}
+
+/// Cleanup help state when exiting Stage1Playing
+pub fn cleanup_help_state(
+    mut commands: Commands,
+    mut help_state: ResMut<HelpState>,
+    help_query: Query<Entity, With<HelpOverlay>>,
+) {
+    // Reset help state
+    help_state.is_visible = false;
+    help_state.is_pregame = false;
+
+    // Despawn any lingering help overlays
+    despawn_help_overlay(commands, help_query);
+}
+
 /// Spawns results screen showing final score and words found
 pub fn spawn_results_screen(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     state: Res<Stage1State>,
+    last_stage: Res<crate::plugins::state::LastStageCompleted>,
 ) {
+    // Only spawn if this stage just completed
+    if *last_stage != crate::plugins::state::LastStageCompleted::Stage1 {
+        return;
+    }
+
     let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
     commands
@@ -403,7 +661,7 @@ pub fn spawn_results_screen(
                 TextColor(Color::WHITE),
             ));
 
-            // Final score
+            // Final score - GOLD (achievement, winning)
             parent.spawn((
                 Text::new(format!("Final Score: {}", state.score)),
                 TextFont {
@@ -411,28 +669,58 @@ pub fn spawn_results_screen(
                     font_size: 48.0,
                     ..default()
                 },
-                TextColor(Color::srgb(1.0, 0.9, 0.3)),
+                TextColor(Color::srgb(1.0, 0.85, 0.0)),  // True gold
             ));
 
-            // Words found
+            // Words found - CYAN/BLUE (information, learning metric)
+            // Shows unique count with total in parentheses if different
+            let words_text = if state.total_words_formed > state.words_found.len() as u32 {
+                format!("Words Found: {} unique ({} total)", state.words_found.len(), state.total_words_formed)
+            } else {
+                format!("Words Found: {}", state.words_found.len())
+            };
             parent.spawn((
-                Text::new(format!("Words Found: {}", state.words_found.len())),
+                Text::new(words_text),
                 TextFont {
                     font: font.clone(),
                     font_size: 32.0,
                     ..default()
                 },
-                TextColor(Color::WHITE),
+                TextColor(Color::srgb(0.4, 0.8, 1.0)),  // Bright cyan-blue
             ));
 
-            // Word list (first 10)
-            let word_list = state
-                .words_found
-                .iter()
-                .take(10)
-                .cloned()
-                .collect::<Vec<_>>()
-                .join(", ");
+            // Max combo - ORANGE (excitement, streaks)
+            parent.spawn((
+                Text::new(format!("Max Combo: {}x", state.max_combo)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 32.0,
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 0.6, 0.2)),  // Vibrant orange
+            ));
+
+            // Word list with smart truncation
+            let word_list = if state.words_found.len() > 10 {
+                // Show first 10 words + indicator for remaining
+                let shown_words = state
+                    .words_found
+                    .iter()
+                    .take(10)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                let remaining = state.words_found.len() - 10;
+                format!("{}, ... (+{} more)", shown_words, remaining)
+            } else {
+                // Show all words if 10 or fewer
+                state
+                    .words_found
+                    .iter()
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            };
 
             if !word_list.is_empty() {
                 parent.spawn((
@@ -448,18 +736,21 @@ pub fn spawn_results_screen(
 
             // Play again button
             parent
-                .spawn(ButtonBundle {
-                    node: Node {
-                        width: Val::Px(200.0),
-                        height: Val::Px(60.0),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        margin: UiRect::top(Val::Px(40.0)),
+                .spawn((
+                    ButtonBundle {
+                        node: Node {
+                            width: Val::Px(200.0),
+                            height: Val::Px(60.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            margin: UiRect::top(Val::Px(40.0)),
+                            ..default()
+                        },
+                        background_color: Color::srgb(0.3, 0.6, 0.3).into(),
                         ..default()
                     },
-                    background_color: Color::srgb(0.3, 0.6, 0.3).into(),
-                    ..default()
-                })
+                    ResultsButton::PlayAgain,
+                ))
                 .with_children(|button| {
                     button.spawn((
                         Text::new("Play Again"),
@@ -474,17 +765,20 @@ pub fn spawn_results_screen(
 
             // Back to menu button
             parent
-                .spawn(ButtonBundle {
-                    node: Node {
-                        width: Val::Px(200.0),
-                        height: Val::Px(60.0),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
+                .spawn((
+                    ButtonBundle {
+                        node: Node {
+                            width: Val::Px(200.0),
+                            height: Val::Px(60.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        background_color: Color::srgb(0.4, 0.4, 0.5).into(),
                         ..default()
                     },
-                    background_color: Color::srgb(0.4, 0.4, 0.5).into(),
-                    ..default()
-                })
+                    ResultsButton::MainMenu,
+                ))
                 .with_children(|button| {
                     button.spawn((
                         Text::new("Main Menu"),
@@ -497,4 +791,69 @@ pub fn spawn_results_screen(
                     ));
                 });
         });
+}
+
+/// Handles results screen button clicks
+pub fn handle_results_buttons(
+    mut commands: Commands,
+    mut interaction_query: Query<
+        (&Interaction, &ResultsButton, &mut BackgroundColor),
+        Changed<Interaction>,
+    >,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
+    results_screen_query: Query<Entity, With<ResultsScreen>>,
+) {
+    // Only handle buttons if Stage 1 was the last completed stage
+    if *last_stage != crate::plugins::state::LastStageCompleted::Stage1 {
+        return;
+    }
+
+    for (interaction, button, mut bg_color) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Pressed => {
+                // Cleanup results screen
+                for entity in results_screen_query.iter() {
+                    commands.entity(entity).despawn_recursive();
+                }
+
+                // Reset last stage tracker
+                *last_stage = crate::plugins::state::LastStageCompleted::None;
+
+                match button {
+                    ResultsButton::PlayAgain => {
+                        // Return to Stage 1 start screen (difficulty selection)
+                        next_state.set(GameState::GameBoard);
+                    }
+                    ResultsButton::MainMenu => {
+                        next_state.set(GameState::MainMenu);
+                    }
+                }
+            }
+            Interaction::Hovered => {
+                let base_color = match button {
+                    ResultsButton::PlayAgain => Color::srgb(0.3, 0.6, 0.3),
+                    ResultsButton::MainMenu => Color::srgb(0.4, 0.4, 0.5),
+                };
+                *bg_color = lighten_color(base_color).into();
+            }
+            Interaction::None => {
+                *bg_color = match button {
+                    ResultsButton::PlayAgain => Color::srgb(0.3, 0.6, 0.3),
+                    ResultsButton::MainMenu => Color::srgb(0.4, 0.4, 0.5),
+                }
+                .into();
+            }
+        }
+    }
+}
+
+/// Helper function to lighten a color for hover effect
+fn lighten_color(color: Color) -> Color {
+    let rgb = color.to_srgba();
+    Color::srgb(
+        (rgb.red + 0.1).min(1.0),
+        (rgb.green + 0.1).min(1.0),
+        (rgb.blue + 0.1).min(1.0),
+    )
 }

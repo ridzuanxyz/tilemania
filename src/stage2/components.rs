@@ -25,6 +25,10 @@ pub struct GridTile {
 #[derive(Component)]
 pub struct SelectedTile;
 
+/// Component marking a tile as hovered by mouse cursor
+#[derive(Component)]
+pub struct HoveredTile;
+
 /// Component for tiles that are matched and being cleared
 #[derive(Component)]
 pub struct MatchedTile {
@@ -96,5 +100,12 @@ pub struct SwapAnimation {
     pub start_pos: Vec3,
     pub end_pos: Vec3,
     pub progress: f32,
+    pub duration: f32,
+}
+
+/// Animation component for tile spawn effect
+#[derive(Component)]
+pub struct SpawnAnimation {
+    pub elapsed: f32,
     pub duration: f32,
 }

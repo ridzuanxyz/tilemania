@@ -142,6 +142,7 @@ impl ButtonComponent {
         // Create button container
         let button_entity = commands
             .spawn((
+                Button,
                 Node {
                     width: Val::Px(size.width()),
                     height: Val::Px(size.height()),

@@ -28,13 +28,18 @@ pub fn spawn_grid(
         SpatialBundle::default(),
     ));
 
-    // Spawn 8x8 grid of tiles
+    // Spawn 8x8 grid of tiles with staggered animation
     for row in 0..grid_size {
         for col in 0..grid_size {
             let letter = get_weighted_random_letter();
             let x = start_x + (col as f32) * (TILE_SIZE + GRID_SPACING);
             let y = start_y + (row as f32) * (TILE_SIZE + GRID_SPACING);
 
+            // Stagger spawn animation based on position (diagonal wave)
+            let tile_index = row + col;
+            let stagger_delay = tile_index as f32 * 0.02; // 20ms delay per diagonal
+
+            // Spawn tile with letter text as child
             commands.spawn((
                 GridTile {
                     letter,
@@ -51,23 +56,88 @@ pub fn spawn_grid(
                     transform: Transform::from_xyz(x, y, 0.0),
                     ..default()
                 },
-            ));
-
-            // Spawn letter text at higher z-level
-            commands.spawn((
-                Text2d::new(letter.to_string()),
-                TextFont {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 42.0,
-                    ..default()
+                SpawnAnimation {
+                    elapsed: -stagger_delay, // Negative elapsed = delayed start
+                    duration: 0.3, // 300ms bounce-in
                 },
-                TextColor(Color::srgb(0.1, 0.1, 0.1)),
-                Transform::from_xyz(x, y, 1.0),
-            ));
+            )).with_children(|parent| {
+                // Spawn letter text as child so it inherits transformations
+                parent.spawn((
+                    Text2d::new(letter.to_string()),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 42.0,
+                        ..default()
+                    },
+                    TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                    Transform::from_xyz(0.0, 0.0, 1.0), // Relative to parent
+                ));
+            });
         }
     }
 
     info!("Spawned {}x{} grid", grid_size, grid_size);
+}
+
+/// Detects which tile the mouse is hovering over
+pub fn detect_tile_hover(
+    mut commands: Commands,
+    windows: Query<&Window>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    tile_query: Query<(Entity, &Transform), With<GridTile>>,
+    hovered_query: Query<Entity, With<HoveredTile>>,
+) {
+    // Get mouse position in world coordinates
+    let Ok(window) = windows.get_single() else { return; };
+    let Ok((camera, camera_transform)) = camera_query.get_single() else { return; };
+
+    let Some(cursor_pos) = window.cursor_position() else {
+        // No cursor position - remove all hover markers
+        for entity in hovered_query.iter() {
+            commands.entity(entity).remove::<HoveredTile>();
+        }
+        return;
+    };
+
+    let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else { return; };
+
+    // Find closest tile under cursor
+    let mut closest_tile: Option<(Entity, f32)> = None;
+
+    for (entity, transform) in tile_query.iter() {
+        let tile_pos = transform.translation.truncate();
+        let distance = tile_pos.distance(world_pos);
+
+        if distance < TILE_SIZE / 2.0 {
+            match closest_tile {
+                None => closest_tile = Some((entity, distance)),
+                Some((_, prev_distance)) if distance < prev_distance => {
+                    closest_tile = Some((entity, distance));
+                }
+                _ => {}
+            }
+        }
+    }
+
+    // Update hover markers
+    match closest_tile {
+        Some((hovered_entity, _)) => {
+            // Remove hover from all other tiles
+            for entity in hovered_query.iter() {
+                if entity != hovered_entity {
+                    commands.entity(entity).remove::<HoveredTile>();
+                }
+            }
+            // Add hover to the closest tile
+            commands.entity(hovered_entity).insert(HoveredTile);
+        }
+        None => {
+            // No tile under cursor - remove all hover markers
+            for entity in hovered_query.iter() {
+                commands.entity(entity).remove::<HoveredTile>();
+            }
+        }
+    }
 }
 
 /// Handles tile selection via mouse click
@@ -307,6 +377,22 @@ pub fn clear_matched_words(
     }
 }
 
+/// Despawn tiles after their match animation completes
+pub fn despawn_matched_tiles(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut matched_query: Query<(Entity, &mut MatchedTile)>,
+) {
+    for (entity, mut matched) in matched_query.iter_mut() {
+        matched.elapsed += time.delta_secs();
+
+        if matched.elapsed >= matched.duration {
+            // Animation complete - despawn the tile
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 /// Handles cascade logic (tiles fall down to fill gaps)
 pub fn cascade_tiles(
     mut commands: Commands,
@@ -374,6 +460,7 @@ pub fn spawn_new_tiles(
                 let x = start_x + (col as f32) * (TILE_SIZE + GRID_SPACING);
                 let y = start_y + (row as f32) * (TILE_SIZE + GRID_SPACING);
 
+                // Spawn tile with letter text as child
                 commands.spawn((
                     GridTile {
                         letter,
@@ -394,7 +481,23 @@ pub fn spawn_new_tiles(
                         target_pos: grid_pos,
                         speed: 500.0,
                     },
-                ));
+                    SpawnAnimation {
+                        elapsed: 0.0,
+                        duration: 0.3,
+                    },
+                )).with_children(|parent| {
+                    // Spawn letter text as child so it inherits transformations
+                    parent.spawn((
+                        Text2d::new(letter.to_string()),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 42.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.1, 0.1, 0.1)),
+                        Transform::from_xyz(0.0, 0.0, 1.0), // Relative to parent
+                    ));
+                });
 
                 info!("Spawned new tile at ({},{}) with letter {}", row, col, letter);
             }
@@ -407,6 +510,7 @@ pub fn check_game_over(
     state: Res<Stage2State>,
     config: Res<Stage2Config>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
 ) {
     if !state.is_active {
         return;
@@ -419,12 +523,14 @@ pub fn check_game_over(
         } else {
             info!("❌ Time's up! Score: {} / {}", state.score, config.target_score);
         }
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage2;
         next_state.set(GameState::Results);
     }
 
     // Check target score reached
     if state.score >= config.target_score {
         info!("🎯 Target score reached! Final score: {}", state.score);
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage2;
         next_state.set(GameState::Results);
     }
 
@@ -435,6 +541,7 @@ pub fn check_game_over(
         } else {
             info!("❌ Out of moves!");
         }
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage2;
         next_state.set(GameState::Results);
     }
 }
@@ -482,6 +589,29 @@ pub fn update_moves_display(
         } else {
             **text = format!("Moves: {}", state.moves_made);
         }
+    }
+}
+
+/// Cleanup system to despawn all grid entities when leaving Stage2Playing
+pub fn cleanup_stage2_gameplay(
+    mut commands: Commands,
+    grid_query: Query<Entity, With<GameGrid>>,
+    tile_query: Query<Entity, With<GridTile>>,
+    hud_query: Query<Entity, With<crate::stage2::ui::Stage2HUD>>,
+) {
+    // Despawn grid container
+    for entity in grid_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    // Despawn all tiles
+    for entity in tile_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    // Despawn HUD
+    for entity in hud_query.iter() {
+        commands.entity(entity).despawn_recursive();
     }
 }
 

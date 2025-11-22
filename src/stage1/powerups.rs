@@ -23,6 +23,7 @@ pub struct ActivePowerUps {
 #[derive(Component)]
 pub struct PowerUpPickup {
     pub powerup_type: PowerUp,
+    pub assigned_number: u8,
 }
 
 /// Spawns power-ups randomly on the field
@@ -32,12 +33,18 @@ pub fn spawn_powerup_pickups(
     time: Res<Time>,
     config: Res<Stage1Config>,
     asset_server: Res<AssetServer>,
+    pickup_query: Query<&PowerUpPickup>,
 ) {
     *last_spawn_time += time.delta_secs();
 
     // Try to spawn a power-up every 15 seconds
     if *last_spawn_time >= 15.0 {
         *last_spawn_time = 0.0;
+
+        // Check if we already have 4 bonuses on screen
+        if pickup_query.iter().count() >= 4 {
+            return;
+        }
 
         let mut rng = rand::thread_rng();
         if rng.gen::<f32>() < 0.7 {
@@ -49,45 +56,207 @@ pub fn spawn_powerup_pickups(
                 _ => PowerUp::ExtraTime,
             };
 
-            // Random position
-            let column = rng.gen_range(0..config.column_count);
-            let x_pos = -400.0 + (column as f32 * 120.0);
-            let y_pos = rng.gen_range(-200.0..200.0);
+            // Horizontal sliding: spawn from left edge at random height
+            let x_pos = -450.0;
+            let y_pos = rng.gen_range(-250.0..250.0);
+
+            // Calculate sequential number (1-4)
+            let assigned_number = calculate_next_number(&pickup_query);
 
             let color = powerup_color(&powerup_type);
 
+            // Spawn bonus tile with text as children
             commands.spawn((
-                PowerUpPickup { powerup_type },
+                PowerUpPickup {
+                    powerup_type,
+                    assigned_number,
+                },
+                super::components::Velocity {
+                    x: 150.0,  // Horizontal speed (pixels per second)
+                    y: 0.0,
+                },
                 SpriteBundle {
                     sprite: Sprite {
                         color,
-                        custom_size: Some(Vec2::new(48.0, 48.0)),
+                        custom_size: Some(Vec2::new(64.0, 64.0)),
                         ..default()
                     },
                     transform: Transform::from_xyz(x_pos, y_pos, 2.0),
                     ..default()
                 },
-            ));
+            ))
+            .with_children(|parent| {
+                // Power-up icon
+                parent.spawn((
+                    Text2d::new(powerup_icon(&powerup_type)),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 32.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                    Transform::from_xyz(0.0, 10.0, 1.0),  // Relative to parent
+                ));
 
-            // Spawn power-up icon text at higher z-level
-            commands.spawn((
-                Text2d::new(powerup_icon(&powerup_type)),
-                TextFont {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 32.0,
-                    ..default()
-                },
-                TextColor(Color::WHITE),
-                Transform::from_xyz(x_pos, y_pos, 3.0),
-            ));
+                // Number display
+                parent.spawn((
+                    Text2d::new(format!("{}", assigned_number)),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 48.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                    Transform::from_xyz(0.0, -15.0, 1.0),  // Relative to parent, below icon
+                ));
+            });
 
-            info!("💎 Spawned power-up: {:?}", powerup_type);
+            info!("💎 Spawned power-up #{}: {:?}", assigned_number, powerup_type);
         }
     }
 }
 
-/// Handles player collecting power-ups
+/// Calculate the next sequential number for a new powerup
+fn calculate_next_number(pickup_query: &Query<&PowerUpPickup>) -> u8 {
+    let mut used_numbers = pickup_query
+        .iter()
+        .map(|p| p.assigned_number)
+        .collect::<Vec<_>>();
+
+    used_numbers.sort();
+
+    // Find first available number (1-4)
+    for n in 1..=4 {
+        if !used_numbers.contains(&n) {
+            return n;
+        }
+    }
+
+    // Fallback (shouldn't happen if we limit to 4)
+    1
+}
+
+/// Moves power-ups horizontally across the screen
+pub fn move_powerup_pickups(
+    mut query: Query<(&mut Transform, &super::components::Velocity), With<PowerUpPickup>>,
+    time: Res<Time>,
+) {
+    for (mut transform, velocity) in query.iter_mut() {
+        transform.translation.x += velocity.x * time.delta_secs();
+    }
+}
+
+/// Despawns power-ups that have moved off-screen
+pub fn despawn_offscreen_powerups(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform, &PowerUpPickup)>,
+) {
+    for (entity, transform, pickup) in query.iter() {
+        // Despawn if beyond right edge
+        if transform.translation.x > 450.0 {
+            commands.entity(entity).despawn_recursive();
+            info!("💨 Power-up #{} went off-screen", pickup.assigned_number);
+        }
+    }
+}
+
+/// Handles keyboard-based power-up collection (1-4 keys and spacebar)
 pub fn collect_powerups(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    pickup_query: Query<(Entity, &PowerUpPickup)>,
+    mut active: ResMut<ActivePowerUps>,
+    mut state: ResMut<Stage1State>,
+    mut config: ResMut<Stage1Config>,
+    tile_query: Query<(Entity, &Transform), With<FallingTile>>,
+) {
+    // Check which key was pressed
+    let target_number = if keyboard.just_pressed(KeyCode::Digit1) {
+        Some(1)
+    } else if keyboard.just_pressed(KeyCode::Digit2) {
+        Some(2)
+    } else if keyboard.just_pressed(KeyCode::Digit3) {
+        Some(3)
+    } else if keyboard.just_pressed(KeyCode::Digit4) {
+        Some(4)
+    } else if keyboard.just_pressed(KeyCode::Space) {
+        // Spacebar collects lowest numbered bonus
+        let mut numbers: Vec<u8> = pickup_query.iter().map(|(_, p)| p.assigned_number).collect();
+        numbers.sort();
+        numbers.first().copied()
+    } else {
+        None
+    };
+
+    if let Some(number) = target_number {
+        // Find the powerup with matching number
+        for (entity, pickup) in pickup_query.iter() {
+            if pickup.assigned_number == number {
+                info!("✨ Collected power-up #{}: {:?}", number, pickup.powerup_type);
+
+                // Apply effect immediately
+                apply_powerup_effect(
+                    &mut commands,
+                    pickup.powerup_type,
+                    &mut active,
+                    &mut state,
+                    &mut config,
+                    &tile_query,
+                );
+
+                // Despawn the collected powerup
+                commands.entity(entity).despawn_recursive();
+                break;
+            }
+        }
+    }
+}
+
+/// Renumbers remaining powerups after collection/despawn
+pub fn renumber_powerups(
+    mut pickup_query: Query<(Entity, &mut PowerUpPickup), Changed<PowerUpPickup>>,
+    children_query: Query<&Children>,
+    mut text_query: Query<&mut Text2d>,
+) {
+    // Only run if powerups changed (collected/spawned)
+    if pickup_query.is_empty() {
+        return;
+    }
+
+    // Collect all powerups with their current numbers
+    let mut all_pickups: Vec<(Entity, u8)> = pickup_query
+        .iter()
+        .map(|(entity, pickup)| (entity, pickup.assigned_number))
+        .collect();
+
+    // Sort by current assigned number
+    all_pickups.sort_by_key(|(_, num)| *num);
+
+    // Reassign sequential numbers (1, 2, 3, 4) and update display
+    for (new_number, (entity, _)) in all_pickups.iter().enumerate() {
+        let new_num = (new_number + 1) as u8;
+
+        if let Ok((_, mut pickup)) = pickup_query.get_mut(*entity) {
+            if pickup.assigned_number != new_num {
+                pickup.assigned_number = new_num;
+
+                // Update the number text display (second child of the powerup entity)
+                if let Ok(children) = children_query.get(*entity) {
+                    // Second child is the number text (first is icon)
+                    if children.len() >= 2 {
+                        if let Ok(mut text) = text_query.get_mut(children[1]) {
+                            **text = format!("{}", new_num);
+                            info!("Renumbered powerup to #{}", new_num);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Handles player collecting power-ups (OLD PROXIMITY-BASED - DISABLED)
+pub fn collect_powerups_old(
     mut commands: Commands,
     pickup_query: Query<(Entity, &PowerUpPickup, &Transform)>,
     tile_query: Query<&Transform, With<FallingTile>>,
@@ -295,7 +464,7 @@ pub fn spawn_powerup_ui(
         })
         .with_children(|parent| {
             parent.spawn((
-                Text::new("Power-ups (1-4):"),
+                Text::new("Bonuses (1-4 or SPACE):"),
                 TextFont {
                     font: font.clone(),
                     font_size: 20.0,
@@ -311,15 +480,21 @@ pub fn spawn_powerup_ui(
 #[derive(Component)]
 pub struct PowerUpDisplayMarker;
 
-/// Updates the power-up UI display
+/// Updates the power-up UI display to show on-screen bonuses
 pub fn update_powerup_display(
     mut commands: Commands,
-    active: Res<ActivePowerUps>,
+    pickup_query: Query<&PowerUpPickup, Changed<PowerUpPickup>>,
+    all_pickups: Query<&PowerUpPickup>,
     display_query: Query<Entity, With<PowerUpDisplayMarker>>,
     asset_server: Res<AssetServer>,
+    active: Res<ActivePowerUps>,
 ) {
-    if !active.is_changed() {
-        return;
+    // Only update if pickups changed (added, removed, or renumbered)
+    if pickup_query.is_empty() && !pickup_query.iter().count() > 0 {
+        // Check if we need to update anyway
+        if all_pickups.is_empty() {
+            return;
+        }
     }
 
     // Rebuild power-up display
@@ -330,12 +505,20 @@ pub fn update_powerup_display(
             entity_commands.with_children(|parent| {
                 let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
-                for (i, powerup) in active.available_powerups.iter().enumerate() {
+                // Collect and sort on-screen bonuses by number
+                let mut bonuses: Vec<(u8, PowerUp)> = all_pickups
+                    .iter()
+                    .map(|p| (p.assigned_number, p.powerup_type))
+                    .collect();
+                bonuses.sort_by_key(|(num, _)| *num);
+
+                // Display each bonus
+                for (num, powerup) in bonuses.iter() {
                     let icon = powerup_icon(powerup);
                     let color = powerup_color(powerup);
 
                     parent.spawn((
-                        Text::new(format!("{}. {} {:?}", i + 1, icon, powerup)),
+                        Text::new(format!("{}. {} {:?}", num, icon, powerup)),
                         TextFont {
                             font: font.clone(),
                             font_size: 18.0,

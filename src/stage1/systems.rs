@@ -68,6 +68,10 @@ pub fn spawn_falling_tiles(
                     ..default()
                 },
                 Transform::from_xyz(x_pos, y_pos, 0.0),
+                SpawnAnimation {
+                    elapsed: 0.0,
+                    duration: 0.4, // 400ms bounce-in animation
+                },
             )).with_children(|parent| {
                 // Spawn letter text as child (z=1 for layering above sprite)
                 parent.spawn((
@@ -186,6 +190,75 @@ pub fn handle_keyboard_tile_selection(
     }
 }
 
+/// Detects which tile the mouse is hovering over
+pub fn detect_tile_hover(
+    mut commands: Commands,
+    windows: Query<&Window>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    tile_query: Query<(Entity, &Transform), With<FallingTile>>,
+    hovered_query: Query<Entity, With<HoveredTile>>,
+) {
+    // Get mouse position in world coordinates
+    let Ok(window) = windows.get_single() else { return; };
+    let Ok((camera, camera_transform)) = camera_query.get_single() else { return; };
+
+    let Some(cursor_pos) = window.cursor_position() else {
+        // No cursor position - remove all hover markers
+        for entity in hovered_query.iter() {
+            if let Some(mut entity_commands) = commands.get_entity(entity) {
+                entity_commands.remove::<HoveredTile>();
+            }
+        }
+        return;
+    };
+
+    let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else { return; };
+
+    // Find closest tile under cursor
+    let mut closest_tile: Option<(Entity, f32)> = None;
+
+    for (entity, transform) in tile_query.iter() {
+        let tile_pos = transform.translation.truncate();
+        let distance = tile_pos.distance(world_pos);
+
+        if distance < TILE_SIZE / 2.0 {
+            match closest_tile {
+                None => closest_tile = Some((entity, distance)),
+                Some((_, prev_distance)) if distance < prev_distance => {
+                    closest_tile = Some((entity, distance));
+                }
+                _ => {}
+            }
+        }
+    }
+
+    // Update hover markers
+    match closest_tile {
+        Some((hovered_entity, _)) => {
+            // Remove hover from all other tiles
+            for entity in hovered_query.iter() {
+                if entity != hovered_entity {
+                    if let Some(mut entity_commands) = commands.get_entity(entity) {
+                        entity_commands.remove::<HoveredTile>();
+                    }
+                }
+            }
+            // Add hover to the closest tile (only if it still exists)
+            if let Some(mut entity_commands) = commands.get_entity(hovered_entity) {
+                entity_commands.insert(HoveredTile);
+            }
+        }
+        None => {
+            // No tile under cursor - remove all hover markers
+            for entity in hovered_query.iter() {
+                if let Some(mut entity_commands) = commands.get_entity(entity) {
+                    entity_commands.remove::<HoveredTile>();
+                }
+            }
+        }
+    }
+}
+
 /// Validates the word when player submits (Enter or Space)
 pub fn validate_word(
     mut commands: Commands,
@@ -196,7 +269,7 @@ pub fn validate_word(
     asset_server: Res<AssetServer>,
     lexicon: Option<Res<crate::lexicon::Lexicon>>,
 ) {
-    if !keyboard.just_pressed(KeyCode::Enter) && !keyboard.just_pressed(KeyCode::Space) {
+    if !keyboard.just_pressed(KeyCode::Enter) {
         return;
     }
 
@@ -246,7 +319,16 @@ pub fn validate_word(
 
         state.score += points;
         state.combo_count += 1;
-        state.words_found.push(word.to_uppercase());
+        state.max_combo = state.max_combo.max(state.combo_count); // Track highest combo
+
+        // Track total words formed (including duplicates)
+        state.total_words_formed += 1;
+
+        // Track unique words (add only if not already found)
+        let word_upper = word.to_uppercase();
+        if !state.words_found.contains(&word_upper) {
+            state.words_found.push(word_upper);
+        }
 
         // Visual feedback for valid word
         spawn_score_popup(&mut commands, &asset_server, avg_position, points, true);
@@ -362,9 +444,11 @@ pub fn update_timer(
 pub fn check_game_over(
     state: Res<Stage1State>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut last_stage: ResMut<crate::plugins::state::LastStageCompleted>,
 ) {
     if state.time_remaining_ms == 0 && state.is_active {
         info!("Game Over! Final Score: {}", state.score);
+        *last_stage = crate::plugins::state::LastStageCompleted::Stage1;
         next_state.set(GameState::Results);
     }
 }
