@@ -452,49 +452,37 @@ pub fn spawn_help_overlay(
                         ..default()
                     })
                     .with_children(|instructions| {
-                        // Goal - using simple colored circle bullet instead of emoji
-                        instructions.spawn((
-                            Text::new("●  Goal: Form valid 2-letter words"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::srgb(1.0, 0.6, 0.2)),  // Orange bullet
-                        ));
+                        // Goal - with orange circle icon
+                        spawn_help_instruction_with_icon(
+                            instructions,
+                            &font_medium,
+                            "Goal: Form valid 2-letter words",
+                            Color::srgb(1.0, 0.6, 0.2),  // Orange
+                        );
 
-                        // Type letters - using keyboard symbol
-                        instructions.spawn((
-                            Text::new("⌨  Type letters (A-Z) to select tiles"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::srgb(0.5, 0.8, 1.0)),  // Light blue bullet
-                        ));
+                        // Type letters - with light blue square icon
+                        spawn_help_instruction_with_icon(
+                            instructions,
+                            &font_medium,
+                            "Type letters (A-Z) to select tiles",
+                            Color::srgb(0.5, 0.8, 1.0),  // Light blue
+                        );
 
-                        // Submit word - using checkmark symbol
-                        instructions.spawn((
-                            Text::new("✓  Press ENTER to submit your word"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::srgb(0.3, 1.0, 0.3)),  // Green bullet
-                        ));
+                        // Submit word - with green checkmark-shaped icon
+                        spawn_help_instruction_with_icon(
+                            instructions,
+                            &font_medium,
+                            "Press ENTER to submit your word",
+                            Color::srgb(0.3, 1.0, 0.3),  // Green
+                        );
 
-                        // Time pressure - using hourglass/clock symbol
-                        instructions.spawn((
-                            Text::new("⏱  Make as many words as you can before time runs out!"),
-                            TextFont {
-                                font: font_medium.clone(),
-                                font_size: 28.0,
-                                ..default()
-                            },
-                            TextColor(Color::srgb(1.0, 1.0, 0.4)),  // Yellow bullet
-                        ));
+                        // Time pressure - with yellow triangle icon
+                        spawn_help_instruction_with_icon(
+                            instructions,
+                            &font_medium,
+                            "Make as many words as you can before time runs out!",
+                            Color::srgb(1.0, 1.0, 0.4),  // Yellow
+                        );
                     });
 
                     // Bottom instruction
@@ -860,4 +848,47 @@ fn lighten_color(color: Color) -> Color {
         (rgb.green + 0.1).min(1.0),
         (rgb.blue + 0.1).min(1.0),
     )
+}
+
+/// Helper function to spawn a help instruction line with a colored icon
+fn spawn_help_instruction_with_icon(
+    parent: &mut ChildBuilder,
+    font: &Handle<Font>,
+    text: &str,
+    icon_color: Color,
+) {
+    parent
+        .spawn(NodeBundle {
+            node: Node {
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                column_gap: Val::Px(12.0),
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|row| {
+            // Colored icon (circular shape)
+            row.spawn(NodeBundle {
+                node: Node {
+                    width: Val::Px(16.0),
+                    height: Val::Px(16.0),
+                    ..default()
+                },
+                background_color: icon_color.into(),
+                border_radius: BorderRadius::all(Val::Px(8.0)),  // Makes it circular
+                ..default()
+            });
+
+            // Instruction text
+            row.spawn((
+                Text::new(text),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 28.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+        });
 }
