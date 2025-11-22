@@ -661,7 +661,7 @@ pub fn spawn_results_screen(
                 TextColor(Color::WHITE),
             ));
 
-            // Final score
+            // Final score - GOLD (achievement, winning)
             parent.spawn((
                 Text::new(format!("Final Score: {}", state.score)),
                 TextFont {
@@ -669,10 +669,10 @@ pub fn spawn_results_screen(
                     font_size: 48.0,
                     ..default()
                 },
-                TextColor(Color::srgb(1.0, 0.9, 0.3)),
+                TextColor(Color::srgb(1.0, 0.85, 0.0)),  // True gold
             ));
 
-            // Words found
+            // Words found - CYAN/BLUE (information, learning metric)
             parent.spawn((
                 Text::new(format!("Words Found: {}", state.words_found.len())),
                 TextFont {
@@ -680,10 +680,10 @@ pub fn spawn_results_screen(
                     font_size: 32.0,
                     ..default()
                 },
-                TextColor(Color::WHITE),
+                TextColor(Color::srgb(0.4, 0.8, 1.0)),  // Bright cyan-blue
             ));
 
-            // Max combo
+            // Max combo - ORANGE (excitement, streaks)
             parent.spawn((
                 Text::new(format!("Max Combo: {}x", state.max_combo)),
                 TextFont {
@@ -691,7 +691,7 @@ pub fn spawn_results_screen(
                     font_size: 32.0,
                     ..default()
                 },
-                TextColor(Color::srgb(1.0, 0.9, 0.4)),
+                TextColor(Color::srgb(1.0, 0.6, 0.2)),  // Vibrant orange
             ));
 
             // Word list (first 10)
