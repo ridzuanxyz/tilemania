@@ -381,7 +381,7 @@ pub struct HelpState {
 pub fn spawn_help_overlay(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    help_state: Res<HelpState>,
+    help_state: &HelpState,
 ) {
     let font_bold = asset_server.load("fonts/FiraSans-Bold.ttf");
     let font_medium = asset_server.load("fonts/FiraSans-Medium.ttf");
@@ -562,7 +562,7 @@ pub fn show_pregame_help(
 ) {
     help_state.is_visible = true;
     help_state.is_pregame = true;
-    spawn_help_overlay(commands, asset_server, help_state);
+    spawn_help_overlay(commands, asset_server, &help_state);
 }
 
 /// Handles pre-game help dismissal (SPACE key)
@@ -614,7 +614,7 @@ pub fn handle_f1_help_toggle(
             // Show help and pause game
             help_state.is_visible = true;
             state.is_active = false; // Pause timer
-            spawn_help_overlay(commands, asset_server, help_state.into_inner());
+            spawn_help_overlay(commands, asset_server, &help_state);
         }
     }
 }
